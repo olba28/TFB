@@ -1,0 +1,33 @@
+{
+  // Intérprete del entorno virtual (.venv). Ruta de Windows.
+  // En macOS/Linux sería: "${workspaceFolder}/.venv/bin/python"
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+
+  // Formateo con Ruff al guardar + organizar imports automáticamente
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  // Comprobación de tipos y autocompletado (Pylance)
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+
+  // No vigilar ni indexar la copia de datos ni el entorno (rendimiento)
+  "files.watcherExclude": {
+    "**/.venv/**": true,
+    "**/data/**": true
+  },
+  "search.exclude": {
+    "**/.venv": true,
+    "**/data/raw": true
+  },
+
+  // Notebooks (EDA, sección 3.3)
+  "notebook.formatOnSave.enabled": true,
+  "jupyter.askForKernelRestart": false
+}

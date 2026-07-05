@@ -1,0 +1,34 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Byte-compiled / cachés
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Copia local de datos (versionada en disco por fecha, NO en Git).
+# Se conservan solo los manifiestos, que documentan cada descarga.
+data/**/*.json
+data/**/*.csv
+!data/**/manifest.json
+
+# Modelos serializados (regenerables desde el pipeline)
+*.pkl
+*.joblib
+
+# Secretos / variables de entorno
+.env
+
+# VS Code: se comparten settings y extensions; se ignora lo personal
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
