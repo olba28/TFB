@@ -31,7 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Existe, por cada indicador, una copia local versionada del JSON crudo devuelto por la API junto con un manifiesto de procedencia (fecha de descarga, URL, parámetros de consulta).
   4. El cliente de la API pagina automáticamente y reintenta ante fallos transitorios (verificable simulando una respuesta fallida/paginada).
   5. `requirements.lock.txt` existe en el repo y refleja las versiones exactas instaladas vía `pip freeze`.
-**Plans**: TBD
+**Plans**: 5 plans
+- [ ] 01-01-PLAN.md — Fundación: higiene del repo (.gitignore), entorno .venv, requirements.lock.txt (REPRO-01) y scaffolding de tests
+- [ ] 01-02-PLAN.md — Cliente HTTP con reintentos/paginación + manifiesto de procedencia (INGEST-01, INGEST-04)
+- [ ] 01-03-PLAN.md — Lista canónica de países M49 + crosswalk ISO3 + log de exclusiones (INGEST-03)
+- [ ] 01-04-PLAN.md — Esquema SQLite: raw_observations (UNIQUE + assert) y panel derivada (INGEST-05)
+- [ ] 01-05-PLAN.md — Orquestador de ingesta + carga real de los 5 indicadores + verificación (INGEST-01/02/04)
 
 ### Phase 2: Construcción del Panel y EDA
 **Goal**: A partir de los datos crudos versionados, el sistema produce un panel país×año limpio, filtrado por cobertura y documentado, junto con un análisis exploratorio que informa la especificación del Modelo 1.
@@ -100,7 +105,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Ingesta y Almacenamiento Versionado | 0/TBD | Not started | - |
+| 1. Ingesta y Almacenamiento Versionado | 0/5 | Not started | - |
 | 2. Construcción del Panel y EDA | 0/TBD | Not started | - |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 0/TBD | Not started | - |
 | 4. Interpretabilidad, Simulación y Robustez | 0/TBD | Not started | - |
