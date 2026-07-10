@@ -84,23 +84,46 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 
 ## Traceability
 
-Se completará durante la creación del roadmap.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INGEST-01…05 | — | Pending |
-| PANEL-01…04 | — | Pending |
-| MODEL1-01…06 | — | Pending |
-| INTERP-01…06 | — | Pending |
-| DASH-01…05 | — | Pending |
-| REPRO-01…03 | — | Pending |
-| MODEL2-01…03 | — | Pending |
+| INGEST-01 | Phase 1 | Pending |
+| INGEST-02 | Phase 1 | Pending |
+| INGEST-03 | Phase 1 | Pending |
+| INGEST-04 | Phase 1 | Pending |
+| INGEST-05 | Phase 1 | Pending |
+| REPRO-01 | Phase 1 | Pending |
+| PANEL-01 | Phase 2 | Pending |
+| PANEL-02 | Phase 2 | Pending |
+| PANEL-03 | Phase 2 | Pending |
+| PANEL-04 | Phase 2 | Pending |
+| MODEL1-01 | Phase 3 | Pending |
+| MODEL1-02 | Phase 3 | Pending |
+| MODEL1-03 | Phase 3 | Pending |
+| MODEL1-04 | Phase 3 | Pending |
+| MODEL1-05 | Phase 3 | Pending |
+| MODEL1-06 | Phase 3 | Pending |
+| REPRO-03 | Phase 3 | Pending |
+| INTERP-01 | Phase 4 | Pending |
+| INTERP-02 | Phase 4 | Pending |
+| INTERP-03 | Phase 4 | Pending |
+| INTERP-04 | Phase 4 | Pending |
+| INTERP-05 | Phase 4 | Pending |
+| INTERP-06 | Phase 4 | Pending |
+| REPRO-02 | Phase 4 | Pending |
+| DASH-01 | Phase 5 | Pending |
+| DASH-02 | Phase 5 | Pending |
+| DASH-03 | Phase 5 | Pending |
+| DASH-04 | Phase 5 | Pending |
+| DASH-05 | Phase 5 | Pending |
+| MODEL2-01 | Phase 6 | Pending |
+| MODEL2-02 | Phase 6 | Pending |
+| MODEL2-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32 ⚠️ (se completará al crear el roadmap)
+- Mapped to phases: 32
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-10*
-*Last updated: 2026-07-10 after initial definition*
+*Last updated: 2026-07-10 after roadmap creation (6 phases, 100% coverage)*
