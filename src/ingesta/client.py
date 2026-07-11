@@ -95,7 +95,13 @@ def fetch_all_pages(
             )
 
         all_rows.extend(body["data"])
-        total_pages = body["totalPages"]
+        if page == 1:
+            # WR-02: capture total_pages only from the FIRST response, per this
+            # function's own docstring -- re-reading it on every page risks
+            # silent premature truncation if a later page reports a smaller
+            # totalPages than the initial response (the exact Pitfall 4 class
+            # of silent data loss this function is designed to avoid).
+            total_pages = body["totalPages"]
 
         if page < total_pages:
             time.sleep(INTER_PAGE_DELAY_SECONDS)
