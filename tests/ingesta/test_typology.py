@@ -8,6 +8,8 @@ no live network call is made anywhere in this file.
 
 from __future__ import annotations
 
+import pandas as pd
+
 from src.ingesta import typology
 
 # --- Synthetic GeoArea/Tree fixture ------------------------------------------
@@ -135,12 +137,18 @@ SIDS_TREE = {
 TREE_DATA = [SDG_REGION_TREE, CONTINENTAL_REGION_TREE, LDC_TREE, LLDC_TREE, SIDS_TREE]
 
 # Deliberately omits "901" (Kosovo) so it lands in `excluded`, not the
-# returned DataFrame.
+# returned DataFrame. Includes "010" (Antarctica) WITH a crosswalk entry so
+# it passes the crosswalk step and exercises the "absent from region_map"
+# fallback in build_country_reference -- Antarctica is a real, live-verified
+# case: a `type=="Country"` leaf that exists only under the
+# continental-regions root (CONTINENTAL_REGION_TREE below), never under the
+# SDG-regions root, so build_region_map legitimately has no entry for it.
 CROSSWALK = {
     "818": "EGY",  # Egypt
     "404": "KEN",  # Kenya
     "262": "DJI",  # Djibouti
     "724": "ESP",  # Spain
+    "010": "ATA",  # Antarctica -- absent from build_region_map's output
 }
 
 
@@ -257,3 +265,51 @@ def test_build_country_reference_columns_shape():
 
     expected_columns = {"country_code", "region", "subregion", "is_ldc", "is_lldc", "is_sids"}
     assert expected_columns <= set(df.columns)
+
+
+def test_build_country_reference_defaults_region_to_none_for_country_absent_from_region_map():
+    """Antarctica (010 -> ATA) is a real Country leaf resolved by
+    collect_countries(TREE_DATA) (it appears under CONTINENTAL_REGION_TREE),
+    but build_region_map only walks the SDG-regions root, so Antarctica has
+    NO entry in region_map at all (not even a shallow-nesting entry -- a
+    total absence, unlike Egypt's shallow-but-present case).
+
+    Note: pandas silently upgrades the Python `None` passed in to a float
+    `NaN` at the DataFrame level once the column also holds real region-name
+    strings -- this is expected/harmless pandas behavior at THIS layer (SQL
+    persistence via to_sql correctly converts NaN -> SQL NULL downstream), so
+    this test checks `pd.isna()`, not `is None`. The stricter `is None` check
+    belongs at the JSON-serialization boundary instead -- see
+    test_persist_country_reference_writes_valid_json_null_for_missing_region,
+    which is where this same value's `None`-ness actually needs to hold
+    (json.dumps has no equivalent of pandas' NaN-as-missing convention)."""
+    df, _ = typology.build_country_reference(TREE_DATA, CROSSWALK)
+
+    antarctica = df[df["country_code"] == "ATA"].iloc[0]
+    assert pd.isna(antarctica["region"])
+    assert pd.isna(antarctica["subregion"])
+
+
+def test_persist_country_reference_writes_valid_json_null_for_missing_region(tmp_path):
+    """Regression guard for a real bug found during code review: pandas
+    silently upgrades a Python None to a float NaN when a DataFrame column
+    also holds strings (Antarctica's region/subregion vs. every other
+    country's real region name), and json.dumps then emits the bare,
+    non-standard `NaN` token -- NOT valid JSON per RFC 8259. Confirmed live:
+    the first version of data/raw/country_reference.json contained a literal
+    `NaN` token. This test asserts the persisted file never contains that
+    token and parses cleanly with the standard (strict) json module."""
+    import json
+
+    df, _ = typology.build_country_reference(TREE_DATA, CROSSWALK)
+    out_path = tmp_path / "country_reference.json"
+
+    typology.persist_country_reference(df, out_path)
+
+    raw_text = out_path.read_text(encoding="utf-8")
+    assert "NaN" not in raw_text
+
+    parsed = json.loads(raw_text)  # must not raise
+    antarctica = next(r for r in parsed if r["country_code"] == "ATA")
+    assert antarctica["region"] is None
+    assert antarctica["subregion"] is None

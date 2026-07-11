@@ -203,16 +203,46 @@ def capture_country_reference(
     return build_country_reference(tree_data, crosswalk)
 
 
+def _json_safe_records(df: pd.DataFrame) -> list[dict[str, Any]]:
+    """Convert `df` to a list of record dicts with every float NaN replaced by
+    Python `None`.
+
+    A country with no region match (e.g. Antarctica, a `type=="Country"` leaf
+    that exists only under the continental-regions root, not the SDG-regions
+    root -- verified live) gets `region=None, subregion=None` from
+    `build_country_reference`. Pandas silently upgrades that Python `None` to
+    a float `NaN` internally when a DataFrame column also holds strings --
+    even `df.where(pd.notnull(df), None)` re-coerces the replacement back to
+    NaN for pandas' string-backed dtype. `json.dumps` then emits the bare,
+    non-standard `NaN` token for that value, which is NOT valid JSON per RFC
+    8259 -- any strict JSON parser reading the persisted file would fail
+    (confirmed live: `data/raw/country_reference.json` contained a literal
+    `NaN` token for Antarctica before this fix). Operating on the plain
+    Python dict structure (post `to_dict`) rather than the DataFrame avoids
+    pandas' dtype coercion entirely: `v != v` is the standard NaN self-
+    inequality check, true only for float NaN, never for `None` or a string.
+    """
+    records = df.to_dict(orient="records")
+    return [
+        {k: (None if isinstance(v, float) and v != v else v) for k, v in row.items()}
+        for row in records
+    ]
+
+
 def persist_country_reference(
     df: pd.DataFrame, path: Path = DEFAULT_COUNTRY_REFERENCE_PATH
 ) -> Path:
     """Write `df` as JSON records to `path` and a provenance manifest sidecar
     via `manifest.write_manifest` (same date/url/params/row_count/checksum
-    schema Phase 1 established for indicator raw files)."""
+    schema Phase 1 established for indicator raw files).
+
+    Uses `_json_safe_records` so a country with no region match serializes as
+    valid JSON `null`, never the non-standard `NaN` literal.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        json.dumps(df.to_dict(orient="records"), indent=2, ensure_ascii=False),
+        json.dumps(_json_safe_records(df), indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
     manifest_module.write_manifest(
