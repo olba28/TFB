@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. El cliente de la API pagina automáticamente y reintenta ante fallos transitorios (verificable simulando una respuesta fallida/paginada).
   5. `requirements.lock.txt` existe en el repo y refleja las versiones exactas instaladas vía `pip freeze`.
 
-**Plans**: 6 plans (5 complete + 1 gap-closure pending)
+**Plans**: 6/6 plans complete
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Fundación: higiene del repo (.gitignore), entorno .venv, requirements.lock.txt (REPRO-01) y scaffolding de tests
@@ -52,7 +52,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Gap closure** *(from 01-VERIFICATION.md — Success Criterion #3 / INGEST-04)*
 
-- [ ] 01-06-PLAN.md — Aísla el test que corrompía data/raw + guard autouse anti-escritura + restaura los 5 JSON crudos consistentes con su manifiesto (INGEST-04)
+- [x] 01-06-PLAN.md — Aísla el test que corrompía data/raw + guard autouse anti-escritura + restaura los 5 JSON crudos consistentes con su manifiesto (INGEST-04)
 
 ### Phase 2: Construcción del Panel y EDA
 
@@ -136,7 +136,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Ingesta y Almacenamiento Versionado | 5/5 | Complete   | 2026-07-11 |
+| 1. Ingesta y Almacenamiento Versionado | 6/6 | Complete   | 2026-07-11 |
 | 2. Construcción del Panel y EDA | 0/TBD | Not started | - |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 0/TBD | Not started | - |
 | 4. Interpretabilidad, Simulación y Robustez | 0/TBD | Not started | - |

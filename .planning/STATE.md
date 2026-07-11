@@ -6,14 +6,14 @@ current_phase: 01
 current_phase_name: ingesta-y-almacenamiento-versionado
 status: executing
 stopped_at: Completed 01-05-PLAN.md (Phase 1 complete)
-last_updated: "2026-07-11T14:41:54.024Z"
+last_updated: "2026-07-11T15:57:54.793Z"
 last_activity: 2026-07-11
-last_activity_desc: Completed 01-01-PLAN.md
+last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 6
+  completed_plans: 6
   percent: 17
 ---
 
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 01 (ingesta-y-almacenamiento-versionado) — EXECUTING
-Plan: 5 of 5
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-07-11 — Completed 01-01-PLAN.md
+Last activity: 2026-07-11 — Phase 01 execution started
 
 Progress: [██░░░░░░░░] 20%
 
@@ -60,6 +60,7 @@ Progress: [██░░░░░░░░] 20%
 | Phase 01 P03 | 30min | 2 tasks | 6 files |
 | Phase 01 P04 | 15min | 2 tasks | 4 files |
 | Phase 01 P05 | 45min | 3 tasks | 5 files |
+| Phase 01 P06 | 25min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Phase 01-04]: pandas.to_sql wraps sqlalchemy.exc.IntegrityError in pandas.errors.DatabaseError -- tests assert on the pandas wrapper
 - [Phase 01-05]: Adopted PD_AGR_SSFP (small-scale food producers) as indicator 2.3.1's headline series over PD_AGR_LSFP -- SDG target 2.3 explicitly names small-scale food producers; user-approved at Task 3 checkpoint, with the resulting coverage caveat (50 countries, 173/900 non-null) noted for Phase 6 planning
 - [Phase 01-05]: geoAreaCode normalized to zero-padded 3-digit strings at every join boundary via _normalize_code() -- GeoArea/Tree returns bare ints, Indicator/Data returns un-padded strings, M49 CSV crosswalk uses zero-padded strings; discovered live when the unnormalized join zeroed out all 5 indicators on first run
+- [Phase 01-06]: Restoration performed as delete-then-reingest (not partial patch) due to insert_observations UNIQUE(country,year,indicator) constraint
+- [Phase 01-06]: Regenerated manifest sidecars came back byte-identical to git HEAD, confirming zero data drift from the live UN SDG API since the original 01-05 ingestion
+- [Phase 01-06]: data/panel.db file lock (DB Browser for SQLite) resolved by asking user to close the app rather than force-killing it
 
 ### Pending Todos
 
@@ -103,6 +107,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-11T07:28:32.703Z
+Last session: 2026-07-11T15:56:55.928Z
 Stopped at: Completed 01-05-PLAN.md (Phase 1 complete)
 Resume file: None
