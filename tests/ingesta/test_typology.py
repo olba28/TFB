@@ -175,10 +175,16 @@ def test_build_region_map_ignores_the_continental_regions_root():
 # --- build_development_status_flags() ---------------------------------------
 
 
-def test_dev_status_defaults_to_false_when_country_absent_from_all_roots():
+def test_dev_status_flags_map_omits_countries_absent_from_all_roots():
+    """build_development_status_flags itself only records countries actually
+    encountered while walking the 3 dev-status trees -- Egypt appears in
+    neither LDC, LLDC, nor SIDS in this fixture, so it is legitimately ABSENT
+    here (not an explicit all-False entry). The "default to False, not
+    absence" guarantee is enforced one layer up, by build_country_reference's
+    merge (see test_build_country_reference_defaults_dev_status_to_false_for_absent_country)."""
     result = typology.build_development_status_flags(TREE_DATA)
 
-    assert result["818"] == {"is_ldc": False, "is_lldc": False, "is_sids": False}
+    assert "818" not in result
 
 
 def test_dev_status_single_flag_membership():
@@ -209,6 +215,18 @@ def test_build_country_reference_keys_output_by_iso3_not_m49():
     assert "KEN" in codes
     assert "818" not in codes  # M49 code must not leak into the final output
     assert "404" not in codes
+
+
+def test_build_country_reference_defaults_dev_status_to_false_for_absent_country():
+    """Egypt is absent from build_development_status_flags' map entirely (not
+    found under LDC/LLDC/SIDS) -- build_country_reference's merge must still
+    produce an explicit all-False record for it, not a missing/null value."""
+    df, _ = typology.build_country_reference(TREE_DATA, CROSSWALK)
+
+    egypt = df[df["country_code"] == "EGY"].iloc[0]
+    assert bool(egypt["is_ldc"]) is False
+    assert bool(egypt["is_lldc"]) is False
+    assert bool(egypt["is_sids"]) is False
 
 
 def test_build_country_reference_merges_region_and_dev_status_columns():
