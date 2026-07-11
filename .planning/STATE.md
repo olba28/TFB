@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 2
-current_phase_name: Construcción del Panel y EDA
-status: executing
+current_phase: 3
+current_phase_name: PIB per cápita
+status: verifying
 stopped_at: Completed 01-05-PLAN.md (Phase 1 complete)
-last_updated: "2026-07-11T16:11:45.379Z"
+last_updated: "2026-07-11T22:45:47.789Z"
 last_activity: 2026-07-11
-last_activity_desc: Phase 01 complete, transitioned to Phase 2
+last_activity_desc: Phase 02 complete, transitioned to Phase 3
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
-  percent: 17
+  completed_phases: 2
+  total_plans: 8
+  completed_plans: 8
+  percent: 33
 ---
 
 # Project State
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
-**Current focus:** Phase 01 — ingesta-y-almacenamiento-versionado
+**Current focus:** Phase 02 — Construcción del Panel y EDA
 
 ## Current Position
 
-Phase: 2 — Construcción del Panel y EDA
+Phase: 3 — Modelo 1 — Regresión de Panel (PIB per cápita)
 Plan: Not started
-Status: Ready to execute
-Last activity: 2026-07-11 — Phase 01 complete, transitioned to Phase 2
+Status: Phase complete — ready for verification
+Last activity: 2026-07-11 — Phase 02 complete, transitioned to Phase 3
 
 Progress: [██░░░░░░░░] 20%
 
@@ -39,7 +39,7 @@ Progress: [██░░░░░░░░] 20%
 
 **Velocity:**
 
-- Total plans completed: 6
+- Total plans completed: 8
 - Average duration: - min
 - Total execution time: 0 hours
 
@@ -48,6 +48,7 @@ Progress: [██░░░░░░░░] 20%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 6 | - | - |
+| 02 | 2 | - | - |
 
 **Recent Trend:**
 
@@ -61,6 +62,8 @@ Progress: [██░░░░░░░░] 20%
 | Phase 01 P04 | 15min | 2 tasks | 4 files |
 | Phase 01 P05 | 45min | 3 tasks | 5 files |
 | Phase 01 P06 | 25min | 2 tasks | 9 files |
+| Phase 02 P01 | 25min | 3 tasks | 5 files |
+| Phase 02 P02 | 20min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -87,6 +90,8 @@ Recent decisions affecting current work:
 - [Phase 01-06]: Restoration performed as delete-then-reingest (not partial patch) due to insert_observations UNIQUE(country,year,indicator) constraint
 - [Phase 01-06]: Regenerated manifest sidecars came back byte-identical to git HEAD, confirming zero data drift from the live UN SDG API since the original 01-05 ingestion
 - [Phase 01-06]: data/panel.db file lock (DB Browser for SQLite) resolved by asking user to close the app rather than force-killing it
+- [Phase 02-01]: Tipología de país = UN development-status flags (is_ldc, is_lldc, is_sids) from GeoArea/Tree, not World Bank income groups (verified those carry no country membership in this API)
+- [Phase 02-01]: panel_clean never nulls real reported values based on coverage status -- exclusions documented separately in panel_exclusions, corrected during planning's adversarial self-check from an earlier data-destructive design
 
 ### Pending Todos
 

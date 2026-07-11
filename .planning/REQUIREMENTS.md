@@ -15,10 +15,10 @@
 
 ### Construcción del Panel y EDA
 
-- [ ] **PANEL-01**: El pipeline de limpieza, fusión y feature engineering es idempotente y reconstruible desde los datos crudos
-- [ ] **PANEL-02**: El sistema filtra países con cobertura mínima del 70% de años disponibles por indicador, documentando las exclusiones en una tabla
-- [ ] **PANEL-03**: La memoria documenta explícitamente el patrón de datos faltantes (riesgo MNAR) y su posible sesgo hacia países con mejor reporting
-- [ ] **PANEL-04**: El sistema produce un análisis exploratorio (EDA) global, regional y por tipología de país, con matriz de correlación/VIF entre variables
+- [x] **PANEL-01**: El pipeline de limpieza, fusión y feature engineering es idempotente y reconstruible desde los datos crudos
+- [x] **PANEL-02**: El sistema filtra países con cobertura mínima del 70% de años disponibles por indicador, documentando las exclusiones en una tabla
+- [x] **PANEL-03**: La memoria documenta explícitamente el patrón de datos faltantes (riesgo MNAR) y su posible sesgo hacia países con mejor reporting
+- [x] **PANEL-04**: El sistema produce un análisis exploratorio (EDA) global, regional y por tipología de país, con matriz de correlación/VIF entre variables
 
 ### Modelo 1 — PIB per cápita
 
@@ -92,10 +92,10 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | INGEST-04 | Phase 1 | Complete |
 | INGEST-05 | Phase 1 | Complete |
 | REPRO-01 | Phase 1 | Complete |
-| PANEL-01 | Phase 2 | Pending |
-| PANEL-02 | Phase 2 | Pending |
-| PANEL-03 | Phase 2 | Pending |
-| PANEL-04 | Phase 2 | Pending |
+| PANEL-01 | Phase 2 | Complete |
+| PANEL-02 | Phase 2 | Complete |
+| PANEL-03 | Phase 2 | Complete |
+| PANEL-04 | Phase 2 | Complete |
 | MODEL1-01 | Phase 3 | Pending |
 | MODEL1-02 | Phase 3 | Pending |
 | MODEL1-03 | Phase 3 | Pending |
