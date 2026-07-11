@@ -1,0 +1,10 @@
+{
+  "source_url": "https://unstats.un.org/unsd/methodology/m49/overview/",
+  "download_date": "2026-07-11",
+  "file": "m49_countries.csv",
+  "delimiter": ";",
+  "encoding": "utf-8-sig",
+  "row_count": 248,
+  "checksum": "da52466df41547599ecb7e5efdd9f20a765403cf936bacc49300cb9cf11e5236",
+  "notes": "One-time manual download (no scriptable export exists for the official M49 classification table, per 01-RESEARCH.md Assumptions Log A1). File acquired manually by the student and placed at src/ingesta/data/m49_countries.csv; row_count and checksum computed programmatically from the file on disk, mirroring the D-08 manifest pattern (src/ingesta/manifest.py) adapted for this one-time static reference file (source URL + download date + checksum, not the per-indicator API manifest schema)."
+}
