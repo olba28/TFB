@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 01
 current_phase_name: ingesta-y-almacenamiento-versionado
-status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-07-11T06:36:34.946Z"
+status: verifying
+stopped_at: Completed 01-05-PLAN.md (Phase 1 complete)
+last_updated: "2026-07-11T07:28:32.719Z"
 last_activity: 2026-07-11
 last_activity_desc: Completed 01-01-PLAN.md
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 4
-  percent: 0
+  completed_plans: 5
+  percent: 17
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 
 Phase: 01 (ingesta-y-almacenamiento-versionado) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-11 — Completed 01-01-PLAN.md
 
 Progress: [██░░░░░░░░] 20%
@@ -59,6 +59,7 @@ Progress: [██░░░░░░░░] 20%
 | Phase 01 P02 | 15min | 2 tasks | 5 files |
 | Phase 01 P03 | 30min | 2 tasks | 6 files |
 | Phase 01 P04 | 15min | 2 tasks | 4 files |
+| Phase 01 P05 | 45min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 01-03]: Renamed src/ingesta/Data/ (capital D, created by the M49 CSV acquisition step) to lowercase src/ingesta/data/ to match plan path and repo convention
 - [Phase 01-04]: Added sqlalchemy>=2.0 to requirements.txt/requirements.lock.txt -- required by the plan's explicit SQLAlchemy Engine design for src/db.py
 - [Phase 01-04]: pandas.to_sql wraps sqlalchemy.exc.IntegrityError in pandas.errors.DatabaseError -- tests assert on the pandas wrapper
+- [Phase 01-05]: Adopted PD_AGR_SSFP (small-scale food producers) as indicator 2.3.1's headline series over PD_AGR_LSFP -- SDG target 2.3 explicitly names small-scale food producers; user-approved at Task 3 checkpoint, with the resulting coverage caveat (50 countries, 173/900 non-null) noted for Phase 6 planning
+- [Phase 01-05]: geoAreaCode normalized to zero-padded 3-digit strings at every join boundary via _normalize_code() -- GeoArea/Tree returns bare ints, Indicator/Data returns un-padded strings, M49 CSV crosswalk uses zero-padded strings; discovered live when the unnormalized join zeroed out all 5 indicators on first run
 
 ### Pending Todos
 
@@ -89,7 +92,6 @@ None yet.
 
 - [Research]: No se localizó una rúbrica oficial de evaluación de TFB de la UCMA — las afirmaciones sobre expectativas del tribunal están generalizadas a partir de literatura de evaluación de tesis académicas; validar contra la guía real del tutor antes de cerrar los diagnósticos de la Fase 3.
 - [Research]: La estrategia de desacoplar SHAP de PanelOLS (modelo auxiliar sklearn vs. KernelExplainer envolviendo PanelOLS.predict) es una decisión metodológica abierta; resolver explícitamente durante la planificación de la Fase 4, no a mitad de la ejecución.
-- [Research]: La cobertura real de países/años del indicador 2.3.1 (productividad agrícola) no fue verificada en vivo contra la API durante la investigación; confirmar cobertura real temprano en la Fase 1 antes de comprometer el alcance de la Fase 6.
 
 ## Deferred Items
 
@@ -101,6 +103,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-11T06:36:34.909Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-07-11T07:28:32.703Z
+Stopped at: Completed 01-05-PLAN.md (Phase 1 complete)
 Resume file: None

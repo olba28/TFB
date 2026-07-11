@@ -13,7 +13,7 @@ El proyecto avanza como un pipeline de datos secuencial y en capas: primero se i
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Ingesta y Almacenamiento Versionado** - Cliente API SDG de la ONU con paginación/reintentos, filtrado de dimensiones y agregados regionales, copia local versionada con manifiesto, panel base en SQLite
+- [x] **Phase 1: Ingesta y Almacenamiento Versionado** - Cliente API SDG de la ONU con paginación/reintentos, filtrado de dimensiones y agregados regionales, copia local versionada con manifiesto, panel base en SQLite (completed 2026-07-11)
 - [ ] **Phase 2: Construcción del Panel y EDA** - Limpieza/fusión/feature engineering idempotente, filtrado por cobertura del 70%, discusión de datos faltantes (MNAR), EDA global/regional/por tipología con correlación/VIF
 - [ ] **Phase 3: Modelo 1 — Regresión de Panel (PIB per cápita)** - `panel_base.py` compartido, PanelOLS con efectos fijos bidireccionales, comparación pooled/RE + Hausman, SEs robustos, robustez, serialización, sección de limitaciones
 - [ ] **Phase 4: Interpretabilidad, Simulación y Robustez** - Simulación contrafactual bootstrap multi-escenario, heterogeneidad regional/por ingresos, SHAP + ALE con semillas fijas
@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. El cliente de la API pagina automáticamente y reintenta ante fallos transitorios (verificable simulando una respuesta fallida/paginada).
   5. `requirements.lock.txt` existe en el repo y refleja las versiones exactas instaladas vía `pip freeze`.
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans complete
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Fundación: higiene del repo (.gitignore), entorno .venv, requirements.lock.txt (REPRO-01) y scaffolding de tests
@@ -48,7 +48,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-05-PLAN.md — Orquestador de ingesta + carga real de los 5 indicadores + verificación (INGEST-01/02/04)
+- [x] 01-05-PLAN.md — Orquestador de ingesta + carga real de los 5 indicadores + verificación (INGEST-01/02/04)
 
 ### Phase 2: Construcción del Panel y EDA
 
@@ -132,7 +132,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Ingesta y Almacenamiento Versionado | 4/5 | In Progress|  |
+| 1. Ingesta y Almacenamiento Versionado | 5/5 | Complete   | 2026-07-11 |
 | 2. Construcción del Panel y EDA | 0/TBD | Not started | - |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 0/TBD | Not started | - |
 | 4. Interpretabilidad, Simulación y Robustez | 0/TBD | Not started | - |
