@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: ingesta-y-almacenamiento-versionado
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-07-11T06:09:04.227Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-07-11T06:28:23.263Z"
 last_activity: 2026-07-11
 last_activity_desc: Completed 01-01-PLAN.md
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 01 (ingesta-y-almacenamiento-versionado) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-07-11 — Completed 01-01-PLAN.md
 
@@ -57,6 +57,7 @@ Progress: [██░░░░░░░░] 20%
 *Updated after each plan completion*
 | Phase 01 P01 | 20min | 3 tasks | 9 files |
 | Phase 01 P02 | 15min | 2 tasks | 5 files |
+| Phase 01 P03 | 30min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,10 @@ Recent decisions affecting current work:
 - [Phase 01]: requirements.lock.txt frozen strictly from .venv interpreter, never global Python
 - [Phase 01-02]: Retry-integration test uses a local loopback http.server (stdlib) instead of mocking session.get, since mocking session.get would bypass urllib3's Retry machinery entirely
 - [Phase 01-02]: fetch_all_pages() uses a repeated timePeriod query param for years 2000-2022 (exact param format left to Claude's Discretion per RESEARCH.md)
+- [Phase 01-03]: M49 CSV crosswalk keyed on the CSV's 'M49 Code' column, not 'Global Code' (always World)
+- [Phase 01-03]: filter_to_countries(rows, countries, crosswalk) requires the country set and crosswalk as explicit params -- pure transform, no network access to derive them internally
+- [Phase 01-03]: collect_countries() exposes D-16 exclusion log via an optional mutable excluded list param, keeping the -> dict[str,str] return type
+- [Phase 01-03]: Renamed src/ingesta/Data/ (capital D, created by the M49 CSV acquisition step) to lowercase src/ingesta/data/ to match plan path and repo convention
 
 ### Pending Todos
 
@@ -93,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-11T06:08:39.180Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-07-11T06:28:23.248Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
