@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. El cliente de la API pagina automáticamente y reintenta ante fallos transitorios (verificable simulando una respuesta fallida/paginada).
   5. `requirements.lock.txt` existe en el repo y refleja las versiones exactas instaladas vía `pip freeze`.
 
-**Plans**: 5/5 plans complete
+**Plans**: 6 plans (5 complete + 1 gap-closure pending)
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Fundación: higiene del repo (.gitignore), entorno .venv, requirements.lock.txt (REPRO-01) y scaffolding de tests
@@ -49,6 +49,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 01-05-PLAN.md — Orquestador de ingesta + carga real de los 5 indicadores + verificación (INGEST-01/02/04)
+
+**Gap closure** *(from 01-VERIFICATION.md — Success Criterion #3 / INGEST-04)*
+
+- [ ] 01-06-PLAN.md — Aísla el test que corrompía data/raw + guard autouse anti-escritura + restaura los 5 JSON crudos consistentes con su manifiesto (INGEST-04)
 
 ### Phase 2: Construcción del Panel y EDA
 
