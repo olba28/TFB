@@ -20,13 +20,13 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 
 ### Validated
 
-(Ninguno aún — el repo actual es solo el esqueleto: `requirements.txt`, `data/`, `figuras/`, `notebook/`, `src/ingesta/`, todos vacíos o mínimos. Ver `.planning/codebase/` para el mapeo completo.)
+- [x] Ingesta automática de indicadores ODS vía API pública de la ONU (Python + requests) para 150+ países, series 2000–2022 — Validado en Fase 01: ingesta-y-almacenamiento-versionado (INGEST-01/02/03)
+- [x] Almacenamiento del panel de datos en SQLite (dataset integrado país × año) — Validado en Fase 01 (INGEST-05)
+- [x] Descarga y versionado de una copia local de los datos (mitigación ante cambios de la API) — Validado en Fase 01 (INGEST-04)
+- [x] Reproducibilidad: `pip freeze > requirements.lock.txt` y versiones exactas fijadas — Validado en Fase 01 (REPRO-01)
 
 ### Active
 
-- [ ] Ingesta automática de indicadores ODS vía API pública de la ONU (Python + requests) para 150+ países, series 2000–2022
-- [ ] Almacenamiento del panel de datos en SQLite (dataset integrado país × año)
-- [ ] Descarga y versionado de una copia local de los datos (mitigación ante cambios de la API)
 - [ ] Limpieza, transformación y feature engineering del panel
 - [ ] Análisis exploratorio (EDA) de la relación estrés hídrico ↔ resultados económicos (global, regional, por tipología de país)
 - [ ] Modelo 1: regresión de panel con efectos fijos por país (PanelOLS) para predecir la tasa de crecimiento del PIB real per cápita en función del estrés hídrico + variables de control socioeconómicas
@@ -35,7 +35,6 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 - [ ] Análisis de interpretabilidad (SHAP) del peso relativo del estrés hídrico frente a otras variables
 - [ ] Dashboard geoespacial interactivo local (Streamlit + Plotly choropleth) para explorar resultados por país/región, usado en la demo de la defensa oral
 - [ ] Filtrado de países con cobertura mínima del 70% de años disponibles por indicador; exclusiones documentadas
-- [ ] Reproducibilidad: `pip freeze > requirements.lock.txt` y versiones exactas fijadas
 
 ### Out of Scope
 
@@ -48,6 +47,7 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 
 ## Context
 
+- Fase 01 completa (2026-07-11): cliente API SDG con paginación/reintentos, crosswalk M49→ISO3, `data/panel.db` poblado (18,086 `raw_observations`, 4,923 `panel`, 215 países), copia local versionada de los 5 indicadores con manifiesto de procedencia, `requirements.lock.txt` congelado. Ver `.planning/phases/01-ingesta-y-almacenamiento-versionado/01-VERIFICATION.md`.
 - Repo ya inicializado en git con estructura mínima: `requirements.txt` (dependencias ya elegidas: requests, pandas, numpy, jupyter, matplotlib, seaborn, statsmodels, linearmodels, scikit-learn, shap, plotly, streamlit), carpetas `data/`, `figuras/`, `notebook/`, `src/ingesta/` — ver `.planning/codebase/` para el mapeo detallado (STACK, ARCHITECTURE, STRUCTURE, CONVENTIONS, TESTING, INTEGRATIONS, CONCERNS).
 - Fuente de datos única: API pública de indicadores ODS de la ONU (`https://unstats.un.org/SDGAPI/v1/`), ya usada en trabajos previos del alumno.
 - Indicadores clave identificados en la propuesta:
@@ -87,9 +87,9 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Roadmap de GSD cubre el TFB completo (no solo Entrega 2) | El alumno prefiere planificar todas las fases desde el inicio, ajustando sobre la marcha | — Pending |
-| SQLite como motor de almacenamiento del panel | Cero configuración, un solo archivo, adecuado para un TFB individual y fácil de entregar/versionar | — Pending |
+| SQLite como motor de almacenamiento del panel | Cero configuración, un solo archivo, adecuado para un TFB individual y fácil de entregar/versionar | Implementado en Fase 01 (`src/db.py`) |
 | Dashboard solo local (sin despliegue online) | Basta con demo en vivo durante la defensa oral; evita complejidad/coste de hosting | — Pending |
-| Fuente de datos única: API SDG de la ONU | Exigencia explícita de la propuesta — garantiza trazabilidad y reproducibilidad total | — Pending |
+| Fuente de datos única: API SDG de la ONU | Exigencia explícita de la propuesta — garantiza trazabilidad y reproducibilidad total | Implementado en Fase 01 (`src/ingesta/`) |
 | Modelos de panel con efectos fijos (no solo regresión simple) | Mitigación del riesgo de causalidad inversa señalado en el análisis de riesgos de la propuesta | — Pending |
 | Modelo 2 (agricultura) como extensión del Modelo 1, priorizado tras Modelo 1 (PIB) | Mitigación del riesgo de tiempo limitado señalado en la propuesta | — Pending |
 
@@ -111,4 +111,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-10 after initialization*
+*Last updated: 2026-07-11 after Phase 01 completion*
