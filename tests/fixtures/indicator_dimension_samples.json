@@ -1,0 +1,131 @@
+{
+  "6.4.2": [
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "45.2",
+      "dimensions": {"Reporting Type": "G", "Activity": "TOTAL"}
+    },
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "12.0",
+      "dimensions": {"Reporting Type": "G", "Activity": "AGR"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "8.3",
+      "dimensions": {"Reporting Type": "G", "Activity": "TOTAL"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "9.9",
+      "dimensions": {"Reporting Type": "N", "Activity": "TOTAL"}
+    }
+  ],
+  "6.4.1": [
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "60.1",
+      "dimensions": {"Reporting Type": "G", "Activity": "TOTAL"}
+    },
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "30.0",
+      "dimensions": {"Reporting Type": "G", "Activity": "IND"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "55.4",
+      "dimensions": {"Reporting Type": "G", "Activity": "TOTAL"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "40.0",
+      "dimensions": {"Reporting Type": "N", "Activity": "TOTAL"}
+    }
+  ],
+  "8.1.1": [
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "1.5",
+      "dimensions": {"Reporting Type": "G"}
+    },
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "1.8",
+      "dimensions": {"Reporting Type": "N"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "2.0",
+      "dimensions": {"Reporting Type": "G"}
+    }
+  ],
+  "8.2.1": [
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "3.4",
+      "dimensions": {"Reporting Type": "G", "Age": "15+"}
+    },
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "3.9",
+      "dimensions": {"Reporting Type": "N", "Age": "15+"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "2.7",
+      "dimensions": {"Reporting Type": "G", "Age": "15+"}
+    }
+  ],
+  "2.3.1": [
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "NaN",
+      "dimensions": {"Reporting Type": "G", "Sex": "BOTHSEX"}
+    },
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "1.0",
+      "dimensions": {"Reporting Type": "G", "Sex": "MALE"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "2.5",
+      "dimensions": {"Reporting Type": "G", "Sex": "BOTHSEX"}
+    }
+  ]
+}
