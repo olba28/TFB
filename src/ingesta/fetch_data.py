@@ -175,6 +175,23 @@ def run_ingestion(force: bool = False) -> None:
         raw_path.parent.mkdir(parents=True, exist_ok=True)
         raw_path.write_text(json.dumps({"data": rows}, ensure_ascii=False), encoding="utf-8")
 
+        # CR-01: everything that can raise (dimension filter, country filter,
+        # DB insert) must run BEFORE the manifest is written -- the manifest's
+        # existence is what manifest_exists() uses to decide whether to skip
+        # re-fetching on a future run (D-07). Writing it before validating and
+        # inserting the rows would let a mid-pipeline failure permanently and
+        # silently skip that indicator on every subsequent run.
+        filtered = filter_headline_rows(rows, indicator_code)
+        kept, row_excluded = countries.filter_to_countries(filtered, country_set, crosswalk)
+        all_excluded.extend(row_excluded)
+
+        df = _build_observations_df(
+            kept, indicator_code, source_manifest_id=f"{indicator_code}:{today}"
+        )
+        db.insert_observations(engine, df)
+
+        # Only now, once the data has actually landed in raw_observations, record
+        # success by writing the manifest that gates future idempotent skips.
         manifest.write_manifest(
             raw_path,
             url=client.API_BASE_URL,
@@ -184,15 +201,6 @@ def run_ingestion(force: bool = False) -> None:
             },
             row_count=len(rows),
         )
-
-        filtered = filter_headline_rows(rows, indicator_code)
-        kept, row_excluded = countries.filter_to_countries(filtered, country_set, crosswalk)
-        all_excluded.extend(row_excluded)
-
-        df = _build_observations_df(
-            kept, indicator_code, source_manifest_id=f"{indicator_code}:{today}"
-        )
-        db.insert_observations(engine, df)
 
     countries.write_exclusion_log(all_excluded, EXCLUSION_LOG_PATH)
     db.rebuild_panel(engine)
