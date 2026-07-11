@@ -83,8 +83,8 @@ def test_value_coercion_handles_literal_nan_string():
 
     values = pd.to_numeric([r["value"] for r in filtered], errors="coerce")
 
-    assert values.isna().any()  # the "NaN"-string row coerced to NaN, not raised
-    assert not values.isna().all()  # the other kept row still has a real numeric value
+    assert pd.isna(values).any()  # the "NaN"-string row coerced to NaN, not raised
+    assert not pd.isna(values).all()  # the other kept row still has a real numeric value
 
 
 # --- run_ingestion(): idempotency guard (D-07) -------------------------------
