@@ -140,9 +140,25 @@ def test_run_ingestion_force_true_refetches_even_when_manifest_exists(monkeypatc
     monkeypatch.setattr(fetch_data.db, "init_db", MagicMock())
     monkeypatch.setattr(fetch_data.db, "rebuild_panel", MagicMock())
 
-    # Every indicator returns zero rows -> filter_headline_rows would assert;
+    # Every indicator returns zero rows -> filter_headline_rows would raise;
     # patch it too so we can isolate testing the fetch-count/skip behavior.
     monkeypatch.setattr(fetch_data, "filter_headline_rows", MagicMock(return_value=[]))
+    # WR-04 added a symmetrical "zero rows survived" guard after the country
+    # filter -- patch it to return one well-formed dummy row (and patch
+    # insert_observations, since the mocked get_engine() is not a real
+    # SQLAlchemy engine `to_sql` could write through) so this test stays
+    # isolated to fetch-count/skip behavior, not the full data pipeline.
+    monkeypatch.setattr(
+        fetch_data.countries,
+        "filter_to_countries",
+        MagicMock(
+            return_value=(
+                [{"iso3": "ESP", "timePeriodStart": 2020, "value": "1.0", "dimensions": {}}],
+                [],
+            )
+        ),
+    )
+    monkeypatch.setattr(fetch_data.db, "insert_observations", MagicMock())
 
     fetch_data.run_ingestion(force=True)
 

@@ -192,6 +192,12 @@ def run_ingestion(force: bool = False) -> None:
         filtered = filter_headline_rows(rows, indicator_code)
         kept, row_excluded = countries.filter_to_countries(filtered, country_set, crosswalk)
         all_excluded.extend(row_excluded)
+        # WR-04: symmetrical loud-failure guard to filter_headline_rows' own
+        # zero-rows check -- if every row fails the country-leaf/crosswalk
+        # join (e.g. a GeoArea/Tree fetch anomaly), inserting zero rows must
+        # not look identical to a clean, fully-processed indicator.
+        if len(kept) == 0:
+            raise ValueError(f"No rows survived country/crosswalk filter for {indicator_code}")
 
         df = _build_observations_df(
             kept, indicator_code, source_manifest_id=f"{indicator_code}:{today}"
