@@ -1,0 +1,10 @@
+{
+  "date": "2026-07-11",
+  "url": "https://unstats.un.org/SDGAPI/v1/sdg/Indicator/Data",
+  "params": {
+    "indicator": "2.3.1",
+    "timePeriod": "2000-2022"
+  },
+  "row_count": 4883,
+  "checksum": "6867772dc6c271a5fd06aa09b143bf304db575a2a092295c54c1d4725d01bad5"
+}
