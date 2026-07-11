@@ -106,6 +106,47 @@ def test_build_crosswalk_loads_from_explicit_csv_path(tmp_path):
     assert crosswalk == {"724": "ESP", "818": "EGY"}
 
 
+# --- code normalization regression (live GeoArea/Tree returns int codes) ----
+
+
+def test_collect_countries_normalizes_integer_geoarea_codes_to_zero_padded_strings():
+    """Live-verified regression: the real GeoArea/Tree endpoint serializes
+    geoAreaCode as a bare JSON integer (e.g. 4, not "004" or "4"). Without
+    normalization, collect_countries() would key its dict by an int, which
+    then never matches Indicator/Data's un-padded numeric STRING codes or the
+    M49 CSV's zero-padded string codes -- silently zeroing out every row's
+    country-leaf lookup (see Phase 1 Plan 5 SUMMARY)."""
+    tree_with_int_codes = [
+        {
+            "geoAreaCode": 1,
+            "geoAreaName": "World",
+            "type": "Region",
+            "children": [
+                {"geoAreaCode": 4, "geoAreaName": "Afghanistan", "type": "Country", "children": None},
+                {"geoAreaCode": 818, "geoAreaName": "Egypt", "type": "Country", "children": None},
+            ],
+        }
+    ]
+
+    result = countries.collect_countries(tree_with_int_codes)
+
+    assert result == {"004": "Afghanistan", "818": "Egypt"}
+
+
+def test_filter_to_countries_matches_unpadded_string_geoarea_code_against_padded_country_set():
+    """Indicator/Data rows carry geoAreaCode as an un-padded numeric STRING
+    (e.g. "4"); this must still resolve against a country_set/crosswalk keyed
+    by zero-padded 3-digit codes (e.g. "004")."""
+    country_set = {"004": "Afghanistan"}
+    crosswalk = {"004": "AFG"}
+    rows = [{"geoAreaCode": "4", "value": "1.0"}]
+
+    kept, excluded = countries.filter_to_countries(rows, country_set, crosswalk)
+
+    assert excluded == []
+    assert kept == [{"geoAreaCode": "4", "value": "1.0", "iso3": "AFG"}]
+
+
 # --- filter_to_countries() ---------------------------------------------------
 
 

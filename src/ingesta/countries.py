@@ -18,6 +18,17 @@ Kong or any other disputed territory.
 Per D-16, every excluded code (any node with `type != 'Country'`, or a
 country-leaf code with no matching M49 CSV crosswalk entry) is recorded in a
 documented exclusion log -- never silently dropped.
+
+Code normalization: the live `GeoArea/Tree` endpoint serializes `geoAreaCode`
+as a bare JSON integer (e.g. ``4``, not ``"004"``), the `Indicator/Data`
+endpoint serializes it as an un-padded numeric string (e.g. ``"4"``), and the
+official M49 CSV's `M49 Code` column is a zero-padded 3-digit string (e.g.
+``"004"``). All three must be joined on the same key -- every code is
+normalized via :func:`_normalize_code` (`str(code).zfill(3)`) before being
+used as a dict key or looked up, both here and in :func:`filter_to_countries`.
+Without this, every observation row fails the country-leaf lookup silently
+(live-verified: a live run without normalization produced zero surviving
+rows across all 5 indicators -- see Phase 1 Plan 5 SUMMARY).
 """
 
 from __future__ import annotations
@@ -30,6 +41,17 @@ from typing import Any
 # D-15: fixed, repo-relative path -- never derived from API response content
 # (Security V5, path-construction safety).
 M49_CSV_PATH = Path(__file__).resolve().parent / "data" / "m49_countries.csv"
+
+
+def _normalize_code(code: Any) -> str:
+    """Normalize a geoAreaCode/M49 code to a zero-padded 3-digit string.
+
+    `GeoArea/Tree` returns bare JSON integers, `Indicator/Data` returns
+    un-padded numeric strings, and the M49 CSV uses zero-padded 3-digit
+    strings -- this is the single normalization point all three are joined
+    through.
+    """
+    return str(code).strip().zfill(3)
 
 
 def collect_countries(
@@ -49,7 +71,7 @@ def collect_countries(
     countries: dict[str, str] = {}
 
     def walk(node: dict[str, Any], parent_name: str) -> None:
-        code = node.get("geoAreaCode")
+        code = _normalize_code(node.get("geoAreaCode"))
         name = node.get("geoAreaName")
         node_type = node.get("type")
         if node_type == "Country":
@@ -107,7 +129,7 @@ def filter_to_countries(
     excluded: list[dict[str, Any]] = []
 
     for row in rows:
-        code = row.get("geoAreaCode")
+        code = _normalize_code(row.get("geoAreaCode"))
         if code not in countries:
             excluded.append({**row, "exclusion_reason": "not_a_country_leaf"})
             continue
