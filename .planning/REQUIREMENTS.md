@@ -7,10 +7,10 @@
 
 ### Ingesta y Almacenamiento
 
-- [ ] **INGEST-01**: El sistema obtiene, vía la API SDG de la ONU, los 5 indicadores definidos (estrés hídrico 6.4.2, eficiencia de uso del agua, crecimiento PIB per cápita, productividad laboral, productividad agrícola 2.3.1) para 150+ países, series 2000–2022, con paginación y reintentos
+- [x] **INGEST-01**: El sistema obtiene, vía la API SDG de la ONU, los 5 indicadores definidos (estrés hídrico 6.4.2, eficiencia de uso del agua, crecimiento PIB per cápita, productividad laboral, productividad agrícola 2.3.1) para 150+ países, series 2000–2022, con paginación y reintentos
 - [ ] **INGEST-02**: El sistema filtra las respuestas de la API por dimensión (p. ej. `Activity: TOTAL`) para evitar filas duplicadas por país-año
 - [ ] **INGEST-03**: El sistema excluye agregados regionales (códigos M49 de región) del panel de países, usando un crosswalk M49↔ISO3 (pycountry) y una lista canónica de países
-- [ ] **INGEST-04**: El sistema guarda una copia local versionada de los datos crudos (JSON) junto con un manifiesto de procedencia, antes de cualquier transformación
+- [x] **INGEST-04**: El sistema guarda una copia local versionada de los datos crudos (JSON) junto con un manifiesto de procedencia, antes de cualquier transformación
 - [ ] **INGEST-05**: El sistema almacena el panel en SQLite (tabla `raw_observations` larga e inmutable + tabla `panel` ancha derivada)
 
 ### Construcción del Panel y EDA
@@ -86,10 +86,10 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INGEST-01 | Phase 1 | Pending |
+| INGEST-01 | Phase 1 | Complete |
 | INGEST-02 | Phase 1 | Pending |
 | INGEST-03 | Phase 1 | Pending |
-| INGEST-04 | Phase 1 | Pending |
+| INGEST-04 | Phase 1 | Complete |
 | INGEST-05 | Phase 1 | Pending |
 | REPRO-01 | Phase 1 | Complete |
 | PANEL-01 | Phase 2 | Pending |
