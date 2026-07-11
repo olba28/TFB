@@ -203,3 +203,16 @@ None - the one manual step (Task 1's M49 CSV download) was already completed by 
 ---
 *Phase: 01-ingesta-y-almacenamiento-versionado*
 *Completed: 2026-07-11*
+
+## Self-Check: PASSED
+
+- FOUND: src/ingesta/data/m49_countries.csv
+- FOUND: src/ingesta/data/m49_countries.provenance.json
+- FOUND: src/ingesta/countries.py
+- FOUND: tests/ingesta/test_countries.py
+- FOUND: tests/fixtures/geoarea_tree_sample.json
+- FOUND: .planning/phases/01-ingesta-y-almacenamiento-versionado/01-03-SUMMARY.md
+- FOUND commit: 991ad2a (Task 1)
+- FOUND commit: c2e0151 (Task 2)
+- FOUND commit: d865fc5 (docs: summary)
+- Re-ran `pytest tests/ingesta/test_countries.py -x`: 13 passed
