@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +44,13 @@ def write_manifest(
     raw_path = Path(raw_path)
     manifest_path = _manifest_path_for(raw_path)
     manifest_data = {
-        "date": date.today().isoformat(),
+        # WR-03: derive `date` from raw_path's own filename stem (per D-06,
+        # `data/raw/{indicator}/{date}.json`) rather than calling
+        # `date.today()` independently -- the two are only guaranteed
+        # consistent by caller convention today, and a manifest re-written
+        # near a midnight boundary, or during a backfill/repair script for an
+        # older raw file, would otherwise silently record the wrong date.
+        "date": raw_path.stem,
         "url": url,
         "params": params,
         "row_count": row_count,

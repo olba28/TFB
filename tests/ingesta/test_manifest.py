@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import date
 
 import pytest
 
@@ -42,7 +41,10 @@ def test_write_manifest_creates_sidecar_with_all_five_required_fields(raw_file):
 
     loaded = manifest.load_manifest(manifest_path)
     assert set(loaded.keys()) == {"date", "url", "params", "row_count", "checksum"}
-    assert loaded["date"] == date.today().isoformat()
+    # WR-03: `date` is derived from raw_path's own filename stem, not a fresh
+    # `date.today()` call, so it stays consistent even for backfills/repairs
+    # run on a different day than the raw file's own download date.
+    assert loaded["date"] == raw_file.stem
     assert loaded["url"] == "https://unstats.un.org/SDGAPI/v1/sdg/Indicator/Data"
     assert loaded["params"] == {"indicator": "6.4.2", "page": 1, "pageSize": 1000}
     assert loaded["row_count"] == 2
