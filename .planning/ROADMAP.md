@@ -136,7 +136,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Ingesta y Almacenamiento Versionado | 6/6 | Complete   | 2026-07-11 |
+| 1. Ingesta y Almacenamiento Versionado | 6/6 | Complete    | 2026-07-11 |
 | 2. Construcción del Panel y EDA | 0/TBD | Not started | - |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 0/TBD | Not started | - |
 | 4. Interpretabilidad, Simulación y Robustez | 0/TBD | Not started | - |
