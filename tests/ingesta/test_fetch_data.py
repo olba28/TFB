@@ -124,8 +124,14 @@ def test_run_ingestion_skips_fetch_when_manifest_exists_for_all_indicators(monke
     mock_rebuild.assert_called_once()
 
 
-def test_run_ingestion_force_true_refetches_even_when_manifest_exists(monkeypatch):
+def test_run_ingestion_force_true_refetches_even_when_manifest_exists(monkeypatch, tmp_path):
     """force=True must bypass the manifest-exists skip and fetch every indicator."""
+    # Redirect run_ingestion's real (un-mocked) raw_path.write_text() into a
+    # tmp_path sandbox -- mirrors the isolation pattern already used in
+    # test_manifest.py. Without this, run_ingestion(force=True) writes
+    # directly to the real data/raw/{code}/{today}.json for all 5 real
+    # INDICATOR_CODES, clobbering the live-ingested raw data (INGEST-04 gap).
+    monkeypatch.setattr(fetch_data.manifest, "RAW_DATA_ROOT", tmp_path / "data" / "raw")
     monkeypatch.setattr(fetch_data.manifest, "manifest_exists", lambda code, day: True)
     monkeypatch.setattr(fetch_data.manifest, "write_manifest", MagicMock())
 
