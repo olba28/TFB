@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: ingesta-y-almacenamiento-versionado
 status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-07-11T06:28:23.263Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-07-11T06:36:34.946Z"
 last_activity: 2026-07-11
 last_activity_desc: Completed 01-01-PLAN.md
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 01 (ingesta-y-almacenamiento-versionado) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-07-11 — Completed 01-01-PLAN.md
 
@@ -58,6 +58,7 @@ Progress: [██░░░░░░░░] 20%
 | Phase 01 P01 | 20min | 3 tasks | 9 files |
 | Phase 01 P02 | 15min | 2 tasks | 5 files |
 | Phase 01 P03 | 30min | 2 tasks | 6 files |
+| Phase 01 P04 | 15min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 01-03]: filter_to_countries(rows, countries, crosswalk) requires the country set and crosswalk as explicit params -- pure transform, no network access to derive them internally
 - [Phase 01-03]: collect_countries() exposes D-16 exclusion log via an optional mutable excluded list param, keeping the -> dict[str,str] return type
 - [Phase 01-03]: Renamed src/ingesta/Data/ (capital D, created by the M49 CSV acquisition step) to lowercase src/ingesta/data/ to match plan path and repo convention
+- [Phase 01-04]: Added sqlalchemy>=2.0 to requirements.txt/requirements.lock.txt -- required by the plan's explicit SQLAlchemy Engine design for src/db.py
+- [Phase 01-04]: pandas.to_sql wraps sqlalchemy.exc.IntegrityError in pandas.errors.DatabaseError -- tests assert on the pandas wrapper
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-11T06:28:23.248Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-07-11T06:36:34.909Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None

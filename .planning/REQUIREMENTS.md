@@ -11,7 +11,7 @@
 - [ ] **INGEST-02**: El sistema filtra las respuestas de la API por dimensión (p. ej. `Activity: TOTAL`) para evitar filas duplicadas por país-año
 - [x] **INGEST-03**: El sistema excluye agregados regionales (códigos M49 de región) del panel de países, usando un crosswalk M49↔ISO3 (pycountry) y una lista canónica de países
 - [x] **INGEST-04**: El sistema guarda una copia local versionada de los datos crudos (JSON) junto con un manifiesto de procedencia, antes de cualquier transformación
-- [ ] **INGEST-05**: El sistema almacena el panel en SQLite (tabla `raw_observations` larga e inmutable + tabla `panel` ancha derivada)
+- [x] **INGEST-05**: El sistema almacena el panel en SQLite (tabla `raw_observations` larga e inmutable + tabla `panel` ancha derivada)
 
 ### Construcción del Panel y EDA
 
@@ -90,7 +90,7 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | INGEST-02 | Phase 1 | Pending |
 | INGEST-03 | Phase 1 | Complete |
 | INGEST-04 | Phase 1 | Complete |
-| INGEST-05 | Phase 1 | Pending |
+| INGEST-05 | Phase 1 | Complete |
 | REPRO-01 | Phase 1 | Complete |
 | PANEL-01 | Phase 2 | Pending |
 | PANEL-02 | Phase 2 | Pending |
