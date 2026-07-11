@@ -202,7 +202,24 @@ def run_ingestion(force: bool = False) -> None:
             row_count=len(rows),
         )
 
-    countries.write_exclusion_log(all_excluded, EXCLUSION_LOG_PATH)
+    # CR-02: `all_excluded` only carries entries for indicators actually
+    # processed THIS run -- indicators skipped via the per-indicator
+    # `continue` above (already fetched today) never contribute their row
+    # exclusions here. Merge with whatever is already on disk (keyed by
+    # code + exclusion_reason) instead of blindly overwriting, so a partial
+    # re-run never destroys previously-documented exclusions (D-16).
+    merged_excluded = all_excluded
+    if EXCLUSION_LOG_PATH.exists():
+        existing_excluded = json.loads(EXCLUSION_LOG_PATH.read_text(encoding="utf-8"))
+        merged_by_key = {
+            (e.get("code"), e.get("exclusion_reason")): e for e in existing_excluded
+        }
+        merged_by_key.update(
+            {(e.get("code"), e.get("exclusion_reason")): e for e in all_excluded}
+        )
+        merged_excluded = list(merged_by_key.values())
+
+    countries.write_exclusion_log(merged_excluded, EXCLUSION_LOG_PATH)
     db.rebuild_panel(engine)
 
 
