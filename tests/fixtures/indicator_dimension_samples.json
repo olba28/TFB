@@ -111,6 +111,15 @@
       "geoAreaName": "United States of America",
       "timePeriodStart": 2020,
       "value": "NaN",
+      "series": "PD_AGR_SSFP",
+      "dimensions": {"Reporting Type": "G", "Sex": "BOTHSEX"}
+    },
+    {
+      "geoAreaCode": "840",
+      "geoAreaName": "United States of America",
+      "timePeriodStart": 2020,
+      "value": "9.9",
+      "series": "PD_AGR_LSFP",
       "dimensions": {"Reporting Type": "G", "Sex": "BOTHSEX"}
     },
     {
@@ -118,6 +127,7 @@
       "geoAreaName": "United States of America",
       "timePeriodStart": 2020,
       "value": "1.0",
+      "series": "PD_AGR_SSFP",
       "dimensions": {"Reporting Type": "G", "Sex": "MALE"}
     },
     {
@@ -125,6 +135,15 @@
       "geoAreaName": "Canada",
       "timePeriodStart": 2020,
       "value": "2.5",
+      "series": "PD_AGR_SSFP",
+      "dimensions": {"Reporting Type": "G", "Sex": "BOTHSEX"}
+    },
+    {
+      "geoAreaCode": "124",
+      "geoAreaName": "Canada",
+      "timePeriodStart": 2020,
+      "value": "8.8",
+      "series": "PD_AGR_LSFP",
       "dimensions": {"Reporting Type": "G", "Sex": "BOTHSEX"}
     }
   ]

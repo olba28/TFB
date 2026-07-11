@@ -65,6 +65,19 @@ def test_filter_headline_rows_raises_when_zero_rows_survive():
         fetch_data.filter_headline_rows(rows, "6.4.2")
 
 
+def test_headline_series_excludes_large_scale_producer_series_for_2_3_1():
+    """Live-run finding: 2.3.1 multiplexes two series (small-scale vs
+    large-scale food producers) under the identical headline dimension
+    combo. Only the adopted headline series (PD_AGR_SSFP) may survive --
+    PD_AGR_LSFP rows must never reach raw_observations, even though they
+    pass the Sex/Reporting Type dimension check."""
+    filtered = fetch_data.filter_headline_rows(SAMPLES["2.3.1"], "2.3.1")
+
+    assert len(filtered) == 2
+    assert all(r["series"] == "PD_AGR_SSFP" for r in filtered)
+    assert not any(r["series"] == "PD_AGR_LSFP" for r in filtered)
+
+
 def test_headline_dimensions_is_per_indicator_not_a_single_global_rule():
     assert fetch_data.HEADLINE_DIMENSIONS["6.4.2"] == {"Activity": "TOTAL"}
     assert fetch_data.HEADLINE_DIMENSIONS["6.4.1"] == {"Activity": "TOTAL"}

@@ -49,8 +49,8 @@ EXCLUSION_LOG_PATH = Path("data/raw/exclusion_log.json")
 # Per-indicator headline dimension filter (Pitfall 1) -- NEVER a single global
 # rule. 6.4.2/6.4.1 need Activity:TOTAL; 2.3.1 needs Sex:BOTHSEX; 8.1.1/8.2.1
 # have no extra dimension beyond Reporting Type == 'G' (Assumption A3: 8.2.1's
-# Age:"15+" is assumed to be the only age bucket -- verify during the live run
-# in Task 2 and add an "Age" entry here if alternate age buckets exist).
+# Age:"15+" is confirmed the only age bucket by the live run -- no alternate
+# buckets found, no "Age" entry needed here).
 HEADLINE_DIMENSIONS: dict[str, dict[str, str]] = {
     "6.4.2": {"Activity": "TOTAL"},
     "6.4.1": {"Activity": "TOTAL"},
@@ -59,20 +59,44 @@ HEADLINE_DIMENSIONS: dict[str, dict[str, str]] = {
     "2.3.1": {"Sex": "BOTHSEX"},
 }
 
+# Live-run finding (Task 2): indicator 2.3.1 multiplexes TWO distinct series
+# under the identical headline dimension combo (Sex: BOTHSEX, Reporting Type:
+# G) -- "PD_AGR_SSFP" (productivity of small-scale food producers) and
+# "PD_AGR_LSFP" (large-scale food producers). Neither `dimensions` key
+# distinguishes them; the API's separate `series` field does. This was not
+# anticipated by RESEARCH.md's Assumptions Log (which only flagged 8.2.1's
+# Age bucket, A3) -- it surfaced via the same per-indicator uniqueness assert
+# (D-11) that A3 was meant to guard, just on a different field.
+#
+# SDG target 2.3 explicitly names "small-scale food producers" as its focus
+# ("double the agricultural productivity and incomes of small-scale food
+# producers"); PD_AGR_SSFP is adopted here as 2.3.1's headline series for
+# that reason -- PD_AGR_LSFP is dropped from raw_observations, not averaged
+# or combined. This is a methodological choice with direct downstream impact
+# on Phase 6's Model 2 (agricultural productivity) and is flagged for human
+# review at this plan's Task 3 checkpoint.
+HEADLINE_SERIES: dict[str, str] = {
+    "2.3.1": "PD_AGR_SSFP",
+}
+
 
 def filter_headline_rows(rows: list[dict[str, Any]], indicator_code: str) -> list[dict[str, Any]]:
     """Keep only rows matching `indicator_code`'s headline dimension combo,
-    always additionally requiring `Reporting Type == 'G'`.
+    always additionally requiring `Reporting Type == 'G'`, and (for
+    indicators listed in `HEADLINE_SERIES`) matching the chosen headline
+    `series` code.
 
     Raises `AssertionError` if zero rows survive (Pitfall 1 loud-failure
     guard) -- a hardcoded global filter would silently zero out 3 of the 5
     indicators instead of failing loudly.
     """
     required = {"Reporting Type": "G", **HEADLINE_DIMENSIONS[indicator_code]}
+    headline_series = HEADLINE_SERIES.get(indicator_code)
     filtered = [
         row
         for row in rows
         if all(row.get("dimensions", {}).get(k) == v for k, v in required.items())
+        and (headline_series is None or row.get("series") == headline_series)
     ]
     assert len(filtered) > 0, f"No rows survived dimension filter for {indicator_code}"
     return filtered
