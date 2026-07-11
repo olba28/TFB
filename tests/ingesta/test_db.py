@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-from sqlalchemy.exc import IntegrityError
+from pandas.errors import DatabaseError
 
 from src import db
 
@@ -63,7 +63,9 @@ def test_unique_constraint_raises(engine):
 
     # No duplicates *within* this single-row df, so the pre-insert assert passes;
     # the schema-level UNIQUE(country_code, year, indicator_code) must catch it.
-    with pytest.raises(IntegrityError):
+    # pandas.to_sql wraps the underlying sqlalchemy.exc.IntegrityError in its own
+    # pandas.errors.DatabaseError -- that wrapper is what callers actually see.
+    with pytest.raises(DatabaseError, match="UNIQUE constraint failed"):
         db.insert_observations(engine, df)
 
 

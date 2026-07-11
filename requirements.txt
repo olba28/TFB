@@ -10,6 +10,9 @@ requests>=2.31
 pandas>=2.0
 numpy>=1.24
 
+# --- Almacenamiento (SQLite via SQLAlchemy Engine, D-11/D-12) ---
+sqlalchemy>=2.0          # Engine para pandas to_sql/read_sql (src/db.py)
+
 # --- Notebooks / análisis exploratorio (3.3) ---
 jupyter>=1.0
 ipykernel>=6.25
