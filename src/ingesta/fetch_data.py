@@ -5,15 +5,20 @@ INGEST-02, INGEST-04).
 Orchestration sequence (per indicator, RESEARCH.md architecture diagram):
 1. Check the manifest -> skip re-fetch unless `force=True` (D-07).
 2. Fetch all pages via `client.fetch_all_pages`.
-3. Write raw JSON + provenance manifest (D-05, D-06, D-08).
+3. Write raw JSON to disk (D-05, D-06).
 4. Filter to the indicator's headline dimension combo (Pitfall 1) -- this is
    NEVER a single global `Activity: TOTAL` rule; see `HEADLINE_DIMENSIONS`.
 5. Join `geoAreaCode` -> ISO3 and drop non-country rows via `countries.py`
    (M49 exclusion, D-13-D-16).
 6. Coerce `value` via `pd.to_numeric(errors='coerce')` (Pitfall 5 -- 2.3.1 can
    return the literal string "NaN").
-7. Insert into `raw_observations` (duplicate-key assert lives in
+7. Insert into `raw_observations` (duplicate-key check lives in
    `db.insert_observations`, D-11).
+8. Only once steps 4-7 have all succeeded, write the provenance manifest
+   (D-08) -- writing it any earlier would let a mid-pipeline failure
+   permanently and silently skip that indicator on every future run, since
+   `manifest_exists()` (step 1) only checks for the manifest's presence, not
+   whether the rows actually reached `raw_observations` (CR-01).
 
 After all indicators, `db.rebuild_panel` regenerates the derived wide pivot
 (D-12). All file paths are built only from the fixed `INDICATOR_CODES` list
@@ -86,9 +91,11 @@ def filter_headline_rows(rows: list[dict[str, Any]], indicator_code: str) -> lis
     indicators listed in `HEADLINE_SERIES`) matching the chosen headline
     `series` code.
 
-    Raises `AssertionError` if zero rows survive (Pitfall 1 loud-failure
-    guard) -- a hardcoded global filter would silently zero out 3 of the 5
-    indicators instead of failing loudly.
+    Raises `ValueError` if zero rows survive (Pitfall 1 loud-failure guard) --
+    a hardcoded global filter would silently zero out 3 of the 5 indicators
+    instead of failing loudly. An explicit `raise` is used instead of a bare
+    `assert` (WR-01) so this guard cannot be silently stripped when Python is
+    run with `-O`/`-OO`/`PYTHONOPTIMIZE=1`.
     """
     required = {"Reporting Type": "G", **HEADLINE_DIMENSIONS[indicator_code]}
     headline_series = HEADLINE_SERIES.get(indicator_code)
@@ -98,7 +105,8 @@ def filter_headline_rows(rows: list[dict[str, Any]], indicator_code: str) -> lis
         if all(row.get("dimensions", {}).get(k) == v for k, v in required.items())
         and (headline_series is None or row.get("series") == headline_series)
     ]
-    assert len(filtered) > 0, f"No rows survived dimension filter for {indicator_code}"
+    if len(filtered) == 0:
+        raise ValueError(f"No rows survived dimension filter for {indicator_code}")
     return filtered
 
 

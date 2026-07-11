@@ -2,7 +2,7 @@
 
 raw_observations is the immutable long table (single source of truth). Duplicate
 (country_code, year, indicator_code) rows must be impossible to persist -- this is
-enforced twice (D-11, belt-and-suspenders): a Python-level assert in
+enforced twice (D-11, belt-and-suspenders): an explicit ValueError check in
 insert_observations() catches duplicates *within* the incoming DataFrame before
 any row reaches SQLite, and the schema's own UNIQUE constraint catches duplicates
 that slip past that check across separate insert calls.
@@ -40,13 +40,16 @@ def _row(country="ESP", indicator="6.4.2", year=2020, value=1.0, dimension="Acti
 
 
 def test_insert_observations_raises_on_duplicate_keys_in_df(engine):
-    """A df with a duplicate (country, year, indicator) pair must never reach SQLite."""
+    """A df with a duplicate (country, year, indicator) pair must never reach SQLite.
+
+    Uses ValueError (WR-01), not a bare assert, so the guard survives
+    `python -O`/`PYTHONOPTIMIZE=1`."""
     df = pd.DataFrame([
         _row(value=1.0),
         _row(value=2.0),  # same (country_code, year, indicator_code) key
     ])
 
-    with pytest.raises(AssertionError, match="ESP"):
+    with pytest.raises(ValueError, match="ESP"):
         db.insert_observations(engine, df)
 
     result = pd.read_sql("SELECT * FROM raw_observations", engine)

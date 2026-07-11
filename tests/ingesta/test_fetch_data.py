@@ -52,7 +52,8 @@ def test_global_activity_total_rule_would_zero_out_non_water_indicators(indicato
 def test_filter_headline_rows_raises_when_zero_rows_survive():
     """Loud-failure guard (Pitfall 1): if nothing matches the per-indicator
     headline combo, filter_headline_rows must raise rather than silently
-    return an empty list."""
+    return an empty list. Uses ValueError (WR-01), not a bare assert, so the
+    guard survives `python -O`/`PYTHONOPTIMIZE=1`."""
     rows = [
         {
             "geoAreaCode": "840",
@@ -61,7 +62,7 @@ def test_filter_headline_rows_raises_when_zero_rows_survive():
         }
     ]
 
-    with pytest.raises(AssertionError, match="No rows survived"):
+    with pytest.raises(ValueError, match="No rows survived"):
         fetch_data.filter_headline_rows(rows, "6.4.2")
 
 
