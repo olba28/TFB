@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 1
-current_phase_name: Ingesta y Almacenamiento Versionado
+current_phase: 01
+current_phase_name: ingesta-y-almacenamiento-versionado
 status: executing
-stopped_at: Phase 1 context gathered
-last_updated: "2026-07-11T05:12:48.325Z"
-last_activity: 2026-07-10
-last_activity_desc: Roadmap created, 32/32 v1 requirements mapped across 6 phases
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-07-11T05:58:57.481Z"
+last_activity: 2026-07-11
+last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 5
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
-**Current focus:** Phase 1 — Ingesta y Almacenamiento Versionado
+**Current focus:** Phase 01 — ingesta-y-almacenamiento-versionado
 
 ## Current Position
 
-Phase: 1 of 6 (Ingesta y Almacenamiento Versionado)
-Plan: 0 of TBD in current phase
-Status: Ready to execute
-Last activity: 2026-07-10 — Roadmap created, 32/32 v1 requirements mapped across 6 phases
+Phase: 01 (ingesta-y-almacenamiento-versionado) — EXECUTING
+Plan: 2 of 5
+Status: Executing Phase 01
+Last activity: 2026-07-11 — Completed 01-01-PLAN.md
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01 P01 | 20min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - [Roadmap]: Estructura horizontal de 6 fases siguiendo la cadena de dependencia del pipeline (ingesta → panel/EDA → Modelo 1 → interpretabilidad/simulación → dashboard → Modelo 2 stretch), tal como sugería research/SUMMARY.md
 - [Roadmap]: REPRO-01 (requirements.lock.txt) asignado a Fase 1, REPRO-02 (semillas fijas) a Fase 4, REPRO-03 (sección de limitaciones) a Fase 3 — cada requisito de reproducibilidad vive donde se genera el artefacto correspondiente
 - [Roadmap]: Modelo 2 (Fase 6) confirmado como fase final "stretch", dependiente de que Fases 1–5 estén completas, según el riesgo de tiempo limitado señalado en PROJECT.md
+- [Phase 01]: pytest/pytest-cov legitimacy confirmed by human before install (RESEARCH [SUS] flag was a release-recency heuristic false positive)
+- [Phase 01]: requirements.lock.txt frozen strictly from .venv interpreter, never global Python
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-10T19:34:54.558Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-ingesta-y-almacenamiento-versionado/01-CONTEXT.md
+Last session: 2026-07-11T05:58:33.980Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None

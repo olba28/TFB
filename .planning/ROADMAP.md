@@ -35,10 +35,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. El cliente de la API pagina automáticamente y reintenta ante fallos transitorios (verificable simulando una respuesta fallida/paginada).
   5. `requirements.lock.txt` existe en el repo y refleja las versiones exactas instaladas vía `pip freeze`.
 
-**Plans**: 5 plans
+**Plans**: 1/5 plans executed
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Fundación: higiene del repo (.gitignore), entorno .venv, requirements.lock.txt (REPRO-01) y scaffolding de tests
+- [x] 01-01-PLAN.md — Fundación: higiene del repo (.gitignore), entorno .venv, requirements.lock.txt (REPRO-01) y scaffolding de tests
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -132,7 +132,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Ingesta y Almacenamiento Versionado | 0/5 | Not started | - |
+| 1. Ingesta y Almacenamiento Versionado | 1/5 | In Progress|  |
 | 2. Construcción del Panel y EDA | 0/TBD | Not started | - |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 0/TBD | Not started | - |
 | 4. Interpretabilidad, Simulación y Robustez | 0/TBD | Not started | - |

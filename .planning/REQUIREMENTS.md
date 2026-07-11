@@ -48,7 +48,7 @@
 
 ### Reproducibilidad
 
-- [ ] **REPRO-01**: El proyecto genera un fichero de dependencias fijas (`requirements.lock.txt`) vía `pip freeze`
+- [x] **REPRO-01**: El proyecto genera un fichero de dependencias fijas (`requirements.lock.txt`) vía `pip freeze`
 - [ ] **REPRO-02**: Todos los pasos estocásticos (bootstrap, modelo ML, cualquier split) usan semillas aleatorias fijas
 - [ ] **REPRO-03**: La memoria incluye una sección explícita de "Limitaciones / Amenazas a la validez" que aborda causalidad inversa y endogeneidad
 
@@ -91,7 +91,7 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | INGEST-03 | Phase 1 | Pending |
 | INGEST-04 | Phase 1 | Pending |
 | INGEST-05 | Phase 1 | Pending |
-| REPRO-01 | Phase 1 | Pending |
+| REPRO-01 | Phase 1 | Complete |
 | PANEL-01 | Phase 2 | Pending |
 | PANEL-02 | Phase 2 | Pending |
 | PANEL-03 | Phase 2 | Pending |
@@ -120,6 +120,7 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | MODEL2-03 | Phase 6 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 32 total
 - Mapped to phases: 32
 - Unmapped: 0 ✓
