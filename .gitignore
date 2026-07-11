@@ -15,7 +15,10 @@ __pycache__/
 # Se conservan solo los manifiestos, que documentan cada descarga.
 data/**/*.json
 data/**/*.csv
-!data/**/manifest.json
+!data/**/*.manifest.json
+
+# Base de datos SQLite del panel (regenerable desde data/raw/ + src/)
+data/panel.db
 
 # Modelos serializados (regenerables desde el pipeline)
 *.pkl
