@@ -102,8 +102,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 04-01-PLAN.md — src/simulate.py: block bootstrap contrafactual + no-extrapolación + heterogeneidad por interacción (INTERP-01, INTERP-03, REPRO-02)
 - [ ] 04-02-PLAN.md — src/interpret.py: RandomForest + SHAP + VIF + partial-dependence (INTERP-04, INTERP-05, INTERP-06, REPRO-02)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 04-03-PLAN.md — notebook/4_1_interpretabilidad_simulacion.ipynb: orquestación, serialización de rf_shap_model.pkl y verificación de reproducibilidad end-to-end (INTERP-01..06, REPRO-02)
 
 ### Phase 5: Dashboard y Preparación de la Defensa
