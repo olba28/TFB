@@ -22,12 +22,12 @@
 
 ### Modelo 1 — PIB per cápita
 
-- [ ] **MODEL1-01**: Existe una función compartida de ajuste/diagnóstico de panel (`panel_base.py`) reutilizable por Modelo 1 y Modelo 2
-- [ ] **MODEL1-02**: El Modelo 1 usa PanelOLS con efectos fijos de país Y de año (two-way fixed effects) como especificación base
-- [ ] **MODEL1-03**: El sistema compara el Modelo 1 con especificaciones pooled OLS y de efectos aleatorios (RE), incluyendo el test de Hausman que justifica la elección de efectos fijos
-- [ ] **MODEL1-04**: El Modelo 1 usa errores estándar robustos apropiados (clustered por país, o Driscoll-Kraay si el test de dependencia transversal de Pesaran lo indica)
-- [ ] **MODEL1-05**: El sistema incluye al menos una comprobación de robustez del Modelo 1 (especificación alternativa o submuestra)
-- [ ] **MODEL1-06**: El Modelo 1 ajustado se serializa (pickle) para su uso posterior por simulación e interpretabilidad, sin necesidad de reajuste
+- [x] **MODEL1-01**: Existe una función compartida de ajuste/diagnóstico de panel (`panel_base.py`) reutilizable por Modelo 1 y Modelo 2
+- [x] **MODEL1-02**: El Modelo 1 usa PanelOLS con efectos fijos de país Y de año (two-way fixed effects) como especificación base
+- [x] **MODEL1-03**: El sistema compara el Modelo 1 con especificaciones pooled OLS y de efectos aleatorios (RE), incluyendo el test de Hausman que justifica la elección de efectos fijos
+- [x] **MODEL1-04**: El Modelo 1 usa errores estándar robustos apropiados (clustered por país, o Driscoll-Kraay si el test de dependencia transversal de Pesaran lo indica)
+- [x] **MODEL1-05**: El sistema incluye al menos una comprobación de robustez del Modelo 1 (especificación alternativa o submuestra)
+- [x] **MODEL1-06**: El Modelo 1 ajustado se serializa (pickle) para su uso posterior por simulación e interpretabilidad, sin necesidad de reajuste
 
 ### Interpretabilidad, Simulación y Robustez
 
@@ -50,7 +50,7 @@
 
 - [x] **REPRO-01**: El proyecto genera un fichero de dependencias fijas (`requirements.lock.txt`) vía `pip freeze`
 - [ ] **REPRO-02**: Todos los pasos estocásticos (bootstrap, modelo ML, cualquier split) usan semillas aleatorias fijas
-- [ ] **REPRO-03**: La memoria incluye una sección explícita de "Limitaciones / Amenazas a la validez" que aborda causalidad inversa y endogeneidad
+- [x] **REPRO-03**: La memoria incluye una sección explícita de "Limitaciones / Amenazas a la validez" que aborda causalidad inversa y endogeneidad
 
 ### Modelo 2 — Productividad Agrícola
 
@@ -96,13 +96,13 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | PANEL-02 | Phase 2 | Complete |
 | PANEL-03 | Phase 2 | Complete |
 | PANEL-04 | Phase 2 | Complete |
-| MODEL1-01 | Phase 3 | Pending |
-| MODEL1-02 | Phase 3 | Pending |
-| MODEL1-03 | Phase 3 | Pending |
-| MODEL1-04 | Phase 3 | Pending |
-| MODEL1-05 | Phase 3 | Pending |
-| MODEL1-06 | Phase 3 | Pending |
-| REPRO-03 | Phase 3 | Pending |
+| MODEL1-01 | Phase 3 | Complete |
+| MODEL1-02 | Phase 3 | Complete |
+| MODEL1-03 | Phase 3 | Complete |
+| MODEL1-04 | Phase 3 | Complete |
+| MODEL1-05 | Phase 3 | Complete |
+| MODEL1-06 | Phase 3 | Complete |
+| REPRO-03 | Phase 3 | Complete |
 | INTERP-01 | Phase 4 | Pending |
 | INTERP-02 | Phase 4 | Pending |
 | INTERP-03 | Phase 4 | Pending |

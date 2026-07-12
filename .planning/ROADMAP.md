@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Ingesta y Almacenamiento Versionado** - Cliente API SDG de la ONU con paginación/reintentos, filtrado de dimensiones y agregados regionales, copia local versionada con manifiesto, panel base en SQLite (completed 2026-07-11)
 - [x] **Phase 2: Construcción del Panel y EDA** - Limpieza/fusión/feature engineering idempotente, filtrado por cobertura del 70%, discusión de datos faltantes (MNAR), EDA global/regional/por tipología con correlación/VIF (completed 2026-07-11)
-- [ ] **Phase 3: Modelo 1 — Regresión de Panel (PIB per cápita)** - `panel_base.py` compartido, PanelOLS con efectos fijos bidireccionales, comparación pooled/RE + Hausman, SEs robustos, robustez, serialización, sección de limitaciones
+- [x] **Phase 3: Modelo 1 — Regresión de Panel (PIB per cápita)** - `panel_base.py` compartido, PanelOLS con efectos fijos bidireccionales, comparación pooled/RE + Hausman, SEs robustos, robustez, serialización, sección de limitaciones (completed 2026-07-12)
 - [ ] **Phase 4: Interpretabilidad, Simulación y Robustez** - Simulación contrafactual bootstrap multi-escenario, heterogeneidad regional/por ingresos, SHAP + ALE con semillas fijas
 - [ ] **Phase 5: Dashboard y Preparación de la Defensa** - Dashboard Streamlit/Plotly cacheado, choropleth, comparación de indicadores, animación temporal, ensayo con caché fría y respaldo pre-renderizado
 - [ ] **Phase 6: Modelo 2 — Productividad Agrícola (stretch)** - Reutilización de `panel_base.py` para el indicador 2.3.1, documentación de cobertura reducida, extensión de simulación/SHAP/dashboard
@@ -138,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Ingesta y Almacenamiento Versionado | 6/6 | Complete    | 2026-07-11 |
 | 2. Construcción del Panel y EDA | 2/2 | Complete    | 2026-07-11 |
-| 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 0/TBD | Not started | - |
+| 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
 | 4. Interpretabilidad, Simulación y Robustez | 0/TBD | Not started | - |
 | 5. Dashboard y Preparación de la Defensa | 0/TBD | Not started | - |
 | 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |

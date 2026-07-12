@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 3
-current_phase_name: PIB per cápita
-status: executing
+current_phase: 4
+current_phase_name: Interpretabilidad, Simulación y Robustez
+status: verifying
 stopped_at: Phase 3 context gathered
-last_updated: "2026-07-12T11:07:49.323Z"
-last_activity: 2026-07-11
-last_activity_desc: Phase 02 complete, transitioned to Phase 3
+last_updated: "2026-07-12T15:41:12.558Z"
+last_activity: 2026-07-12
+last_activity_desc: Phase 03 complete, transitioned to Phase 4
 progress:
   total_phases: 6
-  completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
-  percent: 33
+  completed_phases: 3
+  total_plans: 10
+  completed_plans: 10
+  percent: 50
 ---
 
 # Project State
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
-**Current focus:** Phase 02 — Construcción del Panel y EDA
+**Current focus:** Phase 03 — modelo-1-regresi-n-de-panel-pib-per-c-pita
 
 ## Current Position
 
-Phase: 3 — Modelo 1 — Regresión de Panel (PIB per cápita)
+Phase: 4 — Interpretabilidad, Simulación y Robustez
 Plan: Not started
-Status: Ready to execute
-Last activity: 2026-07-11 — Phase 02 complete, transitioned to Phase 3
+Status: Phase complete — ready for verification
+Last activity: 2026-07-12 — Phase 03 complete, transitioned to Phase 4
 
 Progress: [██░░░░░░░░] 20%
 
@@ -39,7 +39,7 @@ Progress: [██░░░░░░░░] 20%
 
 **Velocity:**
 
-- Total plans completed: 8
+- Total plans completed: 10
 - Average duration: - min
 - Total execution time: 0 hours
 
@@ -49,6 +49,7 @@ Progress: [██░░░░░░░░] 20%
 |-------|-------|-------|----------|
 | 01 | 6 | - | - |
 | 02 | 2 | - | - |
+| 03 | 2 | - | - |
 
 **Recent Trend:**
 
@@ -64,6 +65,8 @@ Progress: [██░░░░░░░░] 20%
 | Phase 01 P06 | 25min | 2 tasks | 9 files |
 | Phase 02 P01 | 25min | 3 tasks | 5 files |
 | Phase 02 P02 | 20min | 2 tasks | 1 files |
+| Phase 03 P01 | 25min | 2 tasks | 2 files |
+| Phase 03 P02 | 45min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -92,6 +95,8 @@ Recent decisions affecting current work:
 - [Phase 01-06]: data/panel.db file lock (DB Browser for SQLite) resolved by asking user to close the app rather than force-killing it
 - [Phase 02-01]: Tipología de país = UN development-status flags (is_ldc, is_lldc, is_sids) from GeoArea/Tree, not World Bank income groups (verified those carry no country membership in this API)
 - [Phase 02-01]: panel_clean never nulls real reported values based on coverage status -- exclusions documented separately in panel_exclusions, corrected during planning's adversarial self-check from an earlier data-destructive design
+- [Phase 03-01]: hausman_test restricts to fe_results.params.index (never RE's, which could include a const FE lacks); pesaran_cd_test's null-case test uses entity_effects=True,time_effects=False to avoid a De Hoyos and Sarafidis 2006 time-demeaning artifact that would otherwise make the CD test reliably reject regardless of true dependence
+- [Phase 03-02]: Live Pesaran CD test on the real two-way-effects residuals rejects H0 (p=0.0014) at N=171 -- selected Driscoll-Kraay SEs, documented as consistent with (not necessarily caused by) the known time-demeaning artifact rather than presented as unambiguous evidence of true cross-sectional dependence
 
 ### Pending Todos
 
