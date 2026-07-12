@@ -156,10 +156,11 @@ def bootstrap_counterfactual(
         coefs.append(res.params[indep_var])
     coefs = np.array(coefs)
 
-    baseline = (
-        df[df["year"] == baseline_year].set_index(entity_col)[indep_var].astype(float)
+    baseline = pd.to_numeric(
+        df[df["year"] == baseline_year].set_index(entity_col)[indep_var],
+        errors="coerce",
     )
-    historical_min = float(df[indep_var].min())
+    historical_min = float(pd.to_numeric(df[indep_var], errors="coerce").min())
 
     results: dict = {}
     for pct in reduction_pcts:
