@@ -6,14 +6,14 @@ current_phase: 04
 current_phase_name: interpretabilidad-simulaci-n-y-robustez
 status: executing
 stopped_at: Phase 4 context gathered
-last_updated: "2026-07-12T18:47:06.502Z"
+last_updated: "2026-07-12T18:57:23.489Z"
 last_activity: 2026-07-12
 last_activity_desc: Phase 04 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
   percent: 50
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 04 (interpretabilidad-simulaci-n-y-robustez) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-07-12 — Phase 04 execution started
 
@@ -68,6 +68,7 @@ Progress: [██░░░░░░░░] 20%
 | Phase 03 P01 | 25min | 2 tasks | 2 files |
 | Phase 03 P02 | 45min | 2 tasks | 1 files |
 | Phase 04 P01 | 20min | 3 tasks | 2 files |
+| Phase 04 P02 | 5min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase 03-02]: Live Pesaran CD test on the real two-way-effects residuals rejects H0 (p=0.0014) at N=171 -- selected Driscoll-Kraay SEs, documented as consistent with (not necessarily caused by) the known time-demeaning artifact rather than presented as unambiguous evidence of true cross-sectional dependence
 - [Phase Phase 04-01]: reduction_pcts default to signed fractions ([-0.10,-0.20,-0.30]) with delta = pct * baseline — Matches the plan's own explicit function-signature default; keys the results dict directly by the signed scenario value, more intuitive than a magnitude/sign split for the notebook
 - [Phase Phase 04-01]: baseline/historical_min coerced via pd.to_numeric(errors=coerce), not .astype(float) — Threat register T-04-05 mandates reusing panel_base.py's numeric-coercion convention for any new numeric column touched
+- [Phase 04-02]: PDP implemented via sklearn.inspection.PartialDependenceDisplay only -- PyALE (SUS-flagged in legitimacy audit) never installed, no checkpoint needed, requirements.txt unchanged
 
 ### Pending Todos
 
@@ -120,6 +122,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-12T18:46:09.999Z
+Last session: 2026-07-12T18:54:20.752Z
 Stopped at: Phase 4 context gathered
 Resume file: .planning/phases/04-interpretabilidad-simulaci-n-y-robustez/04-CONTEXT.md
