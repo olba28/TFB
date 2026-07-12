@@ -202,6 +202,10 @@ def pesaran_cd_test(residuals: pd.Series) -> dict[str, float]:
     """
     wide = residuals.unstack(level=0)  # index=time, columns=entity
     n_entities = wide.shape[1]
+    if n_entities < 2:
+        raise ValueError(
+            f"pesaran_cd_test requires at least 2 entities, got {n_entities}"
+        )
 
     total = 0.0
     for i in range(n_entities):
