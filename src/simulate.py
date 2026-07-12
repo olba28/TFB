@@ -42,6 +42,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from linearmodels.panel import PanelOLS
 from linearmodels.panel.results import PanelEffectsResults
 
 from src import panel_base
@@ -183,3 +184,48 @@ def bootstrap_counterfactual(
             "excluded_countries": excluded,
         }
     return results
+
+
+def fit_interaction_model(
+    df: pd.DataFrame,
+    dep_var: str,
+    indep_var: str,
+    group_col: str,
+    cov_type: str = "clustered",
+    **cov_config,
+) -> PanelEffectsResults:
+    """Interaction-term heterogeneity model (INTERP-03, D-09/D-10/D-11):
+    fits a single two-way fixed-effects ``PanelOLS`` with
+    ``indep_var : C(group_col)`` (colon, NOT ``*``) as the only regressor
+    term besides the effects.
+
+    The standalone ``C(group_col)`` main effect is deliberately OMITTED --
+    it is time-invariant per entity and therefore fully absorbed by
+    ``EntityEffects``, which raises ``AbsorbingEffectError`` if the main
+    effect is included as a separate term (live-verified, 04-RESEARCH.md
+    Pattern 2, D-09). Only the interaction (which varies over time because
+    ``indep_var`` does) is separately identified.
+
+    Defaults to entity-clustered standard errors (``cov_type="clustered"``,
+    ``cluster_entity=True``) so ``res.params``/``res.std_errors``/
+    ``res.conf_int()`` give one ``indep_var`` coefficient PER group value
+    with SE and CI (D-11 -- a coefficient table only, never a per-country
+    predicted value).
+
+    Generic in ``group_col`` (D-10) -- the Phase 4 notebook calls this twice
+    (``group_col="region"``, ``group_col="is_ldc"``); Phase 6 reuses it
+    unmodified with ``dep_var="2.3.1"`` (D-12).
+    """
+    indexed = df.set_index(["country_code", "year"]).copy()
+    for column in [dep_var, indep_var]:
+        indexed[column] = pd.to_numeric(indexed[column], errors="coerce")
+
+    formula = (
+        f'Q("{dep_var}") ~ 1 + Q("{indep_var}") : C({group_col}) '
+        "+ EntityEffects + TimeEffects"
+    )
+    model = PanelOLS.from_formula(formula, data=indexed)
+
+    if cov_type == "clustered" and not cov_config:
+        cov_config = {"cluster_entity": True}
+    return model.fit(cov_type=cov_type, **cov_config)

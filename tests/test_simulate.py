@@ -233,10 +233,13 @@ def test_interaction_formula():
 
     result = simulate.fit_interaction_model(df, "y", "x", "group")
 
-    # one coefficient per group value (0 and 1) -- D-11's coefficient table
-    assert len(result.params) == 2
+    # one water-stress coefficient PER group value (0 and 1) -- D-11's
+    # coefficient table -- identified by the interaction term name, tolerant
+    # of whether an intercept row is also present alongside them.
+    interaction_params = [p for p in result.params.index if "C(group)" in p]
+    assert len(interaction_params) == 2
     assert result.std_errors is not None
-    assert len(result.std_errors) == 2
+    assert all(p in result.std_errors.index for p in interaction_params)
     conf_int = result.conf_int()
     assert conf_int is not None
-    assert len(conf_int) == 2
+    assert all(p in conf_int.index for p in interaction_params)
