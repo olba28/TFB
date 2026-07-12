@@ -44,6 +44,7 @@ import shap
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.inspection import PartialDependenceDisplay
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.tools import add_constant
 
 
 def compute_vif_table(df: pd.DataFrame, numeric_cols: list[str]) -> pd.DataFrame:
@@ -55,6 +56,13 @@ def compute_vif_table(df: pd.DataFrame, numeric_cols: list[str]) -> pd.DataFrame
     here so interpret.py can call it programmatically (INTERP-04 precedence:
     this table must be computed and reportable BEFORE SHAP output).
 
+    A constant column is added via ``statsmodels.tools.add_constant`` before
+    computing VIF -- the same methodological choice Phase 2's notebook made
+    explicitly ("omitir la constante cambia los valores de VIF resultantes",
+    cell 11) -- and excluded from the returned table (its own VIF has no
+    interpretation). Without this the VIF values are numerically different
+    from (and not comparable to) Phase 2's committed numbers.
+
     Rows with missing values in ``numeric_cols`` are dropped complete-case
     before computing VIF -- ``variance_inflation_factor`` requires a
     complete numeric matrix.
@@ -65,15 +73,15 @@ def compute_vif_table(df: pd.DataFrame, numeric_cols: list[str]) -> pd.DataFrame
     (src/panel_base.py's hausman_test/pesaran_cd_test).
     """
     complete = df[numeric_cols].dropna()
-    matrix = complete.to_numpy(dtype=float)
+    design = add_constant(complete, has_constant="add")
 
     vifs = []
-    for i in range(matrix.shape[1]):
-        vif = variance_inflation_factor(matrix, i)
+    for col in numeric_cols:
+        vif = variance_inflation_factor(design.to_numpy(dtype=float), design.columns.get_loc(col))
         vifs.append(vif)
         if not np.isfinite(vif):
             warnings.warn(
-                f"compute_vif_table: VIF for '{numeric_cols[i]}' is not finite "
+                f"compute_vif_table: VIF for '{col}' is not finite "
                 "(perfect or near-perfect collinearity) -- treat this "
                 "predictor's VIF as undefined, not as a bug",
                 UserWarning,
