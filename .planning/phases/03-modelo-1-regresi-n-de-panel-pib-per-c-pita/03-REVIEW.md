@@ -1,68 +1,254 @@
 ---
-status: clean
 phase: 03-modelo-1-regresi-n-de-panel-pib-per-c-pita
+reviewed: 2026-07-12T00:00:00Z
 depth: standard
 files_reviewed: 3
+files_reviewed_list:
+  - src/panel_base.py
+  - tests/test_panel_base.py
+  - notebook/3_1_modelo1_pib.ipynb
 findings:
-  critical: 0
-  warning: 0
-  info: 0
-  total: 0
-reviewed: 2026-07-12
+  critical: 1
+  warning: 3
+  info: 2
+  total: 6
+status: issues_found
 ---
 
-# Phase 03 Code Review
+# Phase 03: Code Review Report
 
-> ⚠️ **Deviation notice:** This review was produced inline by the same
-> session that planned this phase, not by an independently-spawned
-> `gsd-code-reviewer` subagent — no `Agent`/`Task` tool was available (same
-> constraint as every other phase artifact this session). File scope was
-> computed the same way the standard workflow would (extracted from
-> `03-01-SUMMARY.md`/`03-02-SUMMARY.md`'s `key-files.created`).
->
-> **Note on execution provenance:** the implementation this review covers
-> (`src/panel_base.py`, `tests/test_panel_base.py`,
-> `notebook/3_1_modelo1_pib.ipynb`) was executed by a separate process
-> (visible only as completed git commits and SUMMARY.md files when this
-> session's tool availability resumed — see `03-01-SUMMARY.md`/
-> `03-02-SUMMARY.md`'s own accounts). This review independently verified the
-> claims in those SUMMARYs before accepting them: re-ran the full test suite
-> (84/84 passing), reloaded the pickled model directly and cross-checked its
-> `.summary` against the SUMMARY's cited statistics, re-executed
-> `nbformat`-level inspection of the notebook for exceptions, and read the
-> full source of `src/panel_base.py` and `tests/test_panel_base.py` before
-> writing any finding below.
-
+**Reviewed:** 2026-07-12T00:00:00Z
 **Depth:** standard
-**Files reviewed:** 3 (`src/panel_base.py`, `tests/test_panel_base.py`, `notebook/3_1_modelo1_pib.ipynb`)
+**Files Reviewed:** 3
+**Status:** issues_found
 
 ## Summary
 
-No findings. This is unusually clean, careful work: the implementation
-correctly diagnosed and handled a genuine, subtle statistical artifact (the
-De Hoyos & Sarafidis 2006 two-way-fixed-effects time-demeaning artifact
-mechanically inducing a small negative average pairwise residual
-correlation, which would otherwise make the Pesaran CD test's null-case
-unit test reject regardless of true cross-sectional dependence) rather than
-either ignoring it or silently loosening the test's tolerance. The same
-nuance was correctly forwarded into the live notebook's interpretation of
-the real Pesaran CD result (which does reject at N=171, p=0.0014) —
-documented as *consistent with* rather than definitive proof of true
-cross-sectional dependence, which is the methodologically honest framing.
+Reviewed `src/panel_base.py`, `tests/test_panel_base.py`, and
+`notebook/3_1_modelo1_pib.ipynb` at standard depth, with extra scrutiny on
+the manually-coded `hausman_test` and `pesaran_cd_test` functions (no
+library backstop for either) and on whether the notebook uses a consistent
+covariance type on both sides of its Hausman comparison.
 
-## Verification Performed
+The notebook's Hausman comparison is correctly consistent: both
+`final_fe_results` (cell 6) and `hausman_re_results` (cell 8) are fit with
+the same `chosen_cov_type`/`chosen_cov_config` selected by
+`choose_cov_type`, and this is verified against live output (`cov_type=
+"kernel"` on both sides, H=0.2566, df=1, p=0.6125). That specific
+requirement holds.
 
-- **Full test suite:** `.venv/Scripts/python.exe -m pytest tests/ -q` → **84 passed**, independently re-run, not just trusted from the SUMMARY.
-- **Pickle round-trip:** reloaded `data/modelos/model1_gdp.pkl` directly (not via the notebook) and printed `.summary` — confirmed `No. Observations: 3879`, `Cov. Estimator: Driscoll-Kraay`, coefficient `-0.0001 (p=0.8238)`, matching the SUMMARY's cited values exactly.
-- **Notebook execution state:** inspected all 15 cells via `nbformat` — zero cells with `output_type == "error"`.
-- **Apparent 3,933-vs-3,879 discrepancy investigated and resolved (not a bug):** the notebook's own sanity-check cell prints "Observations after filter_by_exclusions: 3933" (the country-level-filtered row count, which still contains some individually-missing years within included countries — expected, since D-02's exclusion is country-level, not row-level). `PanelOLS` then internally drops the remaining row-level NaNs at fit time (visible in the notebook's own `MissingValueWarning` output), landing on 3,879 actual regression observations — matching `03-RESEARCH.md` Finding 4's estimate almost exactly. Both numbers are correctly reported for what they measure; this is not an inconsistency.
-- **Source review:** read `src/panel_base.py` and `tests/test_panel_base.py` in full. Confirmed: `hausman_test` restricts to `fe_results.params.index` (not RE's, avoiding the const-mismatch bug a naive implementation would hit); the `pinv` fallback is tested with a deliberately-singular fixture; the hand-computable Pesaran fixture matches the exact `-1.0` value verified independently during planning; `choose_cov_type`'s two branches are both tested; `_build_panel_index`'s `.copy()` before mutating avoids a `SettingWithCopyWarning`/aliasing bug.
-- **Kernel/environment fix verified:** `notebook/3_1_modelo1_pib.ipynb`'s metadata confirmed to reference the `tfb-venv` kernel (not the default `python3`), consistent with the SUMMARY's claimed fix and Phase 2's own precedent for the same issue.
-- **No new dependencies, no unexpected `src/` changes:** `git status --short src/ requirements.txt requirements.lock.txt` shows nothing beyond the pre-existing, unrelated stray `.msi` file already noted in Phase 1/2's reviews as out of scope.
-- **No secrets, no stray TODO/FIXME markers** in either new source file.
+However, direct execution of `fit_panel_model` against the same synthetic
+panel used in the test suite surfaces a real defect: the function's own
+default (`cov_type="clustered"` with no default cluster configuration)
+silently computes heteroskedasticity-robust standard errors that are
+**not** clustered by entity at all -- identical to `cov_type="robust"`,
+and measurably different from the entity-clustered result the parameter
+name implies (0.049910 vs. 0.053601 in a controlled comparison, see
+CR-01). Because this module is explicitly designed to be reused
+unmodified by Model 2 (Phase 6, D-05), and three of the tests in
+`tests/test_panel_base.py` exercise exactly this silently-wrong default
+without asserting anything about the resulting standard errors, this is a
+live trap for any future caller who omits `cluster_entity=True`.
 
-## Files Reviewed
+Two further statistical-correctness gaps were found in the manually-coded
+tests themselves: `hausman_test` has no guard against a negative test
+statistic (a well-documented possibility whenever `Var(FE) - Var(RE)` is
+not positive semi-definite, which is exactly the situation this codebase
+creates by design when it fits both sides with non-classical robust/
+clustered/kernel covariance types -- see CR/WR discussion below), and
+`compare_specifications` fits `PooledOLS` with no intercept term, which
+(unlike `RandomEffects`'s quasi-demeaning or `PanelOLS`'s exact demeaning)
+forces the pooled regression through the origin.
 
-- `src/panel_base.py` — no findings. Clean, dependent-variable-agnostic implementation matching `03-01-PLAN.md`'s specification exactly, including both Review-Notes fixes from the planning stage (Hausman covariance-consistency requirement documented in the docstring; hand-computable Pesaran fixture value matches).
-- `tests/test_panel_base.py` — no findings. 13 tests, comprehensive coverage of the exclusion semantics, fit correctness, comparison table, both diagnostic tests (including the singular-matrix Hausman fallback and the hand-computable Pesaran fixture), and the SE-choice decision rule.
-- `notebook/3_1_modelo1_pib.ipynb` — no findings. Executes cleanly, contains all required sections (SE-choice justification, pooled/RE/FE comparison, Hausman result computed with covariance-type consistency between FE/RE as Plan 03-02's Review Notes required, COVID-excluded robustness check, and the "Limitaciones / Amenazas a la validez" section covering both reverse causality and endogeneity).
+## Critical Issues
+
+### CR-01: `fit_panel_model`'s default `cov_type="clustered"` silently produces non-clustered (per-observation) standard errors
+
+**File:** `src/panel_base.py:77-94`
+**Issue:** `fit_panel_model` defaults to `cov_type="clustered"` but supplies
+no default clustering configuration (`cluster_entity`, `cluster_time`, or
+`clusters`). `linearmodels`'s `ClusteredCovariance` falls back to
+`clusters = np.arange(nobs)` when none is supplied -- i.e., every
+observation is its own cluster, which is mathematically identical to
+`cov_type="robust"` (heteroskedasticity-robust/White SEs), **not**
+entity-clustered SEs. Verified empirically on a 10-entity/10-year synthetic
+panel identical in shape to the test fixtures:
+
+```
+default clustered (no config) std err: [0.04990955]
+robust std err:                        [0.04990955]   <- identical
+clustered by entity std err:           [0.05360098]   <- actually different
+```
+
+Three tests in `tests/test_panel_base.py`
+(`test_fit_panel_model_recovers_known_coefficient_sign_and_significance`,
+`test_fit_panel_model_effects_flags_change_the_fit`,
+`test_fit_panel_model_builds_index_internally_not_left_to_caller`) call
+`fit_panel_model(df, DEP_VAR, INDEP_VARS)` with no `cov_type`/`cov_config`
+override, so this silently-wrong default is exercised by the suite but
+never actually checked. The live notebook happens to always pass an
+explicit `cov_config` (cell 5's provisional fit passes
+`cluster_entity=True`; cells 6/12 pass `chosen_cov_type`/`chosen_cov_config`
+from `choose_cov_type`), so Model 1's reported results are not affected --
+but `panel_base.py` is explicitly documented (module docstring, D-05) as
+the unmodified shared entry point Model 2 (Phase 6) will call directly.
+Any future call of `fit_panel_model(df, dep_var, indep_vars)` without an
+explicit `cluster_entity=True` will silently report standard errors/
+p-values under a misleading label ("clustered"), which is exactly the kind
+of silent statistical-inference error that matters for a thesis defended
+before an academic tribunal.
+
+**Fix:** Either supply a sensible default clustering config when
+`cov_type == "clustered"` and none was given, or fail loudly instead of
+silently degrading:
+
+```python
+def fit_panel_model(
+    df: pd.DataFrame,
+    dep_var: str,
+    indep_vars: list[str],
+    entity_effects: bool = True,
+    time_effects: bool = True,
+    cov_type: str = "clustered",
+    **cov_config: Any,
+) -> PanelEffectsResults:
+    indexed = _build_panel_index(df, dep_var, indep_vars)
+    if cov_type == "clustered" and not cov_config:
+        # linearmodels silently degrades an unconfigured "clustered" to a
+        # per-observation (i.e. plain "robust") covariance -- make the
+        # entity-clustering intent explicit rather than relying on that
+        # fallback.
+        cov_config = {"cluster_entity": True}
+    model = PanelOLS(
+        indexed[dep_var],
+        indexed[indep_vars],
+        entity_effects=entity_effects,
+        time_effects=time_effects,
+    )
+    return model.fit(cov_type=cov_type, **cov_config)
+```
+
+## Warnings
+
+### WR-01: `hausman_test` has no guard against a negative (uninterpretable) test statistic
+
+**File:** `src/panel_base.py:147-160`
+**Issue:** The classic Hausman statistic `H = diff' * inv(Var(FE)-Var(RE)) * diff`
+is only guaranteed non-negative when `Var(FE) - Var(RE)` is positive
+semi-definite, which itself is only guaranteed under the classical
+Hausman assumption that RE is the *efficient* estimator under H0 --
+i.e., when both covariance matrices are computed with the classical
+(homoskedastic, "unadjusted") estimator. This codebase's own documented
+methodology (notebook cell 8, and this phase's Success Criterion #3)
+deliberately fits both sides with **non-classical** robust/clustered/
+kernel covariance types (whatever `choose_cov_type` selects), which does
+not guarantee `Var(FE) - Var(RE)` stays positive semi-definite. When it
+doesn't, `np.linalg.inv` still succeeds (the matrix is merely
+negative-definite, not singular, so the existing `LinAlgError` fallback at
+line 149 never triggers), and the resulting `statistic` can be negative.
+`stats.chi2.cdf(negative_value, df)` returns `0.0` unconditionally (chi2's
+support is `x >= 0`), so `pvalue = 1 - 0 = 1.0` -- i.e. a negative,
+invalid statistic is silently reported as "fail to reject H0 with p=1.0",
+indistinguishable from a genuinely well-behaved non-rejection. This run
+happened to produce a positive statistic (H=0.2566), but nothing in the
+code detects or flags the case when it doesn't, despite the module
+already treating the sibling "singular `var_diff`" pathology as worth an
+explicit warning.
+
+**Fix:**
+```python
+statistic = float(diff @ inv_var_diff @ diff)
+if statistic < 0:
+    warnings.warn(
+        "Hausman test: negative test statistic (Var(FE) - Var(RE) is not "
+        "positive semi-definite) -- the classical chi2 approximation is "
+        "not valid here, likely because both sides were fit with a "
+        "non-classical (robust/clustered/kernel) covariance estimator; "
+        "treat this result as uninterpretable, not as evidence for H0",
+        UserWarning,
+        stacklevel=2,
+    )
+degrees_of_freedom = len(common)
+pvalue = float(1 - stats.chi2.cdf(statistic, degrees_of_freedom))
+```
+
+### WR-02: `compare_specifications` fits `PooledOLS`/`RandomEffects` with no intercept term
+
+**File:** `src/panel_base.py:110-120`
+**Issue:** `exog = indexed[indep_vars]` never includes a constant column,
+and none of `PooledOLS`, `RandomEffects`, or `PanelOLS` are given one.
+For `PanelOLS` with `entity_effects=True, time_effects=True` this is
+correct (two-way demeaning absorbs any level shift, no intercept needed).
+For `RandomEffects`, the quasi-demeaning transformation
+(`y_it - theta * ybar_i`) plays a similar role, so omitting an explicit
+constant is defensible. But `PooledOLS` performs **no** demeaning at all
+-- it is literal OLS on the pooled panel. Without an intercept, the
+regression is forced through the origin; since a country's GDP per
+capita (`8.1.1`) and water-stress index (`6.4.2`) are not naturally
+mean-zero variables, the resulting Pooled coefficient/R-squared reported
+in the comparison table (03-RESEARCH.md Finding 1 describes this table as
+"directly embeddable" in the thesis) is likely biased relative to a
+correctly-specified Pooled OLS baseline, undermining its value as the
+"naive" comparison point against RE/FE.
+
+**Fix:** Add an explicit constant to the exog used for `PooledOLS` (and
+optionally `RandomEffects`, for symmetry), leaving `PanelOLS` unchanged:
+
+```python
+exog_with_const = exog.assign(const=1.0)
+pooled_res = PooledOLS(dependent, exog_with_const).fit(cov_type="unadjusted")
+re_res = RandomEffects(dependent, exog_with_const).fit(cov_type="unadjusted")
+fe_res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit(
+    cov_type="unadjusted"
+)
+```
+
+### WR-03: `pesaran_cd_test` divides by zero if fewer than 2 entities survive filtering
+
+**File:** `src/panel_base.py:182-194`
+**Issue:** `n_entities * (n_entities - 1)` is used as a divisor
+(`np.sqrt(2.0 / (n_entities * (n_entities - 1)))`) with no check that
+`n_entities >= 2`. If `residuals` ever carries only 0 or 1 distinct
+entities (e.g., a mis-specified call, or an extreme exclusion scenario
+upstream), this raises an unguarded `ZeroDivisionError` rather than a
+clear, actionable error message. Unlikely in the current ~171-country
+Model 1 run, but this function is shared with Model 2 and has no input
+validation at all.
+
+**Fix:**
+```python
+n_entities = wide.shape[1]
+if n_entities < 2:
+    raise ValueError(
+        f"pesaran_cd_test requires at least 2 entities, got {n_entities}"
+    )
+```
+
+## Info
+
+### IN-01: Redundant local `import numpy as np` in test already imported at module scope
+
+**File:** `tests/test_panel_base.py:223`
+**Issue:** `numpy` is already imported at module level (line 15,
+`import numpy as np`); `test_hausman_test_falls_back_to_pinv_on_singular_var_diff`
+re-imports it locally, which is unnecessary and inconsistent with every
+other test in the file.
+**Fix:** Remove the local `import numpy as np` on line 223; rely on the
+module-level import.
+
+### IN-02: Local `linearmodels` imports duplicated across two test functions
+
+**File:** `tests/test_panel_base.py:206`, `tests/test_panel_base.py:285`
+**Issue:** `from linearmodels.panel import PanelOLS, RandomEffects` (line
+206) and `from linearmodels.panel import PanelOLS` (line 285) are
+imported inside individual test functions rather than once at module
+scope, unlike `src.panel_base`'s own top-level import style. Minor
+inconsistency, no functional impact.
+**Fix:** Hoist both imports to the top of the file alongside the existing
+`from src import panel_base`.
+
+---
+
+_Reviewed: 2026-07-12T00:00:00Z_
+_Reviewer: Claude (gsd-code-reviewer)_
+_Depth: standard_
