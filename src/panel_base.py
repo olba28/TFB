@@ -118,3 +118,96 @@ def compare_specifications(
     )
 
     return compare({"Pooled": pooled_res, "RE": re_res, "FE": fe_res})
+
+
+def hausman_test(
+    fe_results: PanelEffectsResults,
+    re_results: RandomEffectsResults,
+) -> dict[str, float]:
+    """Manual FE-vs-RE Hausman test (03-RESEARCH.md Finding 2 -- neither
+    ``linearmodels`` nor ``statsmodels`` provides this test for panel data).
+
+    Restricted to ``fe_results.params.index`` -- FE has no intercept, so this
+    is exactly the regressor set common to both FE and RE (do NOT use RE's
+    ``params.index``, which would include a ``const`` entry FE lacks whenever
+    RE/Pooled are fit with an explicit constant column).
+
+    ``H = (b_FE - b_RE)' [Var(b_FE) - Var(b_RE)]^-1 (b_FE - b_RE) ~ chi2(k)``
+
+    Falls back to ``numpy.linalg.pinv`` (with an explicit warning) if
+    ``var_diff`` is singular -- a documented, known small-sample pathology of
+    this test, not a bug to hide.
+    """
+    common = fe_results.params.index
+    diff = fe_results.params[common].values - re_results.params[common].values
+    var_diff = (
+        fe_results.cov.loc[common, common].values - re_results.cov.loc[common, common].values
+    )
+
+    try:
+        inv_var_diff = np.linalg.inv(var_diff)
+    except np.linalg.LinAlgError:
+        warnings.warn(
+            "Hausman test: var_diff is singular, using pseudo-inverse (pinv) "
+            "-- known small-sample pathology, not a bug",
+            UserWarning,
+            stacklevel=2,
+        )
+        inv_var_diff = np.linalg.pinv(var_diff)
+
+    statistic = float(diff @ inv_var_diff @ diff)
+    degrees_of_freedom = len(common)
+    pvalue = float(1 - stats.chi2.cdf(statistic, degrees_of_freedom))
+    return {"statistic": statistic, "df": degrees_of_freedom, "pvalue": pvalue}
+
+
+def pesaran_cd_test(residuals: pd.Series) -> dict[str, float]:
+    """Manual Pesaran cross-sectional-dependence test (03-RESEARCH.md
+    Finding 2 -- neither ``linearmodels`` nor ``statsmodels`` provides this).
+
+    ``residuals`` must carry a ``(entity, time)`` MultiIndex (e.g.
+    ``fe_results.resids``, directly usable without transformation).
+    ``unstack(level=0)`` unstacks the OUTER index level (``entity``, given
+    the ``(country_code, year)`` MultiIndex ``fit_panel_model`` builds),
+    producing a (time x entity) wide frame -- verified against a
+    hand-computable 3-entity fixture.
+
+    ``CD = sqrt(2/(N(N-1))) * sum_{i<j} sqrt(T_ij) * rho_hat_ij ~ N(0,1)``
+
+    Handles unbalanced panels natively via per-pair ``.dropna()`` -- included
+    countries can still have individually-missing years within their
+    qualifying span even after D-02's country-level exclusion.
+    """
+    wide = residuals.unstack(level=0)  # index=time, columns=entity
+    n_entities = wide.shape[1]
+
+    total = 0.0
+    for i in range(n_entities):
+        for j in range(i + 1, n_entities):
+            pair = wide.iloc[:, [i, j]].dropna()
+            if len(pair) < 2:
+                continue
+            rho = pair.iloc[:, 0].corr(pair.iloc[:, 1])
+            if pd.notna(rho):
+                total += np.sqrt(len(pair)) * rho
+
+    cd_statistic = float(np.sqrt(2.0 / (n_entities * (n_entities - 1))) * total)
+    pvalue = float(2 * (1 - stats.norm.cdf(abs(cd_statistic))))
+    return {"statistic": cd_statistic, "pvalue": pvalue}
+
+
+def choose_cov_type(
+    pesaran_result: dict[str, float],
+    alpha: float = 0.05,
+) -> tuple[str, dict[str, Any]]:
+    """Pure decision rule (Claude's Discretion, 03-CONTEXT.md): returns
+    ``("kernel", {"kernel": "bartlett"})`` (Driscoll-Kraay) if the Pesaran
+    test rejects H0 of no cross-sectional dependence
+    (``pesaran_result["pvalue"] < alpha``), else
+    ``("clustered", {"cluster_entity": True})``. The returned tuple's second
+    element is the exact ``**cov_config`` to splat into
+    ``fit_panel_model(..., cov_type=result[0], **result[1])``.
+    """
+    if pesaran_result["pvalue"] < alpha:
+        return "kernel", {"kernel": "bartlett"}
+    return "clustered", {"cluster_entity": True}

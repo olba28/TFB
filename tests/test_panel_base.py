@@ -268,14 +268,25 @@ def test_pesaran_cd_test_fails_to_reject_null_on_no_true_cross_sectional_depende
     """Residuals from a correctly-specified FE model on this synthetic panel
     have no true cross-sectional dependence by construction -- the test
     should fail to reject H0 (03-RESEARCH.md Finding 2: verified CD=-0.2814,
-    p=0.778 on an equivalent setup)."""
+    p=0.778 on an equivalent setup).
+
+    Uses entity_effects only (time_effects=False) to generate the residuals:
+    a two-way (entity+time) FE fit forces sum_i(resid_it) == 0 within every
+    period for a balanced panel, which mechanically induces a small negative
+    average pairwise correlation across entities -- a well-documented
+    structural artifact of time-demeaning (De Hoyos & Sarafidis 2006), not
+    true cross-sectional dependence. Verified live: with N=30/T=20 and
+    time_effects=True this mechanical artifact reliably makes the CD test
+    reject (p < 0.01) regardless of random seed, which would test the
+    artifact rather than the formula. entity_effects-only residuals avoid
+    that confound and match the qualitative p > 0.05 expectation."""
     df = _make_synthetic_panel(n_entities=30, n_years=20, seed=1)
 
     from linearmodels.panel import PanelOLS
 
     indexed = df.set_index(["country_code", "year"])
     fe_res = PanelOLS(
-        indexed[DEP_VAR], indexed[INDEP_VARS], entity_effects=True, time_effects=True
+        indexed[DEP_VAR], indexed[INDEP_VARS], entity_effects=True, time_effects=False
     ).fit(cov_type="unadjusted")
 
     result = panel_base.pesaran_cd_test(fe_res.resids)
