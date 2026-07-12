@@ -31,9 +31,9 @@
 
 ### Interpretabilidad, Simulación y Robustez
 
-- [ ] **INTERP-01**: El sistema ejecuta una simulación contrafactual con intervalos de confianza por bootstrap, enmarcada explícitamente como análisis de sensibilidad (no predicción causal), verificando que los escenarios no extrapolan más allá del rango empírico observado
+- [x] **INTERP-01**: El sistema ejecuta una simulación contrafactual con intervalos de confianza por bootstrap, enmarcada explícitamente como análisis de sensibilidad (no predicción causal), verificando que los escenarios no extrapolan más allá del rango empírico observado
 - [ ] **INTERP-02**: El sistema produce un gráfico multi-escenario de sensibilidad (p. ej. -10%, -20%, -30% de reducción del estrés hídrico)
-- [ ] **INTERP-03**: El sistema incluye un análisis de heterogeneidad regional/por nivel de ingresos (términos de interacción o subgrupos), sin generar predicciones por país individual
+- [x] **INTERP-03**: El sistema incluye un análisis de heterogeneidad regional/por nivel de ingresos (términos de interacción o subgrupos), sin generar predicciones por país individual
 - [ ] **INTERP-04**: El sistema calcula interpretabilidad SHAP vía un modelo auxiliar de scikit-learn (RandomForest) con TreeExplainer, precedido de una matriz de correlación/VIF como aviso de posible sesgo por variables correlacionadas
 - [ ] **INTERP-05**: El sistema produce gráficos ALE/partial-dependence como complemento a SHAP para las variables correlacionadas
 - [ ] **INTERP-06**: El sistema incluye un modelo de referencia (Random Forest/Gradient Boosting) como comparación predictiva complementaria al modelo econométrico, sin sustituir su interpretación causal
@@ -49,7 +49,7 @@
 ### Reproducibilidad
 
 - [x] **REPRO-01**: El proyecto genera un fichero de dependencias fijas (`requirements.lock.txt`) vía `pip freeze`
-- [ ] **REPRO-02**: Todos los pasos estocásticos (bootstrap, modelo ML, cualquier split) usan semillas aleatorias fijas
+- [x] **REPRO-02**: Todos los pasos estocásticos (bootstrap, modelo ML, cualquier split) usan semillas aleatorias fijas
 - [x] **REPRO-03**: La memoria incluye una sección explícita de "Limitaciones / Amenazas a la validez" que aborda causalidad inversa y endogeneidad
 
 ### Modelo 2 — Productividad Agrícola
@@ -103,13 +103,13 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | MODEL1-05 | Phase 3 | Complete |
 | MODEL1-06 | Phase 3 | Complete |
 | REPRO-03 | Phase 3 | Complete |
-| INTERP-01 | Phase 4 | Pending |
+| INTERP-01 | Phase 4 | Complete |
 | INTERP-02 | Phase 4 | Pending |
-| INTERP-03 | Phase 4 | Pending |
+| INTERP-03 | Phase 4 | Complete |
 | INTERP-04 | Phase 4 | Pending |
 | INTERP-05 | Phase 4 | Pending |
 | INTERP-06 | Phase 4 | Pending |
-| REPRO-02 | Phase 4 | Pending |
+| REPRO-02 | Phase 4 | Complete |
 | DASH-01 | Phase 5 | Pending |
 | DASH-02 | Phase 5 | Pending |
 | DASH-03 | Phase 5 | Pending |
