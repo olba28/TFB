@@ -116,9 +116,15 @@ def compare_specifications(
     indexed = _build_panel_index(df, dep_var, indep_vars)
     dependent = indexed[dep_var]
     exog = indexed[indep_vars]
+    # PooledOLS performs no demeaning at all (unlike RandomEffects's
+    # quasi-demeaning or PanelOLS's exact two-way demeaning), so without an
+    # explicit constant the pooled regression is forced through the origin --
+    # add one for both Pooled and RE, for symmetry, leaving PanelOLS unchanged
+    # (its two-way effects already absorb any level shift).
+    exog_with_const = exog.assign(const=1.0)
 
-    pooled_res = PooledOLS(dependent, exog).fit(cov_type="unadjusted")
-    re_res = RandomEffects(dependent, exog).fit(cov_type="unadjusted")
+    pooled_res = PooledOLS(dependent, exog_with_const).fit(cov_type="unadjusted")
+    re_res = RandomEffects(dependent, exog_with_const).fit(cov_type="unadjusted")
     fe_res = PanelOLS(dependent, exog, entity_effects=True, time_effects=True).fit(
         cov_type="unadjusted"
     )
