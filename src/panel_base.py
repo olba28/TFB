@@ -162,6 +162,16 @@ def hausman_test(
         inv_var_diff = np.linalg.pinv(var_diff)
 
     statistic = float(diff @ inv_var_diff @ diff)
+    if statistic < 0:
+        warnings.warn(
+            "Hausman test: negative test statistic (Var(FE) - Var(RE) is not "
+            "positive semi-definite) -- the classical chi2 approximation is "
+            "not valid here, likely because both sides were fit with a "
+            "non-classical (robust/clustered/kernel) covariance estimator; "
+            "treat this result as uninterpretable, not as evidence for H0",
+            UserWarning,
+            stacklevel=2,
+        )
     degrees_of_freedom = len(common)
     pvalue = float(1 - stats.chi2.cdf(statistic, degrees_of_freedom))
     return {"statistic": statistic, "df": degrees_of_freedom, "pvalue": pvalue}
