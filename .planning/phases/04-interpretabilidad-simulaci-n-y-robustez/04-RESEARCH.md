@@ -462,17 +462,19 @@ rf = RandomForestRegressor(random_state=SEED, n_jobs=1, oob_score=True)
 
 **If this table is empty:** N/A — see entries above.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does INTERP-06 require a conventional held-out train/test split, or is the RF's `oob_score_` sufficient as the "predictive comparison" metric?**
+1. **Does INTERP-06 require a conventional held-out train/test split, or is the RF's `oob_score_` sufficient as the "predictive comparison" metric?** — `RESOLVED`
    - What we know: REPRO-02's wording explicitly anticipates "cualquier split" as a possible stochastic step needing a fixed seed, suggesting the phase's author considered a split might exist. `oob_score=True` gives an R² estimate "for free" from the same bootstrap-sampled trees already being fit, with no additional seeding surface.
    - What's unclear: Whether a tribunal/thesis-advisor would consider OOB score an adequate substitute for a conventional test-set metric, or whether a `train_test_split(random_state=SEED)` + `.score()` on the held-out set is expected as the more familiar, more easily explained "predictive comparison."
    - Recommendation: Default to `oob_score=True` (simpler, no extra seeding surface, already demonstrated deterministic under `n_jobs=1`) and let the planner add an explicit train/test split only if the phase's discuss-phase output or the thesis advisor specifically expects one. If added, it must be seeded (`random_state=SEED`) per REPRO-02.
+   - **Resolution:** `04-02-PLAN.md` (Task 2) adopted `oob_score_` as the sole INTERP-06 metric — no separate train/test split.
 
-2. **Exact runtime budget for the full notebook (3000 bootstrap refits + SHAP + ALE) — should the plan include a "reduce replicas for dev, restore to 1000 for final run" step?**
+2. **Exact runtime budget for the full notebook (3000 bootstrap refits + SHAP + ALE) — should the plan include a "reduce replicas for dev, restore to 1000 for final run" step?** — `RESOLVED`
    - What we know: ≈18 min (bootstrap, serial) + ≈6 min (SHAP on 300 trees) + ALE/PDP (fast, seconds) ≈ 25-30 min total for one full top-to-bottom execution, live-measured on this machine.
    - What's unclear: Whether this is acceptable as a single `nbconvert --execute` run (matching Phase 2/3's verification pattern of re-executing the whole notebook) or whether it needs `joblib.Parallel` to be part of the plan's Wave 0 rather than a "nice to have."
    - Recommendation: Plan for the serial version first (simpler to reason about and debug); add `joblib.Parallel` + `SeedSequence.spawn()` (Pattern 1) only if the ~25-30 min full-notebook re-execution becomes a practical blocker during the plan's own verification loop.
+   - **Resolution:** `04-03-PLAN.md` adopted the serial version (no Wave 0 `joblib.Parallel` requirement); the plan's own Task 3 accepts the ~25-30 min-per-run cost since it re-executes the notebook twice for REPRO-02 proof.
 
 ## Environment Availability
 
