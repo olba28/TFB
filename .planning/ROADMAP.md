@@ -99,7 +99,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Existen gráficos ALE/partial-dependence que complementan los SHAP para las variables correlacionadas identificadas.
   6. Ejecutar dos veces el pipeline estocástico (bootstrap, entrenamiento del RandomForest, cualquier split) produce resultados idénticos gracias a semillas aleatorias fijas.
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — src/simulate.py: block bootstrap contrafactual + no-extrapolación + heterogeneidad por interacción (INTERP-01, INTERP-03, REPRO-02)
+- [ ] 04-02-PLAN.md — src/interpret.py: RandomForest + SHAP + VIF + partial-dependence (INTERP-04, INTERP-05, INTERP-06, REPRO-02)
+- [ ] 04-03-PLAN.md — notebook/4_1_interpretabilidad_simulacion.ipynb: orquestación, serialización de rf_shap_model.pkl y verificación de reproducibilidad end-to-end (INTERP-01..06, REPRO-02)
 
 ### Phase 5: Dashboard y Preparación de la Defensa
 
@@ -139,6 +144,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Ingesta y Almacenamiento Versionado | 6/6 | Complete    | 2026-07-11 |
 | 2. Construcción del Panel y EDA | 2/2 | Complete    | 2026-07-11 |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
-| 4. Interpretabilidad, Simulación y Robustez | 0/TBD | Not started | - |
+| 4. Interpretabilidad, Simulación y Robustez | 0/3 | Not started | - |
 | 5. Dashboard y Preparación de la Defensa | 0/TBD | Not started | - |
 | 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |
