@@ -85,6 +85,12 @@ def fit_panel_model(
     set if ever needed).
     """
     indexed = _build_panel_index(df, dep_var, indep_vars)
+    if cov_type == "clustered" and not cov_config:
+        # linearmodels silently degrades an unconfigured "clustered" covariance
+        # to a per-observation (i.e. plain "robust"/White) covariance -- make
+        # the entity-clustering intent implied by the parameter name explicit
+        # rather than relying on that fallback (see 03-REVIEW.md CR-01).
+        cov_config = {"cluster_entity": True}
     model = PanelOLS(
         indexed[dep_var],
         indexed[indep_vars],
