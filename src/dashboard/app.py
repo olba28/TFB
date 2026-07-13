@@ -30,7 +30,7 @@ import time
 
 import streamlit as st
 
-from src.dashboard import data
+from src.dashboard import data, models, plots
 
 st.set_page_config(layout="wide")
 
@@ -61,14 +61,74 @@ except Exception:
     st.error(ARTIFACT_ERROR_MSG)
     st.stop()
 
+ACTIVE_MODEL_NAME = "Modelo 1 (PIB per cápita)"
+ACTIVE_MODEL = models.ACTIVE_MODELS[ACTIVE_MODEL_NAME]
+
+NO_DATA_CAPTION = (
+    "Los países en gris no disponen de datos suficientes para este indicador "
+    "o fueron excluidos por cobertura mínima (ver Fase 2)."
+)
+
 tab_mapa, tab_modelo1, tab_simulacion, tab_shap = st.tabs(
     ["Mapa e indicadores", "Modelo 1", "Simulación", "Interpretabilidad (SHAP)"]
 )
 
-# Placeholder bodies -- filled by Task 2 (Mapa e indicadores) and Task 3
-# (Modelo 1 / Simulación / Interpretabilidad SHAP) of 05-04-PLAN.md.
+# --- Tab 1: Mapa e indicadores (DASH-03/D-02) -------------------------------
 with tab_mapa:
-    st.write("Mapa e indicadores -- pendiente de implementación (Task 2).")
+    st.subheader("Comparación de indicadores")
+
+    # D-01: the mappable layers are the 5 raw ODS indicators plus Model 1's
+    # fitted values (a country-year scalar, joinable onto the panel like any
+    # other indicator column). The simulation/SHAP layers (D-01 layers 3-4)
+    # are not a single scalar per country-year and are surfaced in their own
+    # tabs (Task 3) instead of on this map.
+    map_options: dict[str, str] = dict(models.INDICATOR_LABELS)
+    map_df = df
+    fitted_col = "_modelo1_valores_ajustados"
+    fitted_label = "Modelo 1: valores ajustados (8.1.1)"
+    try:
+        fitted_results = data.load_model(ACTIVE_MODEL["pkl_path"])
+        fitted_long = fitted_results.fitted_values.reset_index().rename(
+            columns={"fitted_values": fitted_col}
+        )
+        map_df = df.merge(fitted_long, on=["country_code", "year"], how="left")
+        map_options[fitted_col] = fitted_label
+    except Exception:
+        st.caption(
+            "No se pudieron cargar los valores ajustados del Modelo 1 -- se "
+            "muestran solo los indicadores crudos del panel."
+        )
+
+    option_keys = list(map_options.keys())
+
+    col_left, col_right = st.columns(2, gap="large")
+    with col_left:
+        indicator_left = st.selectbox(
+            "Indicador (izquierda)",
+            option_keys,
+            format_func=lambda k: map_options[k],
+            key="indicator_left",
+        )
+        st.plotly_chart(
+            plots.build_choropleth(map_df, indicator_left, map_options[indicator_left]),
+            use_container_width=True,
+        )
+        st.caption(NO_DATA_CAPTION)
+
+    with col_right:
+        default_right_index = 1 if len(option_keys) > 1 else 0
+        indicator_right = st.selectbox(
+            "Indicador (derecha)",
+            option_keys,
+            index=default_right_index,
+            format_func=lambda k: map_options[k],
+            key="indicator_right",
+        )
+        st.plotly_chart(
+            plots.build_choropleth(map_df, indicator_right, map_options[indicator_right]),
+            use_container_width=True,
+        )
+        st.caption(NO_DATA_CAPTION)
 
 with tab_modelo1:
     st.write("Modelo 1 -- pendiente de implementación (Task 3).")
