@@ -103,7 +103,7 @@ def cached_bootstrap(
     dep_var: str,
     indep_var: str,
     reduction_pcts: tuple[float, ...] = (-0.10, -0.20, -0.30),
-    n_replicas: int = 200,
+    n_replicas: int = 50,
     seed: int = 42,
 ) -> dict:
     """Cached live recompute of the bootstrap counterfactual (D-03).
@@ -116,10 +116,12 @@ def cached_bootstrap(
     ``list`` before delegating to ``simulate.bootstrap_counterfactual``,
     which is called unmodified (D-03).
 
-    ``n_replicas`` defaults to 200 here -- smaller than ``simulate.py``'s own
+    ``n_replicas`` defaults to 50 here -- smaller than ``simulate.py``'s own
     production default of 1000 -- purely as a demo-runtime knob to keep the
     first cold compute inside the <5s demo budget (DASH-02); the underlying
-    bootstrap methodology in ``simulate.py`` is unchanged.
+    bootstrap methodology in ``simulate.py`` is unchanged. (Lowered from an
+    initial 200 during the 05-05 live rehearsal, which measured ~15s at 200
+    replicas on the presentation machine.)
     """
     engine = get_engine()
     df = load_panel_clean(engine)
