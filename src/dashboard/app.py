@@ -125,6 +125,7 @@ with tab_mapa:
         st.plotly_chart(
             plots.build_choropleth(map_df, indicator_left, map_options[indicator_left]),
             use_container_width=True,
+            key="choropleth_left",
         )
         st.caption(NO_DATA_CAPTION)
 
@@ -140,6 +141,7 @@ with tab_mapa:
         st.plotly_chart(
             plots.build_choropleth(map_df, indicator_right, map_options[indicator_right]),
             use_container_width=True,
+            key="choropleth_right",
         )
         st.caption(NO_DATA_CAPTION)
 
