@@ -11,6 +11,8 @@ tests/dashboard/conftest.py -- never the real 215-country data/panel.db.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -119,3 +121,19 @@ def test_build_pdp_delegates(monkeypatch):
 
     assert result is sentinel
     assert captured["args"] == (rf_stub, X_df, features_list, None)
+
+
+# --- static purity guard ----------------------------------------------------
+
+
+def test_plots_module_has_no_streamlit_import():
+    """plots.py must stay pure -- no Streamlit import anywhere in the
+    module's source text -- so every builder is testable under plain pytest
+    without launching Streamlit. Checks for the actual import statement
+    (not the word "streamlit", which legitimately appears in prose within
+    the module's own docstring)."""
+    source_path = Path(__file__).resolve().parents[2] / "src" / "dashboard" / "plots.py"
+    source = source_path.read_text(encoding="utf-8")
+
+    assert "import streamlit" not in source
+    assert "from streamlit" not in source
