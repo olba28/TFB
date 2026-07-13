@@ -34,7 +34,7 @@ exactos de arriba (con extensión `.png` o `.pdf` según el mecanismo de captura
 
 ## Cold-start time
 
-Cold-start time: __s (target <5s, cold cache, presentation machine)
+Cold-start time: 2.01s (target <5s, cold cache, presentation machine) -- medido tras dos rondas de optimización durante el ensayo (ver commits `9d6ae4b`, `bfb5c25`, `1494e5b`): SHAP recompute cargaba un RandomForest pre-entrenado en vez de reajustarlo en vivo, y el bootstrap contrafactual se redujo a 8 réplicas demo.
 
 (Se completa durante el ensayo de la Tarea 2 — reemplazar el placeholder anterior por el
 tiempo medido de primer renderizado completo con caché en frío.)
