@@ -148,7 +148,16 @@ def cached_shap(
     ``load_panel_clean`` rather than receiving them as arguments (same
     rationale as ``cached_bootstrap``). ``feature_vars`` is a ``tuple``
     (hashable), converted to a ``list`` before delegating to
-    ``interpret.shap_analysis``, which is called unmodified (D-03).
+    ``interpret.shap_analysis``.
+
+    Passes ``check_additivity=False`` -- a demo-runtime knob mirroring
+    ``cached_bootstrap``'s ``n_replicas`` -- to stay inside the <5s cold-start
+    budget (DASH-02); 04-RESEARCH.md Pitfall #4 measured ~355s for the full
+    additivity check at this project's real-data scale, live-confirmed as the
+    dominant cold-start cost during the 05-05 rehearsal. The SHAP values
+    themselves are unchanged; only the post-hoc consistency re-check is
+    skipped. ``interpret.shap_analysis``'s own default (``True``) is
+    untouched, so the Phase-4 notebook keeps the full check.
 
     ``interpret.shap_analysis`` already fixes its random seed (REPRO-02), so
     the cached result is deterministic within a session -- no ``ttl`` is
@@ -156,4 +165,4 @@ def cached_shap(
     """
     engine = get_engine()
     df = load_panel_clean(engine)
-    return interpret.shap_analysis(df, dep_var, list(feature_vars))
+    return interpret.shap_analysis(df, dep_var, list(feature_vars), check_additivity=False)

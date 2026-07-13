@@ -96,6 +96,7 @@ def shap_analysis(
     dep_var: str,
     feature_vars: list[str],
     seed: int = 42,
+    check_additivity: bool = True,
 ) -> tuple[RandomForestRegressor, np.ndarray, pd.DataFrame, shap.TreeExplainer]:
     """Train a multivariate RandomForestRegressor (D-05) on complete-case
     rows and compute SHAP values via shap.TreeExplainer (INTERP-04).
@@ -118,12 +119,14 @@ def shap_analysis(
     Predictors per D-05: 6.4.2, 6.4.1, 8.2.1 (numeric) + is_ldc, is_lldc,
     is_sids, region (typology) -- 2.3.1 is deliberately excluded (D-06).
 
-    During iterative development, ``explainer.shap_values(X,
-    check_additivity=False)`` can be called separately by the caller to
-    speed up the SHAP computation (04-RESEARCH.md Pitfall #4: the default
-    additivity check takes ~355s at this project's real-data scale) -- the
-    committed default here keeps the full additivity check
-    (check_additivity defaults to True in shap.TreeExplainer.shap_values).
+    ``check_additivity`` defaults to ``True`` -- shap.TreeExplainer's own
+    default -- so every caller that does not pass it (the Phase-4 notebook,
+    tests) gets the full additivity check. 04-RESEARCH.md Pitfall #4: this
+    check takes ~355s at this project's real-data scale, so the Phase-5
+    dashboard's demo-runtime wrapper (``dashboard.data.cached_shap``) passes
+    ``check_additivity=False`` to stay inside the <5s cold-start budget
+    (DASH-02) -- the SHAP values themselves are unaffected; only the
+    post-hoc consistency re-check is skipped.
     """
     complete = df[feature_vars + [dep_var]].dropna()
 
@@ -143,7 +146,7 @@ def shap_analysis(
     rf.fit(X, y)
 
     explainer = shap.TreeExplainer(rf)
-    shap_values = explainer.shap_values(X)
+    shap_values = explainer.shap_values(X, check_additivity=check_additivity)
 
     return rf, shap_values, X, explainer
 
