@@ -123,7 +123,7 @@ Plans:
   3. El usuario puede comparar al menos dos indicadores lado a lado y reproducir la animación temporal del choropleth a lo largo de 2000–2022.
   4. Existen capturas de pantalla y/o un vídeo de respaldo pre-renderizados, ensayados como plan B ante un fallo del dashboard en directo.
 
-**Plans**: 3/5 plans executed
+**Plans**: 4/5 plans executed
 **UI hint**: yes
 
 Plans:
@@ -138,7 +138,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 05-04-PLAN.md — src/dashboard/app.py: app Streamlit de 4 pestañas (D-06), comparación de choropleths lado a lado (DASH-03), AppTest + guard estático anti-API-en-vivo (DASH-01, DASH-03)
+- [x] 05-04-PLAN.md — src/dashboard/app.py: app Streamlit de 4 pestañas (D-06), comparación de choropleths lado a lado (DASH-03), AppTest + guard estático anti-API-en-vivo (DASH-01, DASH-03)
 
 **Wave 4** *(blocked on Wave 3)*
 
@@ -168,5 +168,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Construcción del Panel y EDA | 2/2 | Complete    | 2026-07-11 |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
 | 4. Interpretabilidad, Simulación y Robustez | 3/3 | Complete    | 2026-07-13 |
-| 5. Dashboard y Preparación de la Defensa | 3/5 | In Progress|  |
+| 5. Dashboard y Preparación de la Defensa | 4/5 | In Progress|  |
 | 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |

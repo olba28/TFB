@@ -6,14 +6,14 @@ current_phase: 05
 current_phase_name: dashboard-y-preparaci-n-de-la-defensa
 status: executing
 stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-07-13T19:23:25.181Z"
+last_updated: "2026-07-13T19:41:57.186Z"
 last_activity: 2026-07-13
 last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 17
   percent: 67
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 05 (dashboard-y-preparaci-n-de-la-defensa) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-07-13 — Phase 05 execution started
 
@@ -74,6 +74,7 @@ Progress: [██████████] 100%
 | Phase 05 P01 | 15min | 3 tasks | 5 files |
 | Phase 05 P02 | 20min | 3 tasks | 2 files |
 | Phase 05 P03 | 20min | 3 tasks | 2 files |
+| Phase 05 P04 | 25min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ Recent decisions affecting current work:
 - [Phase 05-02]: test_plots_module_has_no_streamlit_import checks for the literal 'import streamlit'/'from streamlit' substrings, not the bare word -- a bare-word check false-positived against plots.py's own module docstring
 - [Phase 05-03]: Tasks 1+2 (loaders, live-recompute wrappers) committed as a single atomic commit since both build src/dashboard/data.py and the plan's own verify command requires both present simultaneously -- Task 3 (test_caching.py) committed separately as planned
 - [Phase 05-03]: Streamlit cache-decorator verification uses CachedFunc._info.cache_type (streamlit.runtime.caching.cache_utils/cache_type), discovered live -- matches 05-VALIDATION.md's DASH-02 instruction to inspect decorator attributes, not timing
+- [Phase 05-04]: Model 1's fitted-values overlay in the Mapa tab is genuinely mappable via PanelEffectsResults.fitted_values (indexed by country_code/year), merged onto panel_clean in app.py rather than falling back to the raw 8.1.1 series
+- [Phase 05-04]: SHAP tab's VIF precedence check reuses all 5 ODS indicator codes (not just the RF's 3-predictor subset) to reproduce Phase 2's exact global VIF numbers, matching notebook cell 18
+- [Phase 05-04]: Critical artifact-load failures reuse one verbatim UI-SPEC ARTIFACT_ERROR_MSG via st.error; the Mapa tab's optional Modelo-1-overlay pkl load uses a lighter inline caption fallback since the tab's primary content still renders without it
 
 ### Pending Todos
 
@@ -134,6 +138,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T19:22:16.133Z
+Last session: 2026-07-13T19:40:32.440Z
 Stopped at: Completed 05-02-PLAN.md
 Resume file: None
