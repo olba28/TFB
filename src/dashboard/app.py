@@ -8,10 +8,10 @@ layout/orchestration only, calling into the cached data layer
 math itself (05-PATTERNS.md, D-06 controller-separation).
 
 Single-page, four-tab layout (D-06): "Mapa e indicadores" (D-02's
-side-by-side choropleth comparison, filled in a later task of this plan),
-"Modelo 1", "Simulación", and "Interpretabilidad (SHAP)". ``st.tabs`` is
-used instead of a multipage app so all four sections share Streamlit's
-cache/session state without ``st.session_state`` bookkeeping (D-06).
+side-by-side choropleth comparison), "Modelo 1", "Simulación", and
+"Interpretabilidad (SHAP)". ``st.tabs`` is used instead of a multipage app
+so all four sections share Streamlit's cache/session state without
+``st.session_state`` bookkeeping (D-06).
 
 DASH-01: this module reads ONLY local artifacts through
 :mod:`src.dashboard.data` (``data/panel.db``, ``data/modelos/*.pkl``) --
@@ -19,17 +19,30 @@ never the UN SDG API. ``tests/dashboard/test_no_live_api.py`` statically
 enforces the absence of ``requests``/``httpx``/``src.ingesta`` anywhere
 under ``src/dashboard/``.
 
-This is Task 1 of 05-04-PLAN.md: page config, title/caption, the 4 D-06 tab
-labels, the top-level artifact-load error handling (UI-SPEC), and the
-cold-start timing readout. Tab bodies are filled by Tasks 2-3.
+"Modelo 1" reads the coefficient/diagnostic table straight from the
+deserialized ``PanelEffectsResults`` (``model1_gdp.pkl``, no reajuste).
+"Simulación" and "Interpretabilidad (SHAP)" call D-03's cached live-recompute
+wrappers (``data.cached_bootstrap``/``data.cached_shap``) -- the bootstrap
+counterfactual and SHAP analysis are recomputed inside the dashboard, never
+precomputed to a dedicated artifact, but always through
+:mod:`src.dashboard.data`'s ``st.cache_data``/``st.cache_resource`` split so
+repeat interactions never re-read ``panel.db``/re-run the computation
+(DASH-02). The SHAP tab computes the Phase-2 VIF/correlation caveat via
+``interpret.compute_vif_table`` BEFORE the SHAP summary plot, matching
+INTERP-04's precedence requirement.
 """
 
 from __future__ import annotations
 
 import time
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import shap
 import streamlit as st
 
+from src import interpret
 from src.dashboard import data, models, plots
 
 st.set_page_config(layout="wide")
@@ -81,7 +94,7 @@ with tab_mapa:
     # fitted values (a country-year scalar, joinable onto the panel like any
     # other indicator column). The simulation/SHAP layers (D-01 layers 3-4)
     # are not a single scalar per country-year and are surfaced in their own
-    # tabs (Task 3) instead of on this map.
+    # tabs below instead of on this map.
     map_options: dict[str, str] = dict(models.INDICATOR_LABELS)
     map_df = df
     fitted_col = "_modelo1_valores_ajustados"
@@ -130,14 +143,92 @@ with tab_mapa:
         )
         st.caption(NO_DATA_CAPTION)
 
+# --- Tab 2: Modelo 1 ---------------------------------------------------------
 with tab_modelo1:
-    st.write("Modelo 1 -- pendiente de implementación (Task 3).")
+    st.subheader(f"{ACTIVE_MODEL_NAME}: coeficientes y diagnósticos")
+    try:
+        res = data.load_model(ACTIVE_MODEL["pkl_path"])
+        ci = res.conf_int()
+        coef_table = pd.DataFrame(
+            {
+                "coeficiente": res.params,
+                "error_std": res.std_errors,
+                "IC 2.5%": ci["lower"],
+                "IC 97.5%": ci["upper"],
+                "p-valor": res.pvalues,
+            }
+        )
+        st.dataframe(coef_table, use_container_width=True)
+        st.caption(
+            f"R² (within): {res.rsquared_within:.4f} · N observaciones: {res.nobs} "
+            "(efectos fijos bidireccionales, panel_base.fit_panel_model)."
+        )
+    except Exception:
+        st.error(ARTIFACT_ERROR_MSG)
 
+# --- Tab 3: Simulación (D-03) -------------------------------------------------
 with tab_simulacion:
-    st.write("Simulación -- pendiente de implementación (Task 3).")
+    st.subheader("Simulación contrafactual (análisis de sensibilidad)")
+    st.caption(
+        "Escenarios de reducción del estrés hídrico sobre el valor de 2022 de "
+        "cada país, con intervalos de confianza bootstrap (block bootstrap por "
+        "país). No es una predicción individual por país -- ver limitaciones "
+        "metodológicas, Fase 4."
+    )
+    try:
+        results = data.cached_bootstrap(
+            dep_var=ACTIVE_MODEL["dep_var"],
+            indep_var=ACTIVE_MODEL["indep_var"],
+        )
+        fig_scenario = plots.build_scenario_plot(
+            results,
+            "Efecto simulado del estrés hídrico sobre el crecimiento del PIB per cápita",
+        )
+        st.plotly_chart(fig_scenario, use_container_width=True)
 
+        pcts = sorted(results.keys())
+        metric_cols = st.columns(len(pcts))
+        for metric_col, pct in zip(metric_cols, pcts):
+            scenario = results[pct]
+            central = float(np.mean(scenario["effect_draws"]))
+            ci_low = float(np.mean(scenario["ci_2.5"]))
+            ci_high = float(np.mean(scenario["ci_97.5"]))
+            with metric_col:
+                st.metric(
+                    label=f"Escenario {pct:+.0%}",
+                    value=f"{central:.4f}",
+                    delta=f"IC95%: [{ci_low:.4f}, {ci_high:.4f}]",
+                    delta_color="off",
+                )
+    except Exception:
+        st.error(ARTIFACT_ERROR_MSG)
+
+# --- Tab 4: Interpretabilidad (SHAP) (D-03, INTERP-04) ------------------------
 with tab_shap:
-    st.write("Interpretabilidad (SHAP) -- pendiente de implementación (Task 3).")
+    st.subheader("Interpretabilidad (SHAP)")
+    try:
+        indicator_cols = list(models.INDICATOR_LABELS.keys())
+        vif_table = interpret.compute_vif_table(df, indicator_cols)
+        st.caption(
+            "Antes de interpretar los valores SHAP, se revisa la "
+            "multicolinealidad (VIF) entre los 5 indicadores ODS -- reproduce "
+            "la comprobación de precedencia de la Fase 2 (INTERP-04)."
+        )
+        st.dataframe(vif_table, use_container_width=True)
+
+        feature_vars = tuple(ACTIVE_MODEL["feature_vars"])
+        rf, shap_values, X_shap, _explainer = data.cached_shap(
+            dep_var=ACTIVE_MODEL["dep_var"],
+            feature_vars=feature_vars,
+        )
+        st.caption(f"R² OOB del RandomForest de referencia: {rf.oob_score_:.4f}")
+
+        fig_shap = plt.figure()
+        shap.summary_plot(shap_values, X_shap, show=False)
+        st.pyplot(fig_shap)
+        plt.close(fig_shap)
+    except Exception:
+        st.error(ARTIFACT_ERROR_MSG)
 
 # Cold-start timing readout, logged once after the first full render.
 if not st.session_state["cold_start_logged"]:
