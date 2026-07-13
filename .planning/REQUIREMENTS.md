@@ -40,7 +40,7 @@
 
 ### Dashboard
 
-- [ ] **DASH-01**: El dashboard local (Streamlit + Plotly) muestra un choropleth por país y consume únicamente artefactos ya calculados, sin llamadas en tiempo real a la API
+- [x] **DASH-01**: El dashboard local (Streamlit + Plotly) muestra un choropleth por país y consume únicamente artefactos ya calculados, sin llamadas en tiempo real a la API
 - [ ] **DASH-02**: El dashboard usa caché de datos (`st.cache_data`) y de modelo (`st.cache_resource`) para evitar congelaciones durante la demo en directo
 - [ ] **DASH-03**: El dashboard permite comparar múltiples indicadores lado a lado
 - [ ] **DASH-04**: El dashboard incluye una animación temporal del choropleth a lo largo de 2000–2022
@@ -110,7 +110,7 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | INTERP-05 | Phase 4 | Complete |
 | INTERP-06 | Phase 4 | Complete |
 | REPRO-02 | Phase 4 | Complete |
-| DASH-01 | Phase 5 | Pending |
+| DASH-01 | Phase 5 | Complete |
 | DASH-02 | Phase 5 | Pending |
 | DASH-03 | Phase 5 | Pending |
 | DASH-04 | Phase 5 | Pending |

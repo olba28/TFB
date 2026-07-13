@@ -123,13 +123,13 @@ Plans:
   3. El usuario puede comparar al menos dos indicadores lado a lado y reproducir la animación temporal del choropleth a lo largo de 2000–2022.
   4. Existen capturas de pantalla y/o un vídeo de respaldo pre-renderizados, ensayados como plan B ante un fallo del dashboard en directo.
 
-**Plans**: 5 plans
+**Plans**: 1/5 plans executed
 **UI hint**: yes
 
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Fundación: paquete src/dashboard, registro de "modelo activo" (D-07), tema .streamlit/config.toml y fixtures de test compartidas (DASH-01)
+- [x] 05-01-PLAN.md — Fundación: paquete src/dashboard, registro de "modelo activo" (D-07), tema .streamlit/config.toml y fixtures de test compartidas (DASH-01)
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -168,5 +168,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Construcción del Panel y EDA | 2/2 | Complete    | 2026-07-11 |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
 | 4. Interpretabilidad, Simulación y Robustez | 3/3 | Complete    | 2026-07-13 |
-| 5. Dashboard y Preparación de la Defensa | 0/TBD | Not started | - |
+| 5. Dashboard y Preparación de la Defensa | 1/5 | In Progress|  |
 | 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |

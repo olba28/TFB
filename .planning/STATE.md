@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 5
-current_phase_name: Dashboard y Preparación de la Defensa
-status: verifying
+current_phase: 05
+current_phase_name: dashboard-y-preparaci-n-de-la-defensa
+status: executing
 stopped_at: Phase 5 UI-SPEC approved
-last_updated: "2026-07-13T18:12:26.502Z"
+last_updated: "2026-07-13T18:58:28.098Z"
 last_activity: 2026-07-13
-last_activity_desc: Phase 04 complete, transitioned to Phase 5
+last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 18
+  completed_plans: 14
   percent: 67
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
-**Current focus:** Phase 04 — interpretabilidad-simulaci-n-y-robustez
+**Current focus:** Phase 05 — dashboard-y-preparaci-n-de-la-defensa
 
 ## Current Position
 
-Phase: 5 — Dashboard y Preparación de la Defensa
-Plan: Not started
-Status: All Phase 4 plans (04-01, 04-02, 04-03) complete. Ready for phase-level goal verification.
-Last activity: 2026-07-13 — Phase 04 complete, transitioned to Phase 5
+Phase: 05 (dashboard-y-preparaci-n-de-la-defensa) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-07-13 — Phase 05 execution started
 
 Progress: [██████████] 100%
 
@@ -71,6 +71,7 @@ Progress: [██████████] 100%
 | Phase 04 P01 | 20min | 3 tasks | 2 files |
 | Phase 04 P02 | 5min | 3 tasks | 2 files |
 | Phase 04 P03 | ~50min active (spanned overnight stall, see decisions) | 4 tasks | 3 files |
+| Phase 05 P01 | 15min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,7 @@ Recent decisions affecting current work:
 - [Phase 04-02]: PDP implemented via sklearn.inspection.PartialDependenceDisplay only -- PyALE (SUS-flagged in legitimacy audit) never installed, no checkpoint needed, requirements.txt unchanged
 - [Phase 04-03]: compute_vif_table now adds a constant column before computing VIF, matching Phase 2 methodology exactly (04-02 had omitted it, diverging from the real Phase-2 numbers Task 2 reproduces)
 - [Phase 04-03]: Task 3's continuation executor stalled ~9h overnight on a broken self-monitoring assumption (echoed a placeholder string instead of tracking a real background process); orchestrator detected via unchanged file timestamps/no running processes, then ran the already-authored scripts/verify_repro02.py directly with reliable background+notification handling -- passed on first direct run, no code defect involved
+- [Phase 05-01]: tiny_panel_df fixture uses real ISO3 codes (ESP/FRA/DEU/ITA), not synthetic C00/C01 IDs, because Plotly locationmode=ISO-3 requires real codes
 
 ### Pending Todos
 
@@ -126,6 +128,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T18:12:26.488Z
+Last session: 2026-07-13T18:57:46.953Z
 Stopped at: Phase 5 UI-SPEC approved
 Resume file: .planning/phases/05-dashboard-y-preparaci-n-de-la-defensa/05-UI-SPEC.md
