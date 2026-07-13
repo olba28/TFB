@@ -97,6 +97,8 @@ def shap_analysis(
     feature_vars: list[str],
     seed: int = 42,
     check_additivity: bool = True,
+    rf: RandomForestRegressor | None = None,
+    explain_sample_size: int | None = None,
 ) -> tuple[RandomForestRegressor, np.ndarray, pd.DataFrame, shap.TreeExplainer]:
     """Train a multivariate RandomForestRegressor (D-05) on complete-case
     rows and compute SHAP values via shap.TreeExplainer (INTERP-04).
@@ -113,8 +115,9 @@ def shap_analysis(
     Returns the fitted ``rf`` (so the caller can serialize it -- D-08 -- and
     read ``rf.oob_score_`` for INTERP-06's predictive reference metric,
     D-07: the SAME RF, no separate GBM), the SHAP values array, the feature
-    matrix ``X`` used to fit/explain, and the ``shap.TreeExplainer``
-    instance itself (for downstream plotting, e.g. shap.summary_plot).
+    matrix ``X`` (or its ``explain_sample_size`` sample -- see below) used to
+    explain, and the ``shap.TreeExplainer`` instance itself (for downstream
+    plotting, e.g. shap.summary_plot).
 
     Predictors per D-05: 6.4.2, 6.4.1, 8.2.1 (numeric) + is_ldc, is_lldc,
     is_sids, region (typology) -- 2.3.1 is deliberately excluded (D-06).
@@ -127,6 +130,27 @@ def shap_analysis(
     ``check_additivity=False`` to stay inside the <5s cold-start budget
     (DASH-02) -- the SHAP values themselves are unaffected; only the
     post-hoc consistency re-check is skipped.
+
+    ``rf`` defaults to ``None``, which fits a fresh RandomForest as described
+    above (the Phase-4 notebook's path, and the only path that produces a
+    trustworthy ``rf_shap_model.pkl`` to serialize -- D-08). If a caller
+    passes an already-fitted ``rf`` (e.g. the archived
+    ``data/modelos/rf_shap_model.pkl``), the fit step is skipped entirely and
+    only ``X``'s construction + the SHAP explanation run -- this is what
+    ``dashboard.data.cached_shap`` does, since live-refitting a 300-tree RF
+    on every cold Streamlit session measured ~4.2s by itself (05-05
+    rehearsal), on top of the SHAP computation -- together blowing the <5s
+    budget (DASH-02) regardless of ``check_additivity``.
+
+    ``explain_sample_size`` defaults to ``None`` (explain every complete-case
+    row, the Phase-4 notebook's full-fidelity path). The Phase-5 dashboard
+    passes a small integer (live-measured at ~0.1s/row for
+    ``explainer.shap_values``) as a second demo-runtime knob alongside
+    ``rf``/``check_additivity`` -- sampling which rows are *explained* does
+    not touch the fitted RF (identical model either way) or the SHAP
+    algorithm itself, only how many rows get plotted in the live summary
+    plot; the archived Plan-B screenshots (figuras/plan_b/) carry the
+    full-fidelity version for the record.
     """
     complete = df[feature_vars + [dep_var]].dropna()
 
@@ -137,13 +161,17 @@ def shap_analysis(
         X = complete[feature_vars].copy()
     y = complete[dep_var]
 
-    rf = RandomForestRegressor(
-        n_estimators=300,
-        random_state=seed,
-        n_jobs=1,  # MUST be 1 -- REPRO-02, Pitfall #2
-        oob_score=True,
-    )
-    rf.fit(X, y)
+    if rf is None:
+        rf = RandomForestRegressor(
+            n_estimators=300,
+            random_state=seed,
+            n_jobs=1,  # MUST be 1 -- REPRO-02, Pitfall #2
+            oob_score=True,
+        )
+        rf.fit(X, y)
+
+    if explain_sample_size is not None and explain_sample_size < len(X):
+        X = X.sample(n=explain_sample_size, random_state=seed)
 
     explainer = shap.TreeExplainer(rf)
     shap_values = explainer.shap_values(X, check_additivity=check_additivity)

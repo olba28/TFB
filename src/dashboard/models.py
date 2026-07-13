@@ -43,6 +43,7 @@ ACTIVE_MODELS: dict[str, dict[str, object]] = {
             "region",
         ],
         "pkl_path": "data/modelos/model1_gdp.pkl",
+        "rf_shap_pkl_path": "data/modelos/rf_shap_model.pkl",
     },
     # Fase 6 añade aquí, sin tocar app.py (D-07):
     # "Modelo 2 (Productividad agrícola)": {

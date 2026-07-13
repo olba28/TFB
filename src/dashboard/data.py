@@ -141,6 +141,7 @@ def cached_bootstrap(
 def cached_shap(
     dep_var: str,
     feature_vars: tuple[str, ...],
+    explain_sample_size: int = 20,
 ) -> tuple[Any, Any, pd.DataFrame, Any]:
     """Cached live recompute of the SHAP analysis (D-03).
 
@@ -150,14 +151,32 @@ def cached_shap(
     (hashable), converted to a ``list`` before delegating to
     ``interpret.shap_analysis``.
 
-    Passes ``check_additivity=False`` -- a demo-runtime knob mirroring
-    ``cached_bootstrap``'s ``n_replicas`` -- to stay inside the <5s cold-start
-    budget (DASH-02); 04-RESEARCH.md Pitfall #4 measured ~355s for the full
-    additivity check at this project's real-data scale, live-confirmed as the
-    dominant cold-start cost during the 05-05 rehearsal. The SHAP values
-    themselves are unchanged; only the post-hoc consistency re-check is
-    skipped. ``interpret.shap_analysis``'s own default (``True``) is
-    untouched, so the Phase-4 notebook keeps the full check.
+    Three demo-runtime knobs keep this inside the <5s cold-start budget
+    (DASH-02), all live-measured during the 05-05 rehearsal:
+
+    1. ``rf=load_model(rf_shap_pkl_path)`` -- loads the archived, already-
+       fitted RandomForest (``data/modelos/rf_shap_model.pkl``, D-08)
+       instead of refitting live. Refitting alone measured ~4.2s by itself
+       -- already most of the budget before any SHAP computation -- whereas
+       ``load_model`` (``st.cache_resource``) deserializes the pickle in
+       ~0.1s. This is the SAME fitted model either way (D-08's own
+       round-trip contract); only *where* it comes from differs, exactly
+       mirroring how ``cached_bootstrap`` loads Model 1 from
+       ``model1_gdp.pkl`` rather than re-fitting it.
+    2. ``check_additivity=False`` -- see ``interpret.shap_analysis``
+       docstring; 04-RESEARCH.md Pitfall #4 measured ~355s for the full
+       check at this project's scale.
+    3. ``explain_sample_size=20`` -- explain a 20-row sample rather than all
+       ~3,500 complete-case rows; live-measured at ~0.1s/row, so the full
+       set would cost ~5-6s by itself even with the pre-fit ``rf`` and
+       ``check_additivity=False``. The fitted RF and the SHAP values
+       themselves are exact either way -- sampling only changes how many
+       rows the live summary plot shows. The Plan-B screenshots
+       (figuras/plan_b/) are the full-fidelity reference.
+
+    ``interpret.shap_analysis``'s own defaults (``rf=None``,
+    ``check_additivity=True``, ``explain_sample_size=None``) are untouched,
+    so the Phase-4 notebook keeps the full fit + full check + full sample.
 
     ``interpret.shap_analysis`` already fixes its random seed (REPRO-02), so
     the cached result is deterministic within a session -- no ``ttl`` is
@@ -165,4 +184,12 @@ def cached_shap(
     """
     engine = get_engine()
     df = load_panel_clean(engine)
-    return interpret.shap_analysis(df, dep_var, list(feature_vars), check_additivity=False)
+    rf = load_model(models.ACTIVE_MODELS["Modelo 1 (PIB per cápita)"]["rf_shap_pkl_path"])
+    return interpret.shap_analysis(
+        df,
+        dep_var,
+        list(feature_vars),
+        check_additivity=False,
+        rf=rf,
+        explain_sample_size=explain_sample_size,
+    )
