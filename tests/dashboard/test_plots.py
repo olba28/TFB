@@ -11,7 +11,31 @@ tests/dashboard/conftest.py -- never the real 215-country data/panel.db.
 
 from __future__ import annotations
 
+import numpy as np
+import pandas as pd
+
+from src import interpret
 from src.dashboard import plots
+
+
+def _make_synthetic_scenario_results() -> dict:
+    """A synthetic dict shaped exactly like
+    simulate.bootstrap_counterfactual's return value: keyed by signed
+    reduction pct, each value carrying effect_draws (n_replicas x
+    n_surviving_countries), ci_2.5, and ci_97.5 -- deterministic via a fixed
+    rng, no dependency on simulate.py itself (keeps plots.py's tests fast
+    and isolated from the bootstrap's own runtime)."""
+    rng = np.random.default_rng(0)
+    results = {}
+    for pct in (-0.10, -0.20, -0.30):
+        effect_draws = rng.normal(loc=pct * 10, scale=1.0, size=(50, 4))
+        results[pct] = {
+            "effect_draws": effect_draws,
+            "ci_2.5": np.percentile(effect_draws, 2.5, axis=0),
+            "ci_97.5": np.percentile(effect_draws, 97.5, axis=0),
+            "excluded_countries": [],
+        }
+    return results
 
 
 # --- build_choropleth() (DASH-04) ------------------------------------------
@@ -41,3 +65,57 @@ def test_choropleth_uses_iso3_locationmode(tiny_panel_df):
 
     assert fig.data[0].locationmode == "ISO-3"
     assert set(fig.data[0].locations).issubset(set(tiny_panel_df["country_code"].unique()))
+
+
+# --- build_scenario_plot() / build_pdp() -----------------------------------
+
+
+def test_scenario_plot_has_ci_error_bars():
+    """build_scenario_plot must render one point per scenario key, with
+    asymmetric error bars derived from each scenario's ci_2.5/ci_97.5
+    bounds."""
+    results = _make_synthetic_scenario_results()
+
+    fig = plots.build_scenario_plot(results, "Simulación de escenarios")
+
+    trace = fig.data[0]
+    assert len(trace.x) == len(results)
+    assert len(trace.y) == len(results)
+    assert trace.error_y is not None
+    assert trace.error_y.array is not None
+    assert trace.error_y.arrayminus is not None
+    assert len(trace.error_y.array) == len(results)
+    assert len(trace.error_y.arrayminus) == len(results)
+
+
+def test_scenario_plot_uses_accent_color():
+    """The central-estimate marker must use the UI-SPEC accent color
+    (#1B6CA8), never the choropleth's Viridis data-color scale."""
+    results = _make_synthetic_scenario_results()
+
+    fig = plots.build_scenario_plot(results, "Simulación de escenarios")
+
+    assert fig.data[0].marker.color == "#1B6CA8"
+
+
+def test_build_pdp_delegates(monkeypatch):
+    """build_pdp must delegate to interpret.partial_dependence_plots with
+    the same arguments and return exactly what it returns (INTERP-05 -- no
+    reimplementation of PDP math)."""
+    sentinel = object()
+    captured = {}
+
+    def fake_partial_dependence_plots(rf, X, features, ax=None):
+        captured["args"] = (rf, X, features, ax)
+        return sentinel
+
+    monkeypatch.setattr(interpret, "partial_dependence_plots", fake_partial_dependence_plots)
+
+    rf_stub = object()
+    X_df = pd.DataFrame({"a": [1, 2, 3]})
+    features_list = ["a"]
+
+    result = plots.build_pdp(rf_stub, X_df, features_list)
+
+    assert result is sentinel
+    assert captured["args"] == (rf_stub, X_df, features_list, None)
