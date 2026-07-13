@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Ingesta y Almacenamiento Versionado** - Cliente API SDG de la ONU con paginación/reintentos, filtrado de dimensiones y agregados regionales, copia local versionada con manifiesto, panel base en SQLite (completed 2026-07-11)
 - [x] **Phase 2: Construcción del Panel y EDA** - Limpieza/fusión/feature engineering idempotente, filtrado por cobertura del 70%, discusión de datos faltantes (MNAR), EDA global/regional/por tipología con correlación/VIF (completed 2026-07-11)
 - [x] **Phase 3: Modelo 1 — Regresión de Panel (PIB per cápita)** - `panel_base.py` compartido, PanelOLS con efectos fijos bidireccionales, comparación pooled/RE + Hausman, SEs robustos, robustez, serialización, sección de limitaciones (completed 2026-07-12)
-- [ ] **Phase 4: Interpretabilidad, Simulación y Robustez** - Simulación contrafactual bootstrap multi-escenario, heterogeneidad regional/por ingresos, SHAP + ALE con semillas fijas
+- [x] **Phase 4: Interpretabilidad, Simulación y Robustez** - Simulación contrafactual bootstrap multi-escenario, heterogeneidad regional/por ingresos, SHAP + ALE con semillas fijas (completed 2026-07-13)
 - [ ] **Phase 5: Dashboard y Preparación de la Defensa** - Dashboard Streamlit/Plotly cacheado, choropleth, comparación de indicadores, animación temporal, ensayo con caché fría y respaldo pre-renderizado
 - [ ] **Phase 6: Modelo 2 — Productividad Agrícola (stretch)** - Reutilización de `panel_base.py` para el indicador 2.3.1, documentación de cobertura reducida, extensión de simulación/SHAP/dashboard
 
@@ -99,7 +99,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Existen gráficos ALE/partial-dependence que complementan los SHAP para las variables correlacionadas identificadas.
   6. Ejecutar dos veces el pipeline estocástico (bootstrap, entrenamiento del RandomForest, cualquier split) produce resultados idénticos gracias a semillas aleatorias fijas.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -109,7 +109,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-03-PLAN.md — notebook/4_1_interpretabilidad_simulacion.ipynb: orquestación, serialización de rf_shap_model.pkl y verificación de reproducibilidad end-to-end (INTERP-01..06, REPRO-02)
+- [x] 04-03-PLAN.md — notebook/4_1_interpretabilidad_simulacion.ipynb: orquestación, serialización de rf_shap_model.pkl y verificación de reproducibilidad end-to-end (INTERP-01..06, REPRO-02)
 
 ### Phase 5: Dashboard y Preparación de la Defensa
 
@@ -149,6 +149,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Ingesta y Almacenamiento Versionado | 6/6 | Complete    | 2026-07-11 |
 | 2. Construcción del Panel y EDA | 2/2 | Complete    | 2026-07-11 |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
-| 4. Interpretabilidad, Simulación y Robustez | 2/3 | In Progress|  |
+| 4. Interpretabilidad, Simulación y Robustez | 3/3 | Complete   | 2026-07-13 |
 | 5. Dashboard y Preparación de la Defensa | 0/TBD | Not started | - |
 | 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |
