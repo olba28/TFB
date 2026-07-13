@@ -32,7 +32,7 @@
 ### Interpretabilidad, Simulación y Robustez
 
 - [x] **INTERP-01**: El sistema ejecuta una simulación contrafactual con intervalos de confianza por bootstrap, enmarcada explícitamente como análisis de sensibilidad (no predicción causal), verificando que los escenarios no extrapolan más allá del rango empírico observado
-- [ ] **INTERP-02**: El sistema produce un gráfico multi-escenario de sensibilidad (p. ej. -10%, -20%, -30% de reducción del estrés hídrico)
+- [x] **INTERP-02**: El sistema produce un gráfico multi-escenario de sensibilidad (p. ej. -10%, -20%, -30% de reducción del estrés hídrico)
 - [x] **INTERP-03**: El sistema incluye un análisis de heterogeneidad regional/por nivel de ingresos (términos de interacción o subgrupos), sin generar predicciones por país individual
 - [x] **INTERP-04**: El sistema calcula interpretabilidad SHAP vía un modelo auxiliar de scikit-learn (RandomForest) con TreeExplainer, precedido de una matriz de correlación/VIF como aviso de posible sesgo por variables correlacionadas
 - [x] **INTERP-05**: El sistema produce gráficos ALE/partial-dependence como complemento a SHAP para las variables correlacionadas
@@ -104,7 +104,7 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | MODEL1-06 | Phase 3 | Complete |
 | REPRO-03 | Phase 3 | Complete |
 | INTERP-01 | Phase 4 | Complete |
-| INTERP-02 | Phase 4 | Pending |
+| INTERP-02 | Phase 4 | Complete |
 | INTERP-03 | Phase 4 | Complete |
 | INTERP-04 | Phase 4 | Complete |
 | INTERP-05 | Phase 4 | Complete |
