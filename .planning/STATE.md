@@ -6,14 +6,14 @@ current_phase: 05
 current_phase_name: dashboard-y-preparaci-n-de-la-defensa
 status: executing
 stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-07-13T19:15:50.877Z"
+last_updated: "2026-07-13T19:23:25.181Z"
 last_activity: 2026-07-13
 last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 18
-  completed_plans: 15
+  completed_plans: 16
   percent: 67
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 05 (dashboard-y-preparaci-n-de-la-defensa) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-07-13 — Phase 05 execution started
 
@@ -73,6 +73,7 @@ Progress: [██████████] 100%
 | Phase 04 P03 | ~50min active (spanned overnight stall, see decisions) | 4 tasks | 3 files |
 | Phase 05 P01 | 15min | 3 tasks | 5 files |
 | Phase 05 P02 | 20min | 3 tasks | 2 files |
+| Phase 05 P03 | 20min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting current work:
 - [Phase 05-01]: tiny_panel_df fixture uses real ISO3 codes (ESP/FRA/DEU/ITA), not synthetic C00/C01 IDs, because Plotly locationmode=ISO-3 requires real codes
 - [Phase 05-02]: build_scenario_plot's central estimate aggregates effect_draws across BOTH bootstrap replicas AND surviving countries into a single scalar per scenario -- consistent with the project's 'simulación de sensibilidad, no predicción por país' framing (INTERP-03 precedent), documented explicitly in the function's docstring
 - [Phase 05-02]: test_plots_module_has_no_streamlit_import checks for the literal 'import streamlit'/'from streamlit' substrings, not the bare word -- a bare-word check false-positived against plots.py's own module docstring
+- [Phase 05-03]: Tasks 1+2 (loaders, live-recompute wrappers) committed as a single atomic commit since both build src/dashboard/data.py and the plan's own verify command requires both present simultaneously -- Task 3 (test_caching.py) committed separately as planned
+- [Phase 05-03]: Streamlit cache-decorator verification uses CachedFunc._info.cache_type (streamlit.runtime.caching.cache_utils/cache_type), discovered live -- matches 05-VALIDATION.md's DASH-02 instruction to inspect decorator attributes, not timing
 
 ### Pending Todos
 
@@ -131,6 +134,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T19:15:50.856Z
+Last session: 2026-07-13T19:22:16.133Z
 Stopped at: Completed 05-02-PLAN.md
 Resume file: None
