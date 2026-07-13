@@ -103,7 +103,7 @@ def cached_bootstrap(
     dep_var: str,
     indep_var: str,
     reduction_pcts: tuple[float, ...] = (-0.10, -0.20, -0.30),
-    n_replicas: int = 50,
+    n_replicas: int = 8,
     seed: int = 42,
 ) -> dict:
     """Cached live recompute of the bootstrap counterfactual (D-03).
@@ -116,12 +116,24 @@ def cached_bootstrap(
     ``list`` before delegating to ``simulate.bootstrap_counterfactual``,
     which is called unmodified (D-03).
 
-    ``n_replicas`` defaults to 50 here -- smaller than ``simulate.py``'s own
-    production default of 1000 -- purely as a demo-runtime knob to keep the
-    first cold compute inside the <5s demo budget (DASH-02); the underlying
-    bootstrap methodology in ``simulate.py`` is unchanged. (Lowered from an
-    initial 200 during the 05-05 live rehearsal, which measured ~15s at 200
-    replicas on the presentation machine.)
+    ``n_replicas`` defaults to 8 here -- much smaller than ``simulate.py``'s
+    own production default of 1000 -- purely as a demo-runtime knob to keep
+    the first cold compute inside the <5s demo budget (DASH-02); the
+    underlying bootstrap methodology in ``simulate.py`` is unchanged (each
+    replica still independently resamples entities and refits a real
+    ``PanelOLS`` model -- D-01/D-12 -- just fewer of them).
+
+    History (05-05 live rehearsal, three rounds of measurement): 200
+    replicas measured ~15s; the first drop to 50 alone did not move the
+    *total* cold-start figure because Streamlit executes every tab body on
+    every rerun -- the SHAP tab's live RF refit (fixed separately -- see
+    ``cached_shap``) was masking the improvement. With SHAP fixed
+    separately, 50 replicas in isolation measured ~14.4s (~0.29s/replica,
+    each an independent ``fit_panel_model`` call -- there is no pre-fit
+    shortcut for bootstrap the way ``cached_shap`` has one, since refitting
+    per resampled draw IS the methodology). 8 replicas (~2.3s) is the
+    result of that per-replica cost against the remaining <5s budget after
+    ``cached_shap``'s ~2.25s and the rest of the app's ~0.25s.
     """
     engine = get_engine()
     df = load_panel_clean(engine)
