@@ -44,7 +44,7 @@
 - [x] **DASH-02**: El dashboard usa caché de datos (`st.cache_data`) y de modelo (`st.cache_resource`) para evitar congelaciones durante la demo en directo
 - [x] **DASH-03**: El dashboard permite comparar múltiples indicadores lado a lado
 - [x] **DASH-04**: El dashboard incluye una animación temporal del choropleth a lo largo de 2000–2022
-- [ ] **DASH-05**: El dashboard se ensaya con caché fría en la máquina de presentación antes de la defensa, con capturas/vídeo de respaldo pre-renderizados
+- [x] **DASH-05**: El dashboard se ensaya con caché fría en la máquina de presentación antes de la defensa, con capturas/vídeo de respaldo pre-renderizados
 
 ### Reproducibilidad
 
@@ -114,7 +114,7 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | DASH-02 | Phase 5 | Complete |
 | DASH-03 | Phase 5 | Complete |
 | DASH-04 | Phase 5 | Complete |
-| DASH-05 | Phase 5 | Pending |
+| DASH-05 | Phase 5 | Complete |
 | MODEL2-01 | Phase 6 | Pending |
 | MODEL2-02 | Phase 6 | Pending |
 | MODEL2-03 | Phase 6 | Pending |

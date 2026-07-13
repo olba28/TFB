@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 05
 current_phase_name: dashboard-y-preparaci-n-de-la-defensa
-status: executing
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-07-13T19:41:57.186Z"
-last_activity: 2026-07-13
-last_activity_desc: Phase 05 execution started
+status: verifying
+stopped_at: Completed 05-05-PLAN.md
+last_updated: "2026-07-14T00:46:49.000Z"
+last_activity: 2026-07-14
+last_activity_desc: Phase 05 Plan 05 complete — all 5 plans done, DASH-05 proven
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 18
-  completed_plans: 17
-  percent: 67
+  completed_plans: 18
+  percent: 83
 ---
 
 # Project State
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 05 (dashboard-y-preparaci-n-de-la-defensa) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-07-13 — Phase 05 execution started
+Phase: 05 (dashboard-y-preparaci-n-de-la-defensa) — ALL PLANS COMPLETE
+Plan: 5 of 5 (05-05 complete)
+Status: All Phase 5 plans (05-01..05-05) complete. Ready for phase-level goal verification.
+Last activity: 2026-07-14 — Phase 05 Plan 05 complete (DASH-05 proven: 2.01s cold-start, Plan B captures verified)
 
 Progress: [██████████] 100%
 
@@ -75,6 +75,7 @@ Progress: [██████████] 100%
 | Phase 05 P02 | 20min | 3 tasks | 2 files |
 | Phase 05 P03 | 20min | 3 tasks | 2 files |
 | Phase 05 P04 | 25min | 3 tasks | 3 files |
+| Phase 05 P05 | ~2h59min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,9 @@ Recent decisions affecting current work:
 - [Phase 05-04]: Model 1's fitted-values overlay in the Mapa tab is genuinely mappable via PanelEffectsResults.fitted_values (indexed by country_code/year), merged onto panel_clean in app.py rather than falling back to the raw 8.1.1 series
 - [Phase 05-04]: SHAP tab's VIF precedence check reuses all 5 ODS indicator codes (not just the RF's 3-predictor subset) to reproduce Phase 2's exact global VIF numbers, matching notebook cell 18
 - [Phase 05-04]: Critical artifact-load failures reuse one verbatim UI-SPEC ARTIFACT_ERROR_MSG via st.error; the Mapa tab's optional Modelo-1-overlay pkl load uses a lighter inline caption fallback since the tab's primary content still renders without it
+- [Phase 05-05]: streamlit run defaults to a non-localhost binding; .streamlit/config.toml now hard-codes [server] address = "localhost" (closes live T-5-03 network-exposure gap found during rehearsal)
+- [Phase 05-05]: cached_shap loads the pre-fitted data/modelos/rf_shap_model.pkl artifact instead of refitting a RandomForest live -- root cause of a 9+ minute cold-start stall; production interpret.shap_analysis defaults (rf=None, check_additivity=True, explain_sample_size=None) are unchanged so the Phase-4 notebook/tests are unaffected
+- [Phase 05-05]: Demo-only bootstrap n_replicas tuned via live isolated timing on the presentation machine (200->50->8); simulate.py's production default (1000) and methodology untouched -- final measured cold-start: 2.01s (target <5s)
 
 ### Pending Todos
 
@@ -138,6 +142,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-13T19:40:32.440Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-07-14T00:46:49.000Z
+Stopped at: Completed 05-05-PLAN.md — all Phase 5 plans done, ready for phase-level goal verification
 Resume file: None

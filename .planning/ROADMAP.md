@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Construcción del Panel y EDA** - Limpieza/fusión/feature engineering idempotente, filtrado por cobertura del 70%, discusión de datos faltantes (MNAR), EDA global/regional/por tipología con correlación/VIF (completed 2026-07-11)
 - [x] **Phase 3: Modelo 1 — Regresión de Panel (PIB per cápita)** - `panel_base.py` compartido, PanelOLS con efectos fijos bidireccionales, comparación pooled/RE + Hausman, SEs robustos, robustez, serialización, sección de limitaciones (completed 2026-07-12)
 - [x] **Phase 4: Interpretabilidad, Simulación y Robustez** - Simulación contrafactual bootstrap multi-escenario, heterogeneidad regional/por ingresos, SHAP + ALE con semillas fijas (completed 2026-07-13)
-- [ ] **Phase 5: Dashboard y Preparación de la Defensa** - Dashboard Streamlit/Plotly cacheado, choropleth, comparación de indicadores, animación temporal, ensayo con caché fría y respaldo pre-renderizado
+- [x] **Phase 5: Dashboard y Preparación de la Defensa** - Dashboard Streamlit/Plotly cacheado, choropleth, comparación de indicadores, animación temporal, ensayo con caché fría y respaldo pre-renderizado (completed 2026-07-14)
 - [ ] **Phase 6: Modelo 2 — Productividad Agrícola (stretch)** - Reutilización de `panel_base.py` para el indicador 2.3.1, documentación de cobertura reducida, extensión de simulación/SHAP/dashboard
 
 ## Phase Details
@@ -123,7 +123,7 @@ Plans:
   3. El usuario puede comparar al menos dos indicadores lado a lado y reproducir la animación temporal del choropleth a lo largo de 2000–2022.
   4. Existen capturas de pantalla y/o un vídeo de respaldo pre-renderizados, ensayados como plan B ante un fallo del dashboard en directo.
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans complete
 **UI hint**: yes
 
 Plans:
@@ -142,7 +142,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3)*
 
-- [ ] 05-05-PLAN.md — Ensayo con caché fría en la máquina de presentación + respaldo Plan B pre-renderizado de las 4 pestañas (DASH-05)
+- [x] 05-05-PLAN.md — Ensayo con caché fría en la máquina de presentación + respaldo Plan B pre-renderizado de las 4 pestañas (DASH-05)
 
 ### Phase 6: Modelo 2 — Productividad Agrícola (stretch)
 
@@ -168,5 +168,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Construcción del Panel y EDA | 2/2 | Complete    | 2026-07-11 |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
 | 4. Interpretabilidad, Simulación y Robustez | 3/3 | Complete    | 2026-07-13 |
-| 5. Dashboard y Preparación de la Defensa | 4/5 | In Progress|  |
+| 5. Dashboard y Preparación de la Defensa | 5/5 | Complete   | 2026-07-14 |
 | 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |
