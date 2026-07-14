@@ -168,5 +168,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Construcción del Panel y EDA | 2/2 | Complete    | 2026-07-11 |
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
 | 4. Interpretabilidad, Simulación y Robustez | 3/3 | Complete    | 2026-07-13 |
-| 5. Dashboard y Preparación de la Defensa | 5/5 | Complete   | 2026-07-14 |
+| 5. Dashboard y Preparación de la Defensa | 5/5 | Complete    | 2026-07-14 |
 | 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |
