@@ -30,11 +30,11 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 - [x] Modelo 1: regresión de panel con efectos fijos por país (PanelOLS) para predecir la tasa de crecimiento del PIB real per cápita en función del estrés hídrico — Validado en Fase 03: modelo-1-regresión-de-panel-pib-per-cápita (MODEL1-01..06)
 - [x] Simulación de escenarios contrafactuales: impacto en PIB ante reducciones hipotéticas del estrés hídrico, con intervalos de confianza bootstrap (enmarcado como simulación de sensibilidad, no predicción causal) — Validado en Fase 04: interpretabilidad-simulación-y-robustez (INTERP-01/02/03)
 - [x] Análisis de interpretabilidad (SHAP) del peso relativo del estrés hídrico frente a otras variables, con RandomForest como modelo de referencia y VIF/PDP complementarios — Validado en Fase 04 (INTERP-04/05/06, REPRO-02)
+- [x] Dashboard geoespacial interactivo local (Streamlit + Plotly choropleth) para explorar resultados por país/región, usado en la demo de la defensa oral — Validado en Fase 05: dashboard-y-preparación-de-la-defensa (DASH-01..05)
 
 ### Active
 
 - [ ] Modelo 2: mismo enfoque metodológico para productividad agrícola (indicador 2.3.1) — tratado como extensión del Modelo 1; si la cobertura de datos es insuficiente, limitar a países con datos completos y documentarlo
-- [ ] Dashboard geoespacial interactivo local (Streamlit + Plotly choropleth) para explorar resultados por país/región, usado en la demo de la defensa oral
 
 ### Out of Scope
 
@@ -51,6 +51,7 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 - Fase 02 completa (2026-07-12): tipología de país (LDC/LLDC/SIDS) vía `GeoArea/Tree`, filtro de cobertura 70% con tabla `panel_exclusions` (529 pares excluidos), `panel_clean` (4,923 filas, sin alterar valores reales), notebook EDA con discusión MNAR y matrices VIF/correlación global+regional+tipología. Ver `.planning/phases/02-construcci-n-del-panel-y-eda/02-VERIFICATION.md`.
 - Fase 03 completa (2026-07-12): `panel_base.py` (módulo paramétrico compartido, reutilizable por el Modelo 2 en Fase 6) con filtro de exclusiones, Hausman test y Pesaran CD implementados manualmente (ninguna librería los provee). Modelo 1 ajustado sobre datos reales (171 países, 3,879 obs.): efectos fijos bidireccionales, SEs Driscoll-Kraay (Pesaran CD rechaza H0), comparación pooled/RE/FE + Hausman (no rechaza H0, apoya FE), robustez sin años COVID, `model1_gdp.pkl` serializado, sección de limitaciones (causalidad inversa/endogeneidad). Ver `.planning/phases/03-modelo-1-regresi-n-de-panel-pib-per-c-pita/03-VERIFICATION.md`.
 - Fase 04 completa (2026-07-13): `src/simulate.py` (bootstrap contrafactual con CIs por percentil, exclusión de no-extrapolación, heterogeneidad por interacción) y `src/interpret.py` (RandomForest + SHAP + VIF + PDP, `n_jobs=1`), ambos paramétricos y reutilizables sin modificación por el Modelo 2 (Fase 6). Notebook único de orquestación (`notebook/4_1_interpretabilidad_simulacion.ipynb`) ejecutado sobre el panel real (171 países), `rf_shap_model.pkl` serializado y verificado por round-trip, reproducibilidad end-to-end (REPRO-02) probada bit-idéntica en dos ejecuciones independientes vía `scripts/verify_repro02.py`. Ver `.planning/phases/04-interpretabilidad-simulaci-n-y-robustez/04-VERIFICATION.md`.
+- Fase 05 completa (2026-07-14): dashboard Streamlit local (`src/dashboard/`) con 4 pestañas (Mapa e indicadores, Modelo 1, Simulación, Interpretabilidad SHAP), cacheado con `st.cache_resource`/`st.cache_data`, artefactos locales únicamente (`data/panel.db`, `data/modelos/*.pkl`, sin llamadas a la API en vivo). Ensayo con caché fría en la máquina de presentación: cold-start 2.01s (objetivo <5s) tras dos rondas de optimización (SHAP cargando el RandomForest ya entrenado en vez de reajustarlo, bootstrap reducido a 8 réplicas demo). Respaldo Plan B (`figuras/plan_b/`) con capturas reales de las 4 pestañas. Code review encontró y corrigió 2 hallazgos Critical (eje X del gráfico de escenarios, solapamiento del plot SHAP) antes del cierre. Ver `.planning/phases/05-dashboard-y-preparaci-n-de-la-defensa/05-VERIFICATION.md`.
 - Repo ya inicializado en git con estructura mínima: `requirements.txt` (dependencias ya elegidas: requests, pandas, numpy, jupyter, matplotlib, seaborn, statsmodels, linearmodels, scikit-learn, shap, plotly, streamlit), carpetas `data/`, `figuras/`, `notebook/`, `src/ingesta/` — ver `.planning/codebase/` para el mapeo detallado (STACK, ARCHITECTURE, STRUCTURE, CONVENTIONS, TESTING, INTEGRATIONS, CONCERNS).
 - Fuente de datos única: API pública de indicadores ODS de la ONU (`https://unstats.un.org/SDGAPI/v1/`), ya usada en trabajos previos del alumno.
 - Indicadores clave identificados en la propuesta:
@@ -91,7 +92,7 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 |----------|-----------|---------|
 | Roadmap de GSD cubre el TFB completo (no solo Entrega 2) | El alumno prefiere planificar todas las fases desde el inicio, ajustando sobre la marcha | — Pending |
 | SQLite como motor de almacenamiento del panel | Cero configuración, un solo archivo, adecuado para un TFB individual y fácil de entregar/versionar | Implementado en Fase 01 (`src/db.py`) |
-| Dashboard solo local (sin despliegue online) | Basta con demo en vivo durante la defensa oral; evita complejidad/coste de hosting | — Pending |
+| Dashboard solo local (sin despliegue online) | Basta con demo en vivo durante la defensa oral; evita complejidad/coste de hosting | Implementado en Fase 05 (`src/dashboard/`, `.streamlit/config.toml` con `[server] address = "localhost"`) |
 | Fuente de datos única: API SDG de la ONU | Exigencia explícita de la propuesta — garantiza trazabilidad y reproducibilidad total | Implementado en Fase 01 (`src/ingesta/`) |
 | Modelos de panel con efectos fijos (no solo regresión simple) | Mitigación del riesgo de causalidad inversa señalado en el análisis de riesgos de la propuesta | Implementado en Fase 03 (`src/panel_base.py`, two-way FE con Hausman + Pesaran CD) |
 | Modelo 2 (agricultura) como extensión del Modelo 1, priorizado tras Modelo 1 (PIB) | Mitigación del riesgo de tiempo limitado señalado en la propuesta | — Pending |
@@ -114,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-13 after Phase 04 completion*
+*Last updated: 2026-07-14 after Phase 05 completion*
