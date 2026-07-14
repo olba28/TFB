@@ -225,8 +225,14 @@ with tab_shap:
         )
         st.caption(f"R² OOB del RandomForest de referencia: {rf.oob_score_:.4f}")
 
-        fig_shap = plt.figure()
-        shap.summary_plot(shap_values, X_shap, show=False)
+        shap.summary_plot(
+            shap_values,
+            X_shap,
+            show=False,
+            plot_size=(10, 0.4 * X_shap.shape[1] + 2),
+        )
+        fig_shap = plt.gcf()
+        fig_shap.tight_layout()
         st.pyplot(fig_shap)
         plt.close(fig_shap)
     except Exception:

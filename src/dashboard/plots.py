@@ -138,7 +138,10 @@ def build_scenario_plot(results: dict, title: str) -> go.Figure:
     )
     fig.update_layout(
         title=title,
-        xaxis_title="Escenario (reducción del estrés hídrico)",
+        xaxis=dict(
+            title="Escenario (reducción del estrés hídrico)",
+            type="category",
+        ),
         yaxis_title="Efecto simulado sobre la variable dependiente",
         margin=_FIGURE_MARGIN,
     )
