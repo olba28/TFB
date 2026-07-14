@@ -12,7 +12,7 @@ coherente de las 4 pestañas (D-06).
 | `01_mapa_e_indicadores.png` | Mapa e indicadores |
 | `02_modelo_1.png` | Modelo 1 |
 | `03_simulacion.png` | Simulación |
-| `04_interpretabilidad_shap.png` | Interpretabilidad (SHAP) |
+| `04_interpretabilidad_shap.png` + `04_interpretabilidad_shap2.png` | Interpretabilidad (SHAP) -- partida en 2 capturas (cabecera+tabla VIF, y el summary plot completo) porque el plot SHAP (13 features) no cabe en una sola ventana visible sin recortarse. Mostrar ambas en orden durante la demo de respaldo. |
 
 Formato: PNG o PDF (p. ej. "Print to PDF" del navegador es válido); mantener los nombres
 exactos de arriba (con extensión `.png` o `.pdf` según el mecanismo de captura elegido).
