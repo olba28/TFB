@@ -1,4 +1,4 @@
-## 3. Metodologia
+## 3. Metodología
 
 ### 3.1 Fuentes de datos y estrategia de obtención vía API ODS de la ONU
 
@@ -119,7 +119,7 @@ El signo positivo del efecto marginal (una reducción del estrés hídrico se as
 
 Además del bootstrap, la Fase 4 estima heterogeneidad regional y por tipología mediante un término de interacción `estrés_hídrico : C(grupo)` (sin efecto principal `C(grupo)`, que quedaría absorbido por los efectos fijos de entidad y provocaría un error de colinealidad si se incluyera). Por tipología ONU (`is_ldc`), el coeficiente de interacción para los países no-LDC es -0,000104 (p = 0,4343, no significativo), mientras que para los países LDC es -0,099155 (p = 0,0039, significativo al 5%, con IC 95% [-0,166477, -0,031832]) -- un efecto negativo y estadísticamente significativo del estrés hídrico sobre el crecimiento del PIB per cápita específicamente en los países menos desarrollados, sustancialmente distinto del coeficiente global no significativo del Modelo 1. Por región, ningún coeficiente de interacción resulta significativo al 5% (p-valores entre 0,094 y 0,663 según la región), con errores estándar amplios reflejo del reparto desigual de países entre regiones. Se enfatiza que estas tablas muestran únicamente coeficientes de interacción con su error estándar e intervalo de confianza -- en ningún momento se genera un valor predicho para un país individual.
 
-## 4. Desarrollo e implementacion
+## 4. Desarrollo e implementación
 
 ### 4.1 Ingesta automática y base de datos
 
@@ -185,7 +185,7 @@ El dashboard (`src/dashboard/app.py`, único módulo del proyecto que importa `s
 
 El módulo `src/dashboard/data.py` implementa la separación de caché exigida por el patrón de recarga completa de Streamlit en cada interacción: `st.cache_resource` para objetos compartidos y no copiables (el motor SQLAlchemy, el modelo `PanelEffectsResults` deserializado, el RandomForest auxiliar) y `st.cache_data` para resultados copiables (DataFrames, arrays de efectos del bootstrap, valores SHAP) -- sin `ttl`, dado que la caché es permanente durante la vida de la sesión de demostración. El coste de arranque en frío (*cold start*) se optimizó explícitamente para la defensa: el bootstrap de demostración usa `n_replicas=8` (frente a las 1.000 de producción en `simulate.py`, sin alterar la metodología subyacente) y el análisis SHAP de demostración reutiliza el RandomForest ya serializado (`data/modelos/rf_shap_model.pkl`) en lugar de reajustarlo en vivo, con `check_additivity=False` y una muestra de explicación de 20 filas -- decisiones registradas en `STATE.md` (Fase 05-05) que llevaron el tiempo de arranque en frío medido de más de 9 minutos a **2,01 segundos**, por debajo del objetivo de 5 segundos. Como salvaguarda de contingencia ante un eventual fallo de la aplicación en vivo durante la defensa, existe un "Plan B" de capturas estáticas (`figuras/plan_b/`) con una imagen por pestaña (incluyendo una segunda captura del resumen SHAP), generadas a partir de la versión de fidelidad completa (sin las reducciones de demostración) para preservar la referencia íntegra del análisis.
 
-## Valores numericos pendientes de verificar
+## Valores numéricos pendientes de verificar
 
 - **[CITA POR VERIFICAR]** Rubin (1976), clasificación MCAR/MAR/MNAR de mecanismos de datos faltantes (sección 3.3).
 - **[CITA POR VERIFICAR]** Pesaran (2004), test de dependencia transversal para datos de panel (sección 3.4).
