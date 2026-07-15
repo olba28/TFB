@@ -44,6 +44,10 @@ ACTIVE_MODELS: dict[str, dict[str, object]] = {
         ],
         "pkl_path": "data/modelos/model1_gdp.pkl",
         "rf_shap_pkl_path": "data/modelos/rf_shap_model.pkl",
+        # 06-REVIEW.md WR-02: data-driven flag so app.py's reduced-coverage
+        # caption is gated off this registry entry instead of brittle
+        # display-name string matching (ACTIVE_MODEL_NAME.startswith("Modelo 2")).
+        "reduced_coverage": False,
     },
     # Fase 6 (D-07): Modelo 2 (productividad agrícola), producido por
     # src/model2_agri.py (06-02-SUMMARY.md) -- misma metodología, mismos
@@ -62,6 +66,7 @@ ACTIVE_MODELS: dict[str, dict[str, object]] = {
         ],
         "pkl_path": "data/modelos/model2_agri.pkl",
         "rf_shap_pkl_path": "data/modelos/rf_shap_model_m2.pkl",
+        "reduced_coverage": True,
     },
 }
 

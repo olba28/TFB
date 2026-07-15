@@ -64,13 +64,6 @@ ARTIFACT_ERROR_MSG = (
     "ingesta (Fase 1) y de modelado (Fase 3/4) antes de abrir el dashboard."
 )
 
-MODEL2_COVERAGE_CAPTION = (
-    "Modelo 2 (productividad agrícola, indicador 2.3.1): muestra reducida a "
-    "39 países con >=3 años observados (vs. 171 del Modelo 1), por la baja "
-    "frecuencia de reporte del indicador (oleadas ~2010/2013/2016/2020). "
-    "Ver tabla de cobertura/exclusiones del Modelo 2, Fase 6."
-)
-
 # Top-level artifact load (D-06 shared across all 4 tabs): a broken/missing
 # panel.db must show a clear next-step message instead of a raw traceback in
 # front of the tribunal (UI-SPEC Copywriting Contract, Error state).
@@ -88,6 +81,21 @@ ACTIVE_MODEL_NAME = st.sidebar.selectbox(
 )
 ACTIVE_MODEL = models.ACTIVE_MODELS[ACTIVE_MODEL_NAME]
 
+# Gated off the registry's "reduced_coverage" flag (06-REVIEW.md WR-02), not
+# brittle display-name string matching
+# (ACTIVE_MODEL_NAME.startswith("Modelo 2")) -- computed once here, referenced
+# identically across all 4 tabs below. If the display name in models.py is
+# ever edited/translated, this caption keeps appearing correctly because it
+# no longer depends on the human-readable string at all.
+MODEL2_COVERAGE_CAPTION: str | None = None
+if ACTIVE_MODEL["reduced_coverage"]:
+    MODEL2_COVERAGE_CAPTION = (
+        "Modelo 2 (productividad agrícola, indicador 2.3.1): muestra reducida a "
+        "39 países con >=3 años observados (vs. 171 del Modelo 1), por la baja "
+        "frecuencia de reporte del indicador (oleadas ~2010/2013/2016/2020). "
+        "Ver tabla de cobertura/exclusiones del Modelo 2, Fase 6."
+    )
+
 NO_DATA_CAPTION = (
     "Los países en gris no disponen de datos suficientes para este indicador "
     "o fueron excluidos por cobertura mínima (ver Fase 2)."
@@ -99,7 +107,7 @@ tab_mapa, tab_modelo1, tab_simulacion, tab_shap = st.tabs(
 
 # --- Tab 1: Mapa e indicadores (DASH-03/D-02) -------------------------------
 with tab_mapa:
-    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+    if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader("Comparación de indicadores")
 
@@ -160,7 +168,7 @@ with tab_mapa:
 
 # --- Tab 2: Modelo 1 ---------------------------------------------------------
 with tab_modelo1:
-    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+    if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader(f"{ACTIVE_MODEL_NAME}: coeficientes y diagnósticos")
     try:
@@ -185,7 +193,7 @@ with tab_modelo1:
 
 # --- Tab 3: Simulación (D-03) -------------------------------------------------
 with tab_simulacion:
-    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+    if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader("Simulación contrafactual (análisis de sensibilidad)")
     st.caption(
@@ -225,7 +233,7 @@ with tab_simulacion:
 
 # --- Tab 4: Interpretabilidad (SHAP) (D-03, INTERP-04) ------------------------
 with tab_shap:
-    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+    if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader("Interpretabilidad (SHAP)")
     try:
