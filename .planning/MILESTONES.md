@@ -1,5 +1,16 @@
 # Milestones
 
+## v1.1 Coverage Heatmap (Shipped: 2026-07-15)
+
+**Phases completed:** 1 phase, 2 plans, 4 tasks
+
+**Key accomplishments:**
+
+- `src/coverage.py` pure pandas pivot+reindex module (build_presence_matrix, ordered_countries_with_boundaries) plus five passing unit tests, proving D-04's unified missing-state logic and D-03's region grouping without ever touching Phase 2's filtered clean panel
+- Thin-orchestrator Jupyter notebook rendering a 1x5 binary-status coverage heatmap (5 ODS indicators x country x year, region-grouped) from raw_observations, saved as a single 300 DPI PNG for the thesis annex — human-verified against all 4 Roadmap Success Criteria
+
+---
+
 ## v1.0 MVP (Shipped: 2026-07-15)
 
 **Phases completed:** 6 phases, 21 plans, 56 tasks

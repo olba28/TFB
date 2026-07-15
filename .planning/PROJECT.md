@@ -10,20 +10,20 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 
 ## Current State
 
-**Shipped: v1.0 MVP (2026-07-15)**
+**Shipped: v1.1 Coverage Heatmap (2026-07-15)**
+
+El pipeline completo de extremo a extremo está construido y verificado: ingesta versionada de los 5 indicadores ODS (Fase 1), panel país×año limpio con EDA (Fase 2), Modelo 1 de PanelOLS con efectos fijos bidireccionales para PIB per cápita (Fase 3), simulación contrafactual + interpretabilidad SHAP/PDP (Fase 4), dashboard Streamlit/Plotly local ensayado para la defensa (Fase 5), Modelo 2 stretch de productividad agrícola reutilizando toda la infraestructura del Modelo 1 (Fase 6), y un mapa de calor de cobertura/missingness (país × indicador × año) como figura estática para el anexo de la memoria (Fase 7, cierre de EXTRA-01). Los 34 requisitos definidos hasta la fecha (32 de v1.0 + 2 de v1.1) están validados; ver `.planning/milestones/v1.0-REQUIREMENTS.md` y `.planning/milestones/v1.1-REQUIREMENTS.md`.
+
+<details>
+<summary>Previous milestone: v1.0 MVP (shipped 2026-07-15)</summary>
 
 El pipeline completo de extremo a extremo está construido y verificado: ingesta versionada de los 5 indicadores ODS (Fase 1), panel país×año limpio con EDA (Fase 2), Modelo 1 de PanelOLS con efectos fijos bidireccionales para PIB per cápita (Fase 3), simulación contrafactual + interpretabilidad SHAP/PDP (Fase 4), dashboard Streamlit/Plotly local ensayado para la defensa (Fase 5), y Modelo 2 stretch de productividad agrícola reutilizando toda la infraestructura del Modelo 1 (Fase 6). Las 32 requisitos v1 están validados; ver archivo `.planning/milestones/v1.0-REQUIREMENTS.md`.
 
-## Current Milestone: v1.1 Coverage Heatmap
+</details>
 
-**Status: Phase 7 complete (2026-07-15) — milestone ready to close.**
+## Next Milestone Goals
 
-**Goal:** Generar una figura estática de cobertura/missingness (mapa de calor país × indicador × año) para el anexo de la memoria, cerrando EXTRA-01.
-
-**Target features:**
-- [x] Mapa de calor país × indicador × año para los 5 indicadores ODS ya ingeridos, generado como figura estática (PNG) reutilizable en la memoria — `figuras/07_mapa_calor_cobertura.png`, generado por `notebook/7_1_mapa_calor_cobertura.ipynb`
-- [x] Sin cambios al dashboard Streamlit (alcance explícitamente excluido) — verificado, ningún commit de la Fase 7 tocó `src/dashboard/`
-- [x] Sin nueva sección de discusión escrita más allá de la ya existente en la Fase 2 (MNAR)
+No definido todavía. Próximo paso: `/gsd-new-milestone` para definir el alcance de la siguiente iteración (p. ej. alineado con la Entrega 3 UCMA — ver Context: cronograma oficial, 31 agosto–6 septiembre 2026).
 
 ## Business Context
 
@@ -53,7 +53,7 @@ El pipeline completo de extremo a extremo está construido y verificado: ingesta
 
 ### Active
 
-None — v1.1 Coverage Heatmap completa, todos los requisitos activos validados.
+None — v1.0 y v1.1 completos, todos los requisitos definidos hasta la fecha validados. Pendiente de definir requisitos de la siguiente iteración vía `/gsd-new-milestone`.
 
 ### Out of Scope
 
@@ -72,6 +72,8 @@ None — v1.1 Coverage Heatmap completa, todos los requisitos activos validados.
 - Fase 04 completa (2026-07-13): `src/simulate.py` (bootstrap contrafactual con CIs por percentil, exclusión de no-extrapolación, heterogeneidad por interacción) y `src/interpret.py` (RandomForest + SHAP + VIF + PDP, `n_jobs=1`), ambos paramétricos y reutilizables sin modificación por el Modelo 2 (Fase 6). Notebook único de orquestación (`notebook/4_1_interpretabilidad_simulacion.ipynb`) ejecutado sobre el panel real (171 países), `rf_shap_model.pkl` serializado y verificado por round-trip, reproducibilidad end-to-end (REPRO-02) probada bit-idéntica en dos ejecuciones independientes vía `scripts/verify_repro02.py`. Ver `.planning/phases/04-interpretabilidad-simulaci-n-y-robustez/04-VERIFICATION.md`.
 - Fase 05 completa (2026-07-14): dashboard Streamlit local (`src/dashboard/`) con 4 pestañas (Mapa e indicadores, Modelo 1, Simulación, Interpretabilidad SHAP), cacheado con `st.cache_resource`/`st.cache_data`, artefactos locales únicamente (`data/panel.db`, `data/modelos/*.pkl`, sin llamadas a la API en vivo). Ensayo con caché fría en la máquina de presentación: cold-start 2.01s (objetivo <5s) tras dos rondas de optimización (SHAP cargando el RandomForest ya entrenado en vez de reajustarlo, bootstrap reducido a 8 réplicas demo). Respaldo Plan B (`figuras/plan_b/`) con capturas reales de las 4 pestañas. Code review encontró y corrigió 2 hallazgos Critical (eje X del gráfico de escenarios, solapamiento del plot SHAP) antes del cierre. Ver `.planning/phases/05-dashboard-y-preparaci-n-de-la-defensa/05-VERIFICATION.md`.
 - Fase 06 completa (2026-07-15) — última fase del roadmap v1.0: `src/model2_agri.py` extiende el Modelo 1 al indicador 2.3.1 (productividad agrícola) reutilizando `panel_base.py`/`simulate.py`/`interpret.py` sin modificarlos (mismo two-way FE, Hausman rechaza H0 esta vez —p=0.0143—, Pesaran CD no rechaza →SEs clustered). Tabla `model2_coverage` documenta 39/49 países incluidos (≥3 años con datos de 2.3.1 y 6.4.2, D-01/D-02). Dashboard con selector "Modelo activo" que propaga a las 4 pestañas, con aviso de cobertura reducida. Code review encontró y corrigió 1 hallazgo Critical (el bootstrap en vivo del dashboard remuestreaba de la población de países equivocada para el Modelo 2, extrapolando fuera de muestra) + 4 warnings + 2 info antes del cierre. Ver `.planning/phases/06-modelo-2-productividad-agr-cola-stretch/06-VERIFICATION.md`.
+- Fase 07 completa (2026-07-15) — única fase del milestone v1.1 (Coverage Heatmap), cierre de EXTRA-01: `src/coverage.py` (`build_presence_matrix` + `ordered_countries_with_boundaries`, patrón pivot+reindex+notna sin ramificación por celda) y `notebook/7_1_mapa_calor_cobertura.ipynb` como único punto de entrada, generando `figuras/07_mapa_calor_cobertura.png` — mapa de calor 1×5 (un panel por indicador ODS) sobre `raw_observations` (datos crudos, antes del filtro del 70% de la Fase 2), agrupado por región ODS, aprobado por el alumno contra los 4 Success Criteria del roadmap. Dos warnings de robustez no bloqueantes quedaron documentados como deuda técnica menor (comparación NaN-unsafe de región, drop silencioso de países ausentes en `country_reference`). Ver `.planning/phases/07-mapa-de-calor-de-cobertura/07-VERIFICATION.md`.
+- Estado del código al cierre de v1.1 (2026-07-15): 212 commits, ~19,051 líneas Python/notebook (`.py`+`.ipynb`), 7 fases / 23 planes completados en 11 días de desarrollo (2026-07-05 → 2026-07-15).
 - Repo ya inicializado en git con estructura mínima: `requirements.txt` (dependencias ya elegidas: requests, pandas, numpy, jupyter, matplotlib, seaborn, statsmodels, linearmodels, scikit-learn, shap, plotly, streamlit), carpetas `data/`, `figuras/`, `notebook/`, `src/ingesta/` — ver `.planning/codebase/` para el mapeo detallado (STACK, ARCHITECTURE, STRUCTURE, CONVENTIONS, TESTING, INTEGRATIONS, CONCERNS).
 - Fuente de datos única: API pública de indicadores ODS de la ONU (`https://unstats.un.org/SDGAPI/v1/`), ya usada en trabajos previos del alumno.
 - Indicadores clave identificados en la propuesta:
@@ -94,7 +96,6 @@ None — v1.1 Coverage Heatmap completa, todos los requisitos activos validados.
   - Defensa oral: 12–25 octubre 2026 (70% memoria + 30% defensa)
 - Referencias metodológicas ya seleccionadas por el alumno: Baltagi (panel data), Wooldridge (econometría), James et al. / ISLR (aprendizaje estadístico), Molnar (interpretabilidad), FAO & UN-Water 2024, UNESCO 2024, Borja-Vega & Zhang / Banco Mundial.
 - Competencias del Bachelor a demostrar (nivel esperado 1–5): CE2 (4), CE3 (3), CE4 (5), CE5 (4), CE8 (3), CE10 (2), CE11 (3).
-- Estado del código al cierre de v1.0 (2026-07-15): 189 commits, ~18,657 líneas Python/notebook (`.py`+`.ipynb`), 6 fases / 21 planes / 56 tareas completados en 10 días de desarrollo (2026-07-05 → 2026-07-15).
 
 ## Constraints
 
@@ -136,4 +137,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-15 after completing Phase 07 (v1.1 Coverage Heatmap milestone)*
+*Last updated: 2026-07-15 after archiving v1.1 Coverage Heatmap milestone*
