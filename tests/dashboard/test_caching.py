@@ -89,6 +89,22 @@ def test_load_panel_exclusions_returns_dataframe(tiny_panel_engine) -> None:
     assert "excluded" in frame.columns
 
 
+def _make_fake_fitted(country_codes: list[str]):
+    """A minimal stand-in for ``PanelEffectsResults`` exposing only
+    ``fitted_values`` (a ``(country_code, year)``-MultiIndex DataFrame) --
+    the one attribute ``cached_bootstrap`` reads to restrict resampling to
+    the model's actual fitted entity set (06-REVIEW.md CR-01)."""
+
+    class _Fitted:
+        def __init__(self, codes: list[str]) -> None:
+            idx = pd.MultiIndex.from_product(
+                [codes, [2020, 2021]], names=["country_code", "year"]
+            )
+            self.fitted_values = pd.DataFrame({"fitted_values": 1.0}, index=idx)
+
+    return _Fitted(country_codes)
+
+
 def test_cached_bootstrap_honors_active_model_name(monkeypatch, tiny_panel_engine) -> None:
     """Phase 6 (D-07/06-PATTERNS.md): calling cached_bootstrap with
     active_model_name="Modelo 2 (Productividad agrícola)" must result in
@@ -99,17 +115,15 @@ def test_cached_bootstrap_honors_active_model_name(monkeypatch, tiny_panel_engin
 
     def _fake_load_model(pkl_path: str):
         recorded_paths.append(pkl_path)
-
-        class _Fitted:
-            pass
-
-        return _Fitted()
+        return _make_fake_fitted(["ESP"])
 
     def _fake_bootstrap_counterfactual(fitted, df, dep_var, indep_var, **kwargs):
         return {}
 
+    fake_df = pd.DataFrame({"country_code": ["ESP", "FRA"], "year": [2020, 2020]})
+
     monkeypatch.setattr(data, "get_engine", lambda: tiny_panel_engine)
-    monkeypatch.setattr(data, "load_panel_clean", lambda engine: pd.DataFrame())
+    monkeypatch.setattr(data, "load_panel_clean", lambda engine: fake_df)
     monkeypatch.setattr(data, "load_model", _fake_load_model)
     monkeypatch.setattr(data.simulate, "bootstrap_counterfactual", _fake_bootstrap_counterfactual)
 
@@ -121,6 +135,51 @@ def test_cached_bootstrap_honors_active_model_name(monkeypatch, tiny_panel_engin
     )
 
     assert recorded_paths == ["data/modelos/model2_agri.pkl"]
+
+
+def test_cached_bootstrap_restricts_df_to_fitted_model_coverage(
+    monkeypatch, tiny_panel_engine
+) -> None:
+    """CR-01 regression test (06-REVIEW.md): the ``df`` actually passed into
+    ``simulate.bootstrap_counterfactual`` must contain ONLY the countries the
+    active fitted model was fit on -- not the full unfiltered panel. Uses a
+    fake Model 2 fitted result covering just 2 of 4 panel countries (mirrors
+    the real ~39-of-171-215 coverage gap) and asserts on the actual resampled
+    entity set, not merely which ``.pkl`` path was requested (the pre-fix gap
+    this test closes)."""
+    captured: dict = {}
+
+    def _fake_load_model(pkl_path: str):
+        return _make_fake_fitted(["ESP", "DEU"])
+
+    def _fake_bootstrap_counterfactual(fitted, df, dep_var, indep_var, **kwargs):
+        captured["df"] = df
+        return {}
+
+    full_panel = pd.DataFrame(
+        {
+            "country_code": ["ESP", "FRA", "DEU", "ITA"],
+            "year": [2020, 2020, 2020, 2020],
+            "2.3.1": [1.0, 2.0, 3.0, 4.0],
+            "6.4.2": [10.0, 20.0, 30.0, 40.0],
+        }
+    )
+
+    monkeypatch.setattr(data, "get_engine", lambda: tiny_panel_engine)
+    monkeypatch.setattr(data, "load_panel_clean", lambda engine: full_panel)
+    monkeypatch.setattr(data, "load_model", _fake_load_model)
+    monkeypatch.setattr(data.simulate, "bootstrap_counterfactual", _fake_bootstrap_counterfactual)
+
+    data.cached_bootstrap.clear()
+    data.cached_bootstrap(
+        dep_var="2.3.1",
+        indep_var="6.4.2",
+        active_model_name="Modelo 2 (Productividad agrícola)",
+    )
+
+    assert set(captured["df"]["country_code"].unique()) == {"ESP", "DEU"}
+    assert "FRA" not in set(captured["df"]["country_code"].unique())
+    assert "ITA" not in set(captured["df"]["country_code"].unique())
 
 
 def test_load_model_loads_toy_pickle(toy_model_pkl) -> None:

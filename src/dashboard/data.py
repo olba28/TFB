@@ -126,6 +126,15 @@ def cached_bootstrap(
     is hashable and therefore safe for ``st.cache_data``'s cache-key
     requirement (never the Engine/fitted-model object itself).
 
+    Before resampling, ``df`` is restricted to the exact country set
+    ``fitted`` was actually fit on (derived from
+    ``fitted.fitted_values.index.get_level_values("country_code")``) --
+    mirrors ``model2_agri.run_bootstrap``'s use of the pre-filtered
+    ``panel_m2``, generically for any active model, so Model 2's 39-country
+    coverage-filtered fit (D-01/D-02) is never silently bootstrapped/
+    extrapolated against the full ~171-215-country panel (06-REVIEW.md
+    CR-01).
+
     ``n_replicas`` defaults to 8 here -- much smaller than ``simulate.py``'s
     own production default of 1000 -- purely as a demo-runtime knob to keep
     the first cold compute inside the <5s demo budget (DASH-02); the
@@ -148,6 +157,16 @@ def cached_bootstrap(
     engine = get_engine()
     df = load_panel_clean(engine)
     fitted = load_model(models.ACTIVE_MODELS[active_model_name]["pkl_path"])
+
+    # Restrict resampling to the exact entity set the model was fit on --
+    # mirrors model2_agri.run_bootstrap's use of the pre-filtered panel_m2,
+    # generically for any active model (D-01/D-02 scope-of-validity). Without
+    # this, the live bootstrap would resample from the FULL, unfiltered panel
+    # (~171-215 countries) even for Model 2's 39-country coverage-filtered
+    # fit -- silently out-of-sample-extrapolating (06-REVIEW.md CR-01).
+    fitted_entities = fitted.fitted_values.index.get_level_values("country_code").unique()
+    df = df[df["country_code"].isin(fitted_entities)]
+
     return simulate.bootstrap_counterfactual(
         fitted,
         df,
