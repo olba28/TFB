@@ -159,7 +159,7 @@ with tab_mapa:
     # in their own tabs below instead of on this map.
     map_options: dict[str, str] = dict(models.INDICATOR_LABELS)
     map_df = df
-    fitted_col = "_modelo1_valores_ajustados"
+    fitted_col = "_modelo_valores_ajustados"
     fitted_label = f"{ACTIVE_MODEL_NAME}: valores ajustados ({ACTIVE_MODEL['dep_var']})"
     try:
         fitted_results = data.load_model(ACTIVE_MODEL["pkl_path"])
