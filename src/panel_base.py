@@ -55,6 +55,44 @@ def filter_by_exclusions(
     return df[~df["country_code"].isin(excluded_countries)]
 
 
+def filter_by_min_years(
+    df: pd.DataFrame,
+    dep_var: str,
+    indep_vars: list[str],
+    min_years: int = 3,
+) -> pd.DataFrame:
+    """Model 2's own coverage criterion (D-01/D-02, 06-CONTEXT.md): keep a
+    country only if it has at least ``min_years`` years with ALL of
+    ``[dep_var, *indep_vars]`` simultaneously non-null. ``min_years=3`` is
+    deliberately NOT the 70%-of-years rule of ``filter_by_exclusions`` --
+    indicator ``2.3.1`` is reported in ~3-year waves, so its max real
+    coverage (26%) never clears a 70% threshold and would leave the Model 2
+    panel at zero countries.
+
+    Computed directly on the passed ``panel_clean``-shaped ``df`` via
+    ``country_code`` grouping -- it never reads or wraps the
+    ``panel_exclusions`` table (fixed to the 70% criterion) nor
+    ``filter_by_exclusions``. The two coverage criteria coexist as separate,
+    explicit functions in this module (D-02): Model 1 keeps using
+    ``filter_by_exclusions``, Model 2 uses this function, and neither calls
+    the other.
+
+    Same country-level exclusion semantics as ``filter_by_exclusions``: a
+    country either fully survives (all its rows kept) or is fully dropped
+    (zero rows) -- never partially filtered row-by-row.
+
+    Pure function: no file/DB I/O, no ``warnings.warn`` -- unlike Hausman/
+    Pesaran, this is deterministic bookkeeping, not a numerically-degenerate
+    statistic.
+    """
+    variables = [dep_var, *indep_vars]
+    numeric = df[variables].apply(pd.to_numeric, errors="coerce")
+    all_nonnull = numeric.notna().all(axis=1)
+    years_observed = all_nonnull.groupby(df["country_code"]).sum()
+    kept_countries = years_observed[years_observed >= min_years].index
+    return df[df["country_code"].isin(kept_countries)]
+
+
 def _build_panel_index(df: pd.DataFrame, dep_var: str, indep_vars: list[str]) -> pd.DataFrame:
     """Build the ``(country_code, year)`` MultiIndex and defensively coerce
     the model's dependent/independent columns to numeric (03-RESEARCH.md
