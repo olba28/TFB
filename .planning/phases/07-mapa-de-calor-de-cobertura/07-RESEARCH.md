@@ -337,17 +337,19 @@ Not applicable in the "old vs new library API" sense — this phase uses no libr
 | A2 | A 1×5 horizontal subplot layout (vs. e.g. 5×1 vertical or 2×3 grid) best serves the thesis annex, assuming a landscape-oriented page for this figure | Architecture Patterns | Low-Medium — purely a layout choice (Claude's Discretion); if the memoria's page format can't accommodate a wide landscape figure, planner should pick a taller/narrower grid (e.g. 5 stacked rows) instead — same underlying `src/coverage.py` functions still apply |
 | A3 | Small-font (3.5-4pt) per-country y-tick labels on the leftmost subplot are an acceptable resolution to the 215-country-label density problem, rather than omitting labels entirely | Common Pitfalls (Pitfall 2) | Medium — if the actual annex requirement is strict physical-print legibility (not digital zoom), this choice would need revisiting in favor of region-band-only labeling; flagged explicitly as an open question below |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should `src/coverage.py` be introduced as a new module, or should all logic live inline in the notebook?**
+1. **Should `src/coverage.py` be introduced as a new module, or should all logic live inline in the notebook?** — RESOLVED
    - What we know: D-05 only fixes the *entry point* (the notebook must be the reproducible driver); every other analytical phase (2-6) in this codebase extracts pure logic into a `src/*.py` module with matching `tests/test_*.py`, and the notebook only orchestrates + plots.
    - What's unclear: CONTEXT.md doesn't explicitly discuss whether Phase 7 should introduce a new `src/` module or keep everything notebook-inline (the phase's `code_context` section only lists reusable existing assets, not a decision about new modules).
    - Recommendation: Follow the established precedent (introduce `src/coverage.py` + `tests/test_coverage.py`) for consistency and testability — this is a research recommendation, not a locked decision; the planner should confirm this shape explicitly in the plan rather than assume it silently.
+   - Resolution: Plan 07-01 creates `src/coverage.py` + `tests/test_coverage.py` following the `src/panel_build.py` precedent.
 
-2. **Is per-country y-tick legibility at print size a hard requirement, or is digital-zoom legibility (at 300 DPI) sufficient?**
+2. **Is per-country y-tick legibility at print size a hard requirement, or is digital-zoom legibility (at 300 DPI) sufficient?** — RESOLVED
    - What we know: 215 countries cannot fit at a physically-print-legible font size in a reasonably-sized figure; CONTEXT.md's Claude's-Discretion section allows Claude to choose "orientación de etiquetas" and "tamaño de figura exacto" but doesn't address this specific tension.
    - What's unclear: Whether the tribunal/reviewer is expected to read individual country rows directly off a printed page, or whether digital-PDF zoom is the assumed reading mode for this specific figure (unlike, say, a results table).
    - Recommendation: Default to small-font (3.5-4pt) labels on the leftmost subplot at 300 DPI (assumes digital-PDF zoom is acceptable, consistent with how dense country-level figures are typically handled in econometrics theses). If this proves insufficient during Task/UAT review, the fallback is region-band-only annotation (label each region once at its `axhline` boundary, drop individual country labels).
+   - Resolution: Plan 07-02 targets 300 DPI digital/PDF-zoom legibility with 3.5-4pt leftmost-subplot labels, with region-band-only annotation documented as the fallback.
 
 ## Environment Availability
 
