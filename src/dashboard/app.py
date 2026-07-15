@@ -42,7 +42,7 @@ import pandas as pd
 import shap
 import streamlit as st
 
-from src import interpret
+from src import interpret, panel_base
 from src.dashboard import data, models, plots
 
 st.set_page_config(layout="wide")
@@ -81,6 +81,41 @@ ACTIVE_MODEL_NAME = st.sidebar.selectbox(
 )
 ACTIVE_MODEL = models.ACTIVE_MODELS[ACTIVE_MODEL_NAME]
 
+
+def _model2_coverage_caption() -> str:
+    """Build the reduced-coverage caption with country counts computed at
+    runtime (06-REVIEW.md WR-03) rather than hardcoded literals that could
+    silently drift out of sync with the actual data (e.g. after a UN SDG API
+    refresh regenerates ``panel_clean``). Model 1's count reuses
+    ``panel_base.filter_by_exclusions`` (the same function Model 1's own
+    exclusion pipeline calls); Model 2's count reuses
+    ``panel_base.filter_by_min_years`` (the same function
+    ``model2_agri.build_model2_panel`` calls) -- both against ``df``/
+    ``panel_exclusions``, already loaded/cached, so no extra DB query is
+    introduced beyond the existing ``st.cache_data`` loaders.
+    """
+    model1_cfg = models.ACTIVE_MODELS["Modelo 1 (PIB per cápita)"]
+    model2_cfg = models.ACTIVE_MODELS["Modelo 2 (Productividad agrícola)"]
+
+    exclusions = data.load_panel_exclusions(engine)
+    model1_panel = panel_base.filter_by_exclusions(
+        df, exclusions, model1_cfg["dep_var"], [model1_cfg["indep_var"]]
+    )
+    n_model1 = model1_panel["country_code"].nunique()
+
+    model2_panel = panel_base.filter_by_min_years(
+        df, model2_cfg["dep_var"], [model2_cfg["indep_var"]]
+    )
+    n_model2 = model2_panel["country_code"].nunique()
+
+    return (
+        f"Modelo 2 (productividad agrícola, indicador {model2_cfg['dep_var']}): muestra "
+        f"reducida a {n_model2} países con >=3 años observados (vs. {n_model1} del Modelo "
+        "1), por la baja frecuencia de reporte del indicador (oleadas "
+        "~2010/2013/2016/2020). Ver tabla de cobertura/exclusiones del Modelo 2, Fase 6."
+    )
+
+
 # Gated off the registry's "reduced_coverage" flag (06-REVIEW.md WR-02), not
 # brittle display-name string matching
 # (ACTIVE_MODEL_NAME.startswith("Modelo 2")) -- computed once here, referenced
@@ -89,12 +124,18 @@ ACTIVE_MODEL = models.ACTIVE_MODELS[ACTIVE_MODEL_NAME]
 # no longer depends on the human-readable string at all.
 MODEL2_COVERAGE_CAPTION: str | None = None
 if ACTIVE_MODEL["reduced_coverage"]:
-    MODEL2_COVERAGE_CAPTION = (
-        "Modelo 2 (productividad agrícola, indicador 2.3.1): muestra reducida a "
-        "39 países con >=3 años observados (vs. 171 del Modelo 1), por la baja "
-        "frecuencia de reporte del indicador (oleadas ~2010/2013/2016/2020). "
-        "Ver tabla de cobertura/exclusiones del Modelo 2, Fase 6."
-    )
+    try:
+        MODEL2_COVERAGE_CAPTION = _model2_coverage_caption()
+    except Exception:
+        # Fall back to a count-free caption rather than crashing the whole
+        # app if the runtime count computation itself fails for some reason
+        # (e.g. an unexpected panel_exclusions schema) -- still communicates
+        # the reduced-coverage caveat to the tribunal (D-08).
+        MODEL2_COVERAGE_CAPTION = (
+            "Modelo 2 (productividad agrícola, indicador 2.3.1): muestra reducida "
+            "frente al Modelo 1 -- ver tabla de cobertura/exclusiones del Modelo 2, "
+            "Fase 6."
+        )
 
 NO_DATA_CAPTION = (
     "Los países en gris no disponen de datos suficientes para este indicador "
