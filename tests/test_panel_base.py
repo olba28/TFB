@@ -136,6 +136,96 @@ def test_filter_by_exclusions_ignores_indicators_not_in_this_specification():
     assert "C00" in set(filtered["country_code"].unique())
 
 
+# --- filter_by_min_years() -------------------------------------------------------
+
+
+def _make_sparse_panel(year_presence: dict[str, list[int]]) -> pd.DataFrame:
+    """A synthetic (country_code, year) panel where ``year_presence`` maps
+    each country to the list of years for which it has BOTH dep_var and
+    indep_var non-null (D-01/D-02, 06-CONTEXT.md). All years 2000-2009 are
+    present as rows for every country, but years not listed in
+    ``year_presence[country]`` get an explicit NaN in the indep_var column
+    -- controlling each country's observed-year count precisely without
+    depending on panel_exclusions or filter_by_exclusions."""
+    all_years = list(range(2000, 2010))
+    rows = []
+    for country, present_years in year_presence.items():
+        for year in all_years:
+            indep_value = 1.0 if year in present_years else np.nan
+            rows.append(
+                {"country_code": country, "year": year, "y": 5.0, "x": indep_value}
+            )
+    return pd.DataFrame(rows)
+
+
+def test_filter_by_min_years_keeps_countries_at_or_above_threshold():
+    """Country A has 4 qualifying years, B has 2, C has 3 -- min_years=3
+    keeps A and C, drops B entirely (0 rows), keeps ALL of A's and C's
+    rows (country-level, not row-level, semantics -- D-01)."""
+    df = _make_sparse_panel(
+        {
+            "A": [2000, 2001, 2002, 2003],
+            "B": [2000, 2001],
+            "C": [2000, 2001, 2002],
+        }
+    )
+
+    filtered = panel_base.filter_by_min_years(df, DEP_VAR, INDEP_VARS, min_years=3)
+
+    assert set(filtered["country_code"].unique()) == {"A", "C"}
+    assert (filtered["country_code"] == "B").sum() == 0
+    assert (filtered["country_code"] == "A").sum() == 10  # full original row count kept
+    assert (filtered["country_code"] == "C").sum() == 10
+
+
+def test_filter_by_min_years_counts_only_all_vars_nonnull_years():
+    """A year with dep_var present but indep_var NaN must NOT count toward
+    min_years -- only years where EVERY variable in [dep_var, *indep_vars]
+    is simultaneously non-null qualify (D-01)."""
+    df = _make_sparse_panel({"A": [2000, 2001, 2002]})
+    # Null out dep_var for one of A's "present" years -- that year no longer
+    # qualifies even though indep_var (x) is non-null there.
+    df.loc[(df["country_code"] == "A") & (df["year"] == 2002), "y"] = np.nan
+
+    filtered = panel_base.filter_by_min_years(df, DEP_VAR, INDEP_VARS, min_years=3)
+
+    # Only 2 qualifying years remain (2000, 2001) -- below min_years=3, so A is dropped.
+    assert "A" not in set(filtered["country_code"].unique())
+
+
+def test_filter_by_min_years_drops_country_fully():
+    """Excluded countries contribute zero rows to the result -- identical
+    country-level (never row-level) exclusion semantics as
+    filter_by_exclusions."""
+    df = _make_sparse_panel({"A": [2000, 2001, 2002, 2003], "B": [2000]})
+
+    filtered = panel_base.filter_by_min_years(df, DEP_VAR, INDEP_VARS, min_years=3)
+
+    assert (filtered["country_code"] == "B").sum() == 0
+
+
+def test_filter_by_min_years_default_is_three():
+    """Calling without the min_years kwarg uses the Model 2 default of 3
+    (D-01). Also guards D-02's 'coexist, never wrap filter_by_exclusions'
+    rule: the function's only inputs are df, dep_var, indep_vars, min_years
+    -- no panel_exclusions-shaped frame is passed or required."""
+    import inspect
+
+    signature = inspect.signature(panel_base.filter_by_min_years)
+    assert list(signature.parameters.keys()) == ["df", "dep_var", "indep_vars", "min_years"]
+
+    df = _make_sparse_panel(
+        {
+            "A": [2000, 2001, 2002],  # exactly 3 -- kept under default
+            "B": [2000, 2001],  # 2 -- dropped under default
+        }
+    )
+
+    filtered = panel_base.filter_by_min_years(df, DEP_VAR, INDEP_VARS)
+
+    assert set(filtered["country_code"].unique()) == {"A"}
+
+
 # --- fit_panel_model() ---------------------------------------------------------
 
 
