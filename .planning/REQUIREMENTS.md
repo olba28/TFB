@@ -28,15 +28,15 @@ Ninguno diferido en este momento.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| COVER-01 | TBD | Pending |
-| COVER-02 | TBD | Pending |
+| COVER-01 | Phase 7 | Pending |
+| COVER-02 | Phase 7 | Pending |
 
 **Coverage:**
 
 - v1 requirements: 2 total
-- Mapped to phases: 0
-- Unmapped: 2 ⚠️ (pending roadmap creation)
+- Mapped to phases: 2
+- Unmapped: 0 ✅
 
 ---
 *Requirements defined: 2026-07-15*
-*Last updated: 2026-07-15 after milestone v1.1 requirements definition*
+*Last updated: 2026-07-15 after roadmap creation (Phase 7 mapping)*

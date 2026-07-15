@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Coverage Heatmap
 status: planning
-last_updated: "2026-07-15T13:12:48.165Z"
+last_updated: "2026-07-15T15:20:00.000Z"
 last_activity: 2026-07-15
 progress:
-  total_phases: 0
+  total_phases: 1
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
-**Current focus:** Planning next milestone (v1.0 shipped 2026-07-15)
+**Current focus:** v1.1 Coverage Heatmap — Phase 7 roadmapped, ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 7 — Mapa de Calor de Cobertura (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-15 — Milestone v1.1 started
+Status: Roadmap created, ready for /gsd-plan-phase 7
+Last activity: 2026-07-15 — Roadmap for v1.1 created (Phase 7)
 
 ## Performance Metrics
 
@@ -83,6 +83,8 @@ Last activity: 2026-07-15 — Milestone v1.1 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [Roadmap v1.1]: Milestone Coverage Heatmap resuelto como una única fase (Phase 7) — alcance minúsculo (una figura estática PNG, sin nueva infraestructura); toda la maquinaria necesaria ya existe (tabla `raw_observations` en `src/db.py`, matplotlib/seaborn en requirements.txt). No se sobre-descompone.
+- [Roadmap v1.1]: El heatmap se calcula sobre `raw_observations` (datos crudos, antes del filtro del 70% de la Fase 2) por diseño — el valor de la figura para la memoria es mostrar la cobertura/missingness real previa a la exclusión (complementa la discusión MNAR ya existente en la Fase 2).
 - [Roadmap]: Estructura horizontal de 6 fases siguiendo la cadena de dependencia del pipeline (ingesta → panel/EDA → Modelo 1 → interpretabilidad/simulación → dashboard → Modelo 2 stretch), tal como sugería research/SUMMARY.md
 - [Roadmap]: REPRO-01 (requirements.lock.txt) asignado a Fase 1, REPRO-02 (semillas fijas) a Fase 4, REPRO-03 (sección de limitaciones) a Fase 3 — cada requisito de reproducibilidad vive donde se genera el artefacto correspondiente
 - [Roadmap]: Modelo 2 (Fase 6) confirmado como fase final "stretch", dependiente de que Fases 1–5 estén completas, según el riesgo de tiempo limitado señalado en PROJECT.md
@@ -150,14 +152,14 @@ Items acknowledged and carried forward from previous milestone close:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| v2 | EXTRA-01: Informe automatizado y visual de cobertura/missingness (mapa de calor país × indicador × año) | Deferred to v2 | Requirements definition (2026-07-10) |
+| v2 | EXTRA-01: Informe automatizado y visual de cobertura/missingness (mapa de calor país × indicador × año) | Being delivered in v1.1 as COVER-01/COVER-02 (Phase 7) | Requirements definition (2026-07-10) |
 
 ## Session Continuity
 
-Last session: 2026-07-15T07:34:22.598Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-07-15T15:20:00.000Z
+Stopped at: Roadmap v1.1 created (Phase 7)
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan Phase 7 with /gsd-plan-phase 7
