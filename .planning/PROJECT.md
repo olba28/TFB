@@ -14,13 +14,14 @@ Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento �
 
 El pipeline completo de extremo a extremo está construido y verificado: ingesta versionada de los 5 indicadores ODS (Fase 1), panel país×año limpio con EDA (Fase 2), Modelo 1 de PanelOLS con efectos fijos bidireccionales para PIB per cápita (Fase 3), simulación contrafactual + interpretabilidad SHAP/PDP (Fase 4), dashboard Streamlit/Plotly local ensayado para la defensa (Fase 5), y Modelo 2 stretch de productividad agrícola reutilizando toda la infraestructura del Modelo 1 (Fase 6). Las 32 requisitos v1 están validados; ver archivo `.planning/milestones/v1.0-REQUIREMENTS.md`.
 
-## Next Milestone Goals
+## Current Milestone: v1.1 Coverage Heatmap
 
-Sin milestone v1.1 definido todavía. Candidatos identificados durante v1.0 (ver `.planning/STATE.md` → Deferred Items):
+**Goal:** Generar una figura estática de cobertura/missingness (mapa de calor país × indicador × año) para el anexo de la memoria, cerrando EXTRA-01.
 
-- **EXTRA-01**: Informe automatizado y visual de cobertura/missingness (mapa de calor país × indicador × año) — diferido a v2 en la definición de requisitos original (2026-07-10)
-
-El resto del trabajo restante hasta la defensa oral (redacción de la memoria de 60–80 páginas, ensayo final de la presentación) es entregable académico, no trabajo de ingeniería adicional — se gestiona fuera del roadmap de GSD. Ejecutar `/gsd-new-milestone` cuando se decida el alcance de un v1.1 (si lo hay) o para formalizar el cierre del proyecto.
+**Target features:**
+- Mapa de calor país × indicador × año para los 5 indicadores ODS ya ingeridos, generado como figura estática (PNG) reutilizable en la memoria
+- Sin cambios al dashboard Streamlit (alcance explícitamente excluido)
+- Sin nueva sección de discusión escrita más allá de la ya existente en la Fase 2 (MNAR)
 
 ## Business Context
 
@@ -49,7 +50,7 @@ El resto del trabajo restante hasta la defensa oral (redacción de la memoria de
 
 ### Active
 
-Ninguno pendiente — todas las fases del roadmap v1.0 completas.
+- [ ] Mapa de calor de cobertura/missingness (país × indicador × año) como figura estática para la memoria — milestone v1.1
 
 ### Out of Scope
 
@@ -132,4 +133,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-15 after v1.0 milestone completion*
+*Last updated: 2026-07-15 after starting v1.1 milestone (Coverage Heatmap)*
