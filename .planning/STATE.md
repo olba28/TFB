@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 6
-current_phase_name: stretch
-status: verifying
-stopped_at: Phase 06 UI-SPEC approved
-last_updated: "2026-07-14T18:58:35.784Z"
-last_activity: 2026-07-14
-last_activity_desc: "Completed quick task 260714-s4r: Generar docs/capitulos_3_4.md (capítulos 3 y 4 de la memoria)"
+current_phase: 06
+current_phase_name: modelo-2-productividad-agr-cola-stretch
+status: executing
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-07-15T06:56:19.622Z"
+last_activity: 2026-07-15
+last_activity_desc: Phase 06 execution started
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 21
+  completed_plans: 19
   percent: 83
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
-**Current focus:** Phase 05 — dashboard-y-preparaci-n-de-la-defensa
+**Current focus:** Phase 06 — modelo-2-productividad-agr-cola-stretch
 
 ## Current Position
 
-Phase: 6 — Modelo 2 — Productividad Agrícola (stretch)
-Plan: 3 plans ready (06-01, 06-02, 06-03), 3 waves
-Status: Planned and verified (plan-checker passed, requirements + decision coverage gates passed). Ready to execute.
-Last activity: 2026-07-15 — Planned Phase 6 (research skipped): filter_by_min_years helper, model2_agri.py pipeline, dashboard model selector.
+Phase: 06 (modelo-2-productividad-agr-cola-stretch) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-07-15 — Phase 06 execution started
 
 Progress: [██████████] 100%
 
@@ -77,6 +77,7 @@ Progress: [██████████] 100%
 | Phase 05 P03 | 20min | 3 tasks | 2 files |
 | Phase 05 P04 | 25min | 3 tasks | 3 files |
 | Phase 05 P05 | ~2h59min | 3 tasks | 9 files |
+| Phase 06 P01 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,8 @@ Recent decisions affecting current work:
 - [Phase 05-05]: streamlit run defaults to a non-localhost binding; .streamlit/config.toml now hard-codes [server] address = "localhost" (closes live T-5-03 network-exposure gap found during rehearsal)
 - [Phase 05-05]: cached_shap loads the pre-fitted data/modelos/rf_shap_model.pkl artifact instead of refitting a RandomForest live -- root cause of a 9+ minute cold-start stall; production interpret.shap_analysis defaults (rf=None, check_additivity=True, explain_sample_size=None) are unchanged so the Phase-4 notebook/tests are unaffected
 - [Phase 05-05]: Demo-only bootstrap n_replicas tuned via live isolated timing on the presentation machine (200->50->8); simulate.py's production default (1000) and methodology untouched -- final measured cold-start: 2.01s (target <5s)
+- [Phase 06-01]: filter_by_min_years coerces [dep_var, *indep_vars] via pd.to_numeric(errors=coerce) before the non-null test, matching _build_panel_index's numeric-coercion convention
+- [Phase 06-01]: Consolidated the plan's panel_exclusions-independence guard into test_filter_by_min_years_default_is_three via an inspect.signature assertion, keeping exactly the plan's specified 4 named tests
 
 ### Pending Todos
 
@@ -149,6 +152,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T18:58:35.768Z
-Stopped at: Phase 06 UI-SPEC approved
-Resume file: .planning/phases/06-modelo-2-productividad-agr-cola-stretch/06-UI-SPEC.md
+Last session: 2026-07-15T06:56:19.609Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: None
