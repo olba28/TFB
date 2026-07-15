@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 06
 current_phase_name: modelo-2-productividad-agr-cola-stretch
 status: executing
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-07-15T06:56:19.622Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-07-15T07:16:23.229Z"
 last_activity: 2026-07-15
 last_activity_desc: Phase 06 execution started
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 21
-  completed_plans: 19
+  completed_plans: 20
   percent: 83
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 06 (modelo-2-productividad-agr-cola-stretch) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-07-15 — Phase 06 execution started
 
@@ -78,6 +78,7 @@ Progress: [██████████] 100%
 | Phase 05 P04 | 25min | 3 tasks | 3 files |
 | Phase 05 P05 | ~2h59min | 3 tasks | 9 files |
 | Phase 06 P01 | 6min | 2 tasks | 2 files |
+| Phase 06 P02 | 15min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -126,6 +127,9 @@ Recent decisions affecting current work:
 - [Phase 05-05]: Demo-only bootstrap n_replicas tuned via live isolated timing on the presentation machine (200->50->8); simulate.py's production default (1000) and methodology untouched -- final measured cold-start: 2.01s (target <5s)
 - [Phase 06-01]: filter_by_min_years coerces [dep_var, *indep_vars] via pd.to_numeric(errors=coerce) before the non-null test, matching _build_panel_index's numeric-coercion convention
 - [Phase 06-01]: Consolidated the plan's panel_exclusions-independence guard into test_filter_by_min_years_default_is_three via an inspect.signature assertion, keeping exactly the plan's specified 4 named tests
+- [Phase 06-02]: Hausman-input FE fit and RandomEffects fit both use cov_type=unadjusted (classical covariances) for a valid Hausman chi2 approximation; the final serialized model uses whatever choose_cov_type selects from the Pesaran CD result
+- [Phase 06-02]: run_shap(panel_clean) is called with the full panel_clean (not the 39-country panel_m2) since shap_analysis performs its own complete-case dropna and the RF predictors have much broader real coverage than 2.3.1 alone
+- [Phase 06-02]: Live Model 2 Hausman test rejects H0 (p=0.0143), diverging from Model 1's non-rejection -- flagged for the memoria limitations section, not a degenerate/singular-matrix warning
 
 ### Pending Todos
 
@@ -152,6 +156,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T06:56:19.609Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-07-15T07:16:23.216Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

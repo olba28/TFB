@@ -56,7 +56,7 @@
 
 - [x] **MODEL2-01**: El Modelo 2 (productividad agrícola, indicador 2.3.1) reutiliza `panel_base.py` con la misma metodología que el Modelo 1
 - [x] **MODEL2-02**: El sistema documenta las limitaciones de cobertura de países si la muestra se reduce para el indicador 2.3.1
-- [ ] **MODEL2-03**: La simulación, SHAP y el dashboard se extienden para cubrir los resultados del Modelo 2
+- [x] **MODEL2-03**: La simulación, SHAP y el dashboard se extienden para cubrir los resultados del Modelo 2
 
 ## v2 Requirements
 
@@ -117,7 +117,7 @@ Excluidos explícitamente por la propuesta oficial del TFB (`PROJECT.md`).
 | DASH-05 | Phase 5 | Complete |
 | MODEL2-01 | Phase 6 | Complete |
 | MODEL2-02 | Phase 6 | Complete |
-| MODEL2-03 | Phase 6 | Pending |
+| MODEL2-03 | Phase 6 | Complete |
 
 **Coverage:**
 
