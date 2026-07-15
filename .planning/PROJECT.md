@@ -8,6 +8,20 @@ Trabajo Final de Bàtxelor (TFB) en Ciencia de Datos que cuantifica y modela la 
 
 Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
 
+## Current State
+
+**Shipped: v1.0 MVP (2026-07-15)**
+
+El pipeline completo de extremo a extremo está construido y verificado: ingesta versionada de los 5 indicadores ODS (Fase 1), panel país×año limpio con EDA (Fase 2), Modelo 1 de PanelOLS con efectos fijos bidireccionales para PIB per cápita (Fase 3), simulación contrafactual + interpretabilidad SHAP/PDP (Fase 4), dashboard Streamlit/Plotly local ensayado para la defensa (Fase 5), y Modelo 2 stretch de productividad agrícola reutilizando toda la infraestructura del Modelo 1 (Fase 6). Las 32 requisitos v1 están validados; ver archivo `.planning/milestones/v1.0-REQUIREMENTS.md`.
+
+## Next Milestone Goals
+
+Sin milestone v1.1 definido todavía. Candidatos identificados durante v1.0 (ver `.planning/STATE.md` → Deferred Items):
+
+- **EXTRA-01**: Informe automatizado y visual de cobertura/missingness (mapa de calor país × indicador × año) — diferido a v2 en la definición de requisitos original (2026-07-10)
+
+El resto del trabajo restante hasta la defensa oral (redacción de la memoria de 60–80 páginas, ensayo final de la presentación) es entregable académico, no trabajo de ingeniería adicional — se gestiona fuera del roadmap de GSD. Ejecutar `/gsd-new-milestone` cuando se decida el alcance de un v1.1 (si lo hay) o para formalizar el cierre del proyecto.
+
 ## Business Context
 
 <!-- Trabajo académico individual, no monetizado ni customer-facing. -->
@@ -76,6 +90,7 @@ Ninguno pendiente — todas las fases del roadmap v1.0 completas.
   - Defensa oral: 12–25 octubre 2026 (70% memoria + 30% defensa)
 - Referencias metodológicas ya seleccionadas por el alumno: Baltagi (panel data), Wooldridge (econometría), James et al. / ISLR (aprendizaje estadístico), Molnar (interpretabilidad), FAO & UN-Water 2024, UNESCO 2024, Borja-Vega & Zhang / Banco Mundial.
 - Competencias del Bachelor a demostrar (nivel esperado 1–5): CE2 (4), CE3 (3), CE4 (5), CE5 (4), CE8 (3), CE10 (2), CE11 (3).
+- Estado del código al cierre de v1.0 (2026-07-15): 189 commits, ~18,657 líneas Python/notebook (`.py`+`.ipynb`), 6 fases / 21 planes / 56 tareas completados en 10 días de desarrollo (2026-07-05 → 2026-07-15).
 
 ## Constraints
 
@@ -117,4 +132,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-15 after Phase 06 completion (roadmap v1.0 complete)*
+*Last updated: 2026-07-15 after v1.0 milestone completion*
