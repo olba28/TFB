@@ -16,12 +16,14 @@ El pipeline completo de extremo a extremo está construido y verificado: ingesta
 
 ## Current Milestone: v1.1 Coverage Heatmap
 
+**Status: Phase 7 complete (2026-07-15) — milestone ready to close.**
+
 **Goal:** Generar una figura estática de cobertura/missingness (mapa de calor país × indicador × año) para el anexo de la memoria, cerrando EXTRA-01.
 
 **Target features:**
-- Mapa de calor país × indicador × año para los 5 indicadores ODS ya ingeridos, generado como figura estática (PNG) reutilizable en la memoria
-- Sin cambios al dashboard Streamlit (alcance explícitamente excluido)
-- Sin nueva sección de discusión escrita más allá de la ya existente en la Fase 2 (MNAR)
+- [x] Mapa de calor país × indicador × año para los 5 indicadores ODS ya ingeridos, generado como figura estática (PNG) reutilizable en la memoria — `figuras/07_mapa_calor_cobertura.png`, generado por `notebook/7_1_mapa_calor_cobertura.ipynb`
+- [x] Sin cambios al dashboard Streamlit (alcance explícitamente excluido) — verificado, ningún commit de la Fase 7 tocó `src/dashboard/`
+- [x] Sin nueva sección de discusión escrita más allá de la ya existente en la Fase 2 (MNAR)
 
 ## Business Context
 
@@ -47,10 +49,11 @@ El pipeline completo de extremo a extremo está construido y verificado: ingesta
 - [x] Análisis de interpretabilidad (SHAP) del peso relativo del estrés hídrico frente a otras variables, con RandomForest como modelo de referencia y VIF/PDP complementarios — Validado en Fase 04 (INTERP-04/05/06, REPRO-02)
 - [x] Dashboard geoespacial interactivo local (Streamlit + Plotly choropleth) para explorar resultados por país/región, usado en la demo de la defensa oral — Validado en Fase 05: dashboard-y-preparación-de-la-defensa (DASH-01..05)
 - [x] Modelo 2: mismo enfoque metodológico (efectos fijos bidireccionales, SEs clustered, mismos diagnósticos) para productividad agrícola (indicador 2.3.1), reutilizando `panel_base.py`/`simulate.py`/`interpret.py` sin modificarlos; cobertura reducida (39/49 países) documentada en tabla `model2_coverage` dedicada; selector "Modelo activo" en el dashboard propaga a las 4 pestañas (Mapa, Modelo, Simulación, SHAP) — Validado en Fase 06: modelo-2-productividad-agr-cola-stretch (MODEL2-01/02/03)
+- [x] Mapa de calor de cobertura/missingness (país × indicador × año) como figura estática para la memoria — Validado en Fase 07: mapa-de-calor-de-cobertura (COVER-01/COVER-02)
 
 ### Active
 
-- [ ] Mapa de calor de cobertura/missingness (país × indicador × año) como figura estática para la memoria — milestone v1.1
+None — v1.1 Coverage Heatmap completa, todos los requisitos activos validados.
 
 ### Out of Scope
 
@@ -133,4 +136,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-15 after starting v1.1 milestone (Coverage Heatmap)*
+*Last updated: 2026-07-15 after completing Phase 07 (v1.1 Coverage Heatmap milestone)*
