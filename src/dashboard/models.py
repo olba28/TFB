@@ -29,7 +29,28 @@ and must import cleanly under plain ``pytest`` with no Streamlit runtime.
 
 from __future__ import annotations
 
-ACTIVE_MODELS: dict[str, dict[str, object]] = {
+from typing import TypedDict
+
+
+class ModelConfig(TypedDict):
+    """One :data:`ACTIVE_MODELS` entry's expected shape (06-REVIEW.md IN-02):
+    a plain ``dict[str, object]`` value type defeats static type checking on
+    the individual fields every call site (``app.py``, ``data.py``) accesses
+    by string key -- a typo in a key name (e.g. ``"indep_vars"`` instead of
+    ``"indep_var"``) would not be caught by Pylance in basic mode, only at
+    runtime via ``KeyError``. Matches the project's "type hints required for
+    all parameters" convention (CLAUDE.md).
+    """
+
+    dep_var: str
+    indep_var: str
+    feature_vars: list[str]
+    pkl_path: str
+    rf_shap_pkl_path: str
+    reduced_coverage: bool
+
+
+ACTIVE_MODELS: dict[str, ModelConfig] = {
     "Modelo 1 (PIB per cápita)": {
         "dep_var": "8.1.1",
         "indep_var": "6.4.2",
