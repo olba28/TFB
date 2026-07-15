@@ -21,7 +21,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from streamlit.testing.v1 import AppTest
 
-from src.dashboard import data
+from src.dashboard import data, models
 
 
 class _FakePanelEffectsResults:
@@ -54,6 +54,7 @@ class _FakePanelEffectsResults:
 def _fake_cached_bootstrap(
     dep_var: str,
     indep_var: str,
+    active_model_name: str,
     reduction_pcts: tuple[float, ...] = (-0.10, -0.20, -0.30),
     n_replicas: int = 200,
     seed: int = 42,
@@ -75,7 +76,9 @@ def _fake_cached_bootstrap(
     return results
 
 
-def _fake_cached_shap(dep_var: str, feature_vars: tuple[str, ...]):
+def _fake_cached_shap(
+    dep_var: str, feature_vars: tuple[str, ...], active_model_name: str
+):
     """Trains a tiny real RandomForestRegressor (so rf.oob_score_ and
     shap.summary_plot both work against real, well-shaped objects) instead
     of loading the production rf_shap_model.pkl."""
@@ -121,6 +124,81 @@ def test_side_by_side_comparison(monkeypatch, tiny_panel_engine, tiny_panel_df):
         "Simulación",
         "Interpretabilidad (SHAP)",
     ]
+
+
+def test_active_model_selector_defaults_to_modelo_1(
+    monkeypatch, tiny_panel_engine, tiny_panel_df
+):
+    """D-07: the sidebar exposes a ``st.sidebar.selectbox`` keyed
+    ``active_model_name`` with options equal to ``models.ACTIVE_MODELS``'s
+    keys (in dict order), defaulting to Modelo 1 (PIB per cápita)."""
+    fake_results = _FakePanelEffectsResults(tiny_panel_df, "6.4.2")
+
+    monkeypatch.setattr(data, "get_engine", lambda: tiny_panel_engine)
+    monkeypatch.setattr(data, "load_panel_clean", lambda engine: tiny_panel_df)
+    monkeypatch.setattr(data, "load_model", lambda pkl_path: fake_results)
+    monkeypatch.setattr(data, "cached_bootstrap", _fake_cached_bootstrap)
+    monkeypatch.setattr(data, "cached_shap", _fake_cached_shap)
+
+    at = AppTest.from_file("src/dashboard/app.py", default_timeout=30)
+    at.run()
+
+    assert not at.exception, f"App raised on first run: {at.exception}"
+
+    selector = at.sidebar.selectbox(key="active_model_name")
+    assert list(selector.options) == list(models.ACTIVE_MODELS.keys())
+    assert selector.value == "Modelo 1 (PIB per cápita)"
+
+
+def test_modelo_2_selection_shows_reduced_coverage_caption(
+    monkeypatch, tiny_panel_engine, tiny_panel_df
+):
+    """D-08: selecting Modelo 2 in the sidebar and rerunning must make
+    ``MODEL2_COVERAGE_CAPTION``'s text appear somewhere in the rendered
+    output (all 4 tabs render it at the top of their body)."""
+    fake_results = _FakePanelEffectsResults(tiny_panel_df, "6.4.2")
+
+    monkeypatch.setattr(data, "get_engine", lambda: tiny_panel_engine)
+    monkeypatch.setattr(data, "load_panel_clean", lambda engine: tiny_panel_df)
+    monkeypatch.setattr(data, "load_model", lambda pkl_path: fake_results)
+    monkeypatch.setattr(data, "cached_bootstrap", _fake_cached_bootstrap)
+    monkeypatch.setattr(data, "cached_shap", _fake_cached_shap)
+
+    at = AppTest.from_file("src/dashboard/app.py", default_timeout=30)
+    at.run()
+
+    at.sidebar.selectbox(key="active_model_name").select(
+        "Modelo 2 (Productividad agrícola)"
+    ).run()
+
+    assert not at.exception, f"App raised after selecting Modelo 2: {at.exception}"
+
+    caption_texts = [c.value for c in at.caption]
+    assert any(
+        "muestra reducida a 39 países" in text for text in caption_texts
+    ), "Expected the D-08 reduced-coverage caption text somewhere in the rendered captions"
+
+
+def test_modelo_1_selection_never_shows_reduced_coverage_caption(
+    monkeypatch, tiny_panel_engine, tiny_panel_df
+):
+    """D-08: the reduced-coverage caption must NEVER appear when Modelo 1
+    (the default selection) is active."""
+    fake_results = _FakePanelEffectsResults(tiny_panel_df, "6.4.2")
+
+    monkeypatch.setattr(data, "get_engine", lambda: tiny_panel_engine)
+    monkeypatch.setattr(data, "load_panel_clean", lambda engine: tiny_panel_df)
+    monkeypatch.setattr(data, "load_model", lambda pkl_path: fake_results)
+    monkeypatch.setattr(data, "cached_bootstrap", _fake_cached_bootstrap)
+    monkeypatch.setattr(data, "cached_shap", _fake_cached_shap)
+
+    at = AppTest.from_file("src/dashboard/app.py", default_timeout=30)
+    at.run()
+
+    assert not at.exception
+
+    caption_texts = [c.value for c in at.caption]
+    assert not any("muestra reducida a 39 países" in text for text in caption_texts)
 
 
 def test_missing_panel_shows_ui_spec_error(monkeypatch):

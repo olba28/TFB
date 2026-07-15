@@ -89,6 +89,40 @@ def test_load_panel_exclusions_returns_dataframe(tiny_panel_engine) -> None:
     assert "excluded" in frame.columns
 
 
+def test_cached_bootstrap_honors_active_model_name(monkeypatch, tiny_panel_engine) -> None:
+    """Phase 6 (D-07/06-PATTERNS.md): calling cached_bootstrap with
+    active_model_name="Modelo 2 (Productividad agrícola)" must result in
+    data.load_model being invoked with Model 2's pkl_path -- proving the
+    parameter actually changes which artifact gets requested, not just that
+    the registry entry exists."""
+    recorded_paths: list[str] = []
+
+    def _fake_load_model(pkl_path: str):
+        recorded_paths.append(pkl_path)
+
+        class _Fitted:
+            pass
+
+        return _Fitted()
+
+    def _fake_bootstrap_counterfactual(fitted, df, dep_var, indep_var, **kwargs):
+        return {}
+
+    monkeypatch.setattr(data, "get_engine", lambda: tiny_panel_engine)
+    monkeypatch.setattr(data, "load_panel_clean", lambda engine: pd.DataFrame())
+    monkeypatch.setattr(data, "load_model", _fake_load_model)
+    monkeypatch.setattr(data.simulate, "bootstrap_counterfactual", _fake_bootstrap_counterfactual)
+
+    data.cached_bootstrap.clear()
+    data.cached_bootstrap(
+        dep_var="2.3.1",
+        indep_var="6.4.2",
+        active_model_name="Modelo 2 (Productividad agrícola)",
+    )
+
+    assert recorded_paths == ["data/modelos/model2_agri.pkl"]
+
+
 def test_load_model_loads_toy_pickle(toy_model_pkl) -> None:
     """``load_model`` successfully deserializes the toy fitted
     RandomForestRegressor fixture without depending on the production
