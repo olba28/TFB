@@ -38,13 +38,13 @@ created: 2026-07-15
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| TBD | TBD | TBD | COVER-01 | — | `build_presence_matrix` treats a wholly-absent (country, year) row as missing | unit | `pytest tests/test_coverage.py::test_build_presence_matrix_absent_row_is_missing -x` | ❌ Wave 0 | ⬜ pending |
-| TBD | TBD | TBD | COVER-01 | — | `build_presence_matrix` treats a present row with `value IS NULL` as missing (same state as absent-row, D-04) | unit | `pytest tests/test_coverage.py::test_build_presence_matrix_null_value_is_missing -x` | ❌ Wave 0 | ⬜ pending |
-| TBD | TBD | TBD | COVER-01 | — | `build_presence_matrix` treats a present row with a non-null value as present | unit | `pytest tests/test_coverage.py::test_build_presence_matrix_non_null_value_is_present -x` | ❌ Wave 0 | ⬜ pending |
-| TBD | TBD | TBD | COVER-01 | — | `ordered_countries_with_boundaries` groups countries by region and returns correct boundary indices | unit | `pytest tests/test_coverage.py::test_ordered_countries_with_boundaries_groups_by_region -x` | ❌ Wave 0 | ⬜ pending |
-| TBD | TBD | TBD | COVER-01 | — | Coverage computation reads `raw_observations`/`country_reference` only, never `panel_clean` | unit (behavioral/import check) | `pytest tests/test_coverage.py::test_coverage_module_never_reads_panel_clean -x` | ❌ Wave 0 | ⬜ pending |
-| TBD | TBD | TBD | COVER-02 | — | Notebook produces exactly one PNG file at `figuras/07_mapa_calor_cobertura.png` | manual (nbconvert execution + file-existence check) | `jupyter nbconvert --to notebook --execute notebook/7_1_mapa_calor_cobertura.ipynb` then verify PNG exists | ❌ Wave 0 | ⬜ pending |
-| TBD | TBD | TBD | COVER-02 | — | The 5 ODS indicator codes are visually identifiable in the figure (e.g. as subplot titles) | manual (visual inspection) | N/A — inherently a visual/manual check | ❌ Wave 0 | ⬜ pending |
+| 07-01-T2 | 07-01 | 1 | COVER-01 | — | `build_presence_matrix` treats a wholly-absent (country, year) row as missing | unit | `pytest tests/test_coverage.py::test_build_presence_matrix_absent_row_is_missing -x` | ❌ Wave 0 | ⬜ pending |
+| 07-01-T2 | 07-01 | 1 | COVER-01 | — | `build_presence_matrix` treats a present row with `value IS NULL` as missing (same state as absent-row, D-04) | unit | `pytest tests/test_coverage.py::test_build_presence_matrix_null_value_is_missing -x` | ❌ Wave 0 | ⬜ pending |
+| 07-01-T2 | 07-01 | 1 | COVER-01 | — | `build_presence_matrix` treats a present row with a non-null value as present | unit | `pytest tests/test_coverage.py::test_build_presence_matrix_non_null_value_is_present -x` | ❌ Wave 0 | ⬜ pending |
+| 07-01-T2 | 07-01 | 1 | COVER-01 | — | `ordered_countries_with_boundaries` groups countries by region and returns correct boundary indices | unit | `pytest tests/test_coverage.py::test_ordered_countries_with_boundaries_groups_by_region -x` | ❌ Wave 0 | ⬜ pending |
+| 07-01-T2 | 07-01 | 1 | COVER-01 | — | Coverage computation reads `raw_observations`/`country_reference` only, never `panel_clean` | unit (behavioral/import check) | `pytest tests/test_coverage.py::test_coverage_module_never_reads_panel_clean -x` | ❌ Wave 0 | ⬜ pending |
+| 07-02-T1 | 07-02 | 2 | COVER-02 | — | Notebook produces exactly one PNG file at `figuras/07_mapa_calor_cobertura.png` | manual (nbconvert execution + file-existence check) | `jupyter nbconvert --to notebook --execute notebook/7_1_mapa_calor_cobertura.ipynb` then verify PNG exists | ❌ Wave 0 | ⬜ pending |
+| 07-02-T2 | 07-02 | 2 | COVER-02 | — | The 5 ODS indicator codes are visually identifiable in the figure (e.g. as subplot titles) | manual (visual inspection) | N/A — inherently a visual/manual check | ❌ Wave 0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

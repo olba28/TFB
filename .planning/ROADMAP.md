@@ -36,7 +36,9 @@ Full phase details archived at `.planning/milestones/v1.0-ROADMAP.md`.
   2. La cobertura mostrada se calcula desde `raw_observations` (datos crudos, sin aplicar la exclusión del 70% de la Fase 2), verificable porque incluye países/pares que `panel_clean` excluye.
   3. Los 5 indicadores ODS ingeridos (6.4.2, eficiencia de uso del agua, 8.1.1 PIB, productividad laboral, 2.3.1 agrícola) aparecen identificados en la figura.
   4. La figura se regenera de forma reproducible desde un script/notebook re-ejecutable, sin modificar ningún fichero del dashboard Streamlit (`src/dashboard/`).
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 07-01-PLAN.md — src/coverage.py (build_presence_matrix + ordered_countries_with_boundaries) + tests/test_coverage.py (COVER-01)
+- [ ] 07-02-PLAN.md — notebook/7_1_mapa_calor_cobertura.ipynb + figuras/07_mapa_calor_cobertura.png (COVER-02)
 
 ## Progress
 
@@ -48,4 +50,4 @@ Full phase details archived at `.planning/milestones/v1.0-ROADMAP.md`.
 | 4. Interpretabilidad, Simulación y Robustez            | v1.0      | 3/3             | Complete    | 2026-07-13 |
 | 5. Dashboard y Preparación de la Defensa                | v1.0      | 5/5             | Complete    | 2026-07-14 |
 | 6. Modelo 2 — Productividad Agrícola (stretch)          | v1.0      | 3/3             | Complete    | 2026-07-15 |
-| 7. Mapa de Calor de Cobertura                          | v1.1      | 0/0             | Not started | -          |
+| 7. Mapa de Calor de Cobertura                          | v1.1      | 0/2             | Planned     | -          |
