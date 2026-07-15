@@ -58,4 +58,4 @@ Full phase details archived at `.planning/milestones/v1.0-ROADMAP.md`.
 | 4. Interpretabilidad, Simulación y Robustez            | v1.0      | 3/3             | Complete    | 2026-07-13 |
 | 5. Dashboard y Preparación de la Defensa                | v1.0      | 5/5             | Complete    | 2026-07-14 |
 | 6. Modelo 2 — Productividad Agrícola (stretch)          | v1.0      | 3/3             | Complete    | 2026-07-15 |
-| 7. Mapa de Calor de Cobertura                          | v1.1      | 2/2 | Complete   | 2026-07-15 |
+| 7. Mapa de Calor de Cobertura                          | v1.1      | 2/2 | Complete    | 2026-07-15 |
