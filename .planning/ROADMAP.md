@@ -155,7 +155,20 @@ Plans:
   2. Si la muestra de países se reduce por la cobertura del indicador 2.3.1, la limitación queda documentada explícitamente con una tabla de cobertura/exclusiones específica del Modelo 2.
   3. El dashboard, la simulación contrafactual y el análisis SHAP incluyen una vista o selector que permite explorar los resultados del Modelo 2 junto a los del Modelo 1.
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — src/panel_base.py: nuevo helper filter_by_min_years (umbral ≥3 años, D-01/D-02) (MODEL2-01, MODEL2-02)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 06-02-PLAN.md — src/model2_agri.py: pipeline completo del Modelo 2 (fit, diagnósticos, robustez, bootstrap, heterogeneidad, SHAP, tabla de cobertura, serialización) (MODEL2-01, MODEL2-02, MODEL2-03)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 06-03-PLAN.md — Dashboard: selector "Modelo activo" (D-07), aviso de cobertura reducida (D-08), parametrización de cached_bootstrap/cached_shap (MODEL2-03)
 
 ## Progress
 
@@ -169,4 +182,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
 | 4. Interpretabilidad, Simulación y Robustez | 3/3 | Complete    | 2026-07-13 |
 | 5. Dashboard y Preparación de la Defensa | 5/5 | Complete    | 2026-07-14 |
-| 6. Modelo 2 — Productividad Agrícola (stretch) | 0/TBD | Not started | - |
+| 6. Modelo 2 — Productividad Agrícola (stretch) | 0/3 | Not started | - |
