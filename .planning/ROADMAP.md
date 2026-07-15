@@ -28,16 +28,24 @@ Full phase details archived at `.planning/milestones/v1.0-ROADMAP.md`.
 ## Phase Details
 
 ### Phase 7: Mapa de Calor de Cobertura
+
 **Goal**: Producir una figura estática (PNG) de cobertura/missingness que visualiza la presencia/ausencia de datos país × indicador × año para los 5 indicadores ODS ya ingeridos, calculada sobre los datos crudos (`raw_observations`, antes del filtro del 70% de la Fase 2), lista para el anexo de la memoria.
 **Depends on**: Phase 1 (tabla `raw_observations` poblada en `data/panel.db`) — todas las fases v1.0 completas
 **Requirements**: COVER-01, COVER-02
 **Success Criteria** (what must be TRUE):
+
   1. Existe un fichero PNG en `figuras/` que muestra un mapa de calor de cobertura (presencia/ausencia de datos) con ejes país × año y los 5 indicadores ODS representados.
   2. La cobertura mostrada se calcula desde `raw_observations` (datos crudos, sin aplicar la exclusión del 70% de la Fase 2), verificable porque incluye países/pares que `panel_clean` excluye.
   3. Los 5 indicadores ODS ingeridos (6.4.2, eficiencia de uso del agua, 8.1.1 PIB, productividad laboral, 2.3.1 agrícola) aparecen identificados en la figura.
   4. La figura se regenera de forma reproducible desde un script/notebook re-ejecutable, sin modificar ningún fichero del dashboard Streamlit (`src/dashboard/`).
+
 **Plans**: 2 plans
+**Wave 1**
+
 - [ ] 07-01-PLAN.md — src/coverage.py (build_presence_matrix + ordered_countries_with_boundaries) + tests/test_coverage.py (COVER-01)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 07-02-PLAN.md — notebook/7_1_mapa_calor_cobertura.ipynb + figuras/07_mapa_calor_cobertura.png (COVER-02)
 
 ## Progress
