@@ -64,6 +64,13 @@ ARTIFACT_ERROR_MSG = (
     "ingesta (Fase 1) y de modelado (Fase 3/4) antes de abrir el dashboard."
 )
 
+MODEL2_COVERAGE_CAPTION = (
+    "Modelo 2 (productividad agrícola, indicador 2.3.1): muestra reducida a "
+    "39 países con >=3 años observados (vs. 171 del Modelo 1), por la baja "
+    "frecuencia de reporte del indicador (oleadas ~2010/2013/2016/2020). "
+    "Ver tabla de cobertura/exclusiones del Modelo 2, Fase 6."
+)
+
 # Top-level artifact load (D-06 shared across all 4 tabs): a broken/missing
 # panel.db must show a clear next-step message instead of a raw traceback in
 # front of the tribunal (UI-SPEC Copywriting Contract, Error state).
@@ -74,7 +81,11 @@ except Exception:
     st.error(ARTIFACT_ERROR_MSG)
     st.stop()
 
-ACTIVE_MODEL_NAME = "Modelo 1 (PIB per cápita)"
+ACTIVE_MODEL_NAME = st.sidebar.selectbox(
+    "Modelo activo",
+    list(models.ACTIVE_MODELS.keys()),
+    key="active_model_name",
+)
 ACTIVE_MODEL = models.ACTIVE_MODELS[ACTIVE_MODEL_NAME]
 
 NO_DATA_CAPTION = (
@@ -88,17 +99,19 @@ tab_mapa, tab_modelo1, tab_simulacion, tab_shap = st.tabs(
 
 # --- Tab 1: Mapa e indicadores (DASH-03/D-02) -------------------------------
 with tab_mapa:
+    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+        st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader("Comparación de indicadores")
 
-    # D-01: the mappable layers are the 5 raw ODS indicators plus Model 1's
-    # fitted values (a country-year scalar, joinable onto the panel like any
-    # other indicator column). The simulation/SHAP layers (D-01 layers 3-4)
-    # are not a single scalar per country-year and are surfaced in their own
-    # tabs below instead of on this map.
+    # D-01: the mappable layers are the 5 raw ODS indicators plus the active
+    # model's fitted values (a country-year scalar, joinable onto the panel
+    # like any other indicator column). The simulation/SHAP layers (D-01
+    # layers 3-4) are not a single scalar per country-year and are surfaced
+    # in their own tabs below instead of on this map.
     map_options: dict[str, str] = dict(models.INDICATOR_LABELS)
     map_df = df
     fitted_col = "_modelo1_valores_ajustados"
-    fitted_label = "Modelo 1: valores ajustados (8.1.1)"
+    fitted_label = f"{ACTIVE_MODEL_NAME}: valores ajustados ({ACTIVE_MODEL['dep_var']})"
     try:
         fitted_results = data.load_model(ACTIVE_MODEL["pkl_path"])
         fitted_long = fitted_results.fitted_values.reset_index().rename(
@@ -147,6 +160,8 @@ with tab_mapa:
 
 # --- Tab 2: Modelo 1 ---------------------------------------------------------
 with tab_modelo1:
+    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+        st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader(f"{ACTIVE_MODEL_NAME}: coeficientes y diagnósticos")
     try:
         res = data.load_model(ACTIVE_MODEL["pkl_path"])
@@ -170,6 +185,8 @@ with tab_modelo1:
 
 # --- Tab 3: Simulación (D-03) -------------------------------------------------
 with tab_simulacion:
+    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+        st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader("Simulación contrafactual (análisis de sensibilidad)")
     st.caption(
         "Escenarios de reducción del estrés hídrico sobre el valor de 2022 de "
@@ -181,10 +198,11 @@ with tab_simulacion:
         results = data.cached_bootstrap(
             dep_var=ACTIVE_MODEL["dep_var"],
             indep_var=ACTIVE_MODEL["indep_var"],
+            active_model_name=ACTIVE_MODEL_NAME,
         )
         fig_scenario = plots.build_scenario_plot(
             results,
-            "Efecto simulado del estrés hídrico sobre el crecimiento del PIB per cápita",
+            f"Efecto simulado del estrés hídrico sobre {models.INDICATOR_LABELS[ACTIVE_MODEL['dep_var']]}",
         )
         st.plotly_chart(fig_scenario, use_container_width=True)
 
@@ -207,6 +225,8 @@ with tab_simulacion:
 
 # --- Tab 4: Interpretabilidad (SHAP) (D-03, INTERP-04) ------------------------
 with tab_shap:
+    if ACTIVE_MODEL_NAME.startswith("Modelo 2"):
+        st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader("Interpretabilidad (SHAP)")
     try:
         indicator_cols = list(models.INDICATOR_LABELS.keys())
@@ -222,6 +242,7 @@ with tab_shap:
         rf, shap_values, X_shap, _explainer = data.cached_shap(
             dep_var=ACTIVE_MODEL["dep_var"],
             feature_vars=feature_vars,
+            active_model_name=ACTIVE_MODEL_NAME,
         )
         st.caption(f"R² OOB del RandomForest de referencia: {rf.oob_score_:.4f}")
 
