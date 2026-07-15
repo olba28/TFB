@@ -45,13 +45,24 @@ ACTIVE_MODELS: dict[str, dict[str, object]] = {
         "pkl_path": "data/modelos/model1_gdp.pkl",
         "rf_shap_pkl_path": "data/modelos/rf_shap_model.pkl",
     },
-    # Fase 6 añade aquí, sin tocar app.py (D-07):
-    # "Modelo 2 (Productividad agrícola)": {
-    #     "dep_var": "2.3.1",
-    #     "indep_var": "6.4.2",
-    #     "feature_vars": [...],
-    #     "pkl_path": "data/modelos/model2_agri.pkl",
-    # },
+    # Fase 6 (D-07): Modelo 2 (productividad agrícola), producido por
+    # src/model2_agri.py (06-02-SUMMARY.md) -- misma metodología, mismos
+    # feature_vars que Modelo 1, cobertura reducida a 39 países (D-01).
+    "Modelo 2 (Productividad agrícola)": {
+        "dep_var": "2.3.1",
+        "indep_var": "6.4.2",
+        "feature_vars": [
+            "6.4.2",
+            "6.4.1",
+            "8.2.1",
+            "is_ldc",
+            "is_lldc",
+            "is_sids",
+            "region",
+        ],
+        "pkl_path": "data/modelos/model2_agri.pkl",
+        "rf_shap_pkl_path": "data/modelos/rf_shap_model_m2.pkl",
+    },
 }
 
 INDICATOR_LABELS: dict[str, str] = {

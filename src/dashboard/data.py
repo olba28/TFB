@@ -102,19 +102,29 @@ def load_model(pkl_path: str) -> Any:
 def cached_bootstrap(
     dep_var: str,
     indep_var: str,
+    active_model_name: str,
     reduction_pcts: tuple[float, ...] = (-0.10, -0.20, -0.30),
     n_replicas: int = 8,
     seed: int = 42,
 ) -> dict:
     """Cached live recompute of the bootstrap counterfactual (D-03).
 
-    Loads its heavy inputs (Engine, fitted Model 1 results) internally via
+    Loads its heavy inputs (Engine, fitted model results) internally via
     ``get_engine``/``load_model`` -- both ``st.cache_resource`` -- rather
     than receiving them as arguments, so no non-hashable object ever enters
     this function's cache key (05-RESEARCH.md Pattern 5 / Pitfall 2).
     ``reduction_pcts`` is a ``tuple`` (hashable) and is converted to a
     ``list`` before delegating to ``simulate.bootstrap_counterfactual``,
     which is called unmodified (D-03).
+
+    ``active_model_name`` (Phase 6, D-07) is the plain ``str`` key of the
+    dashboard sidebar's currently-selected model in
+    ``models.ACTIVE_MODELS`` -- it is what makes the D-07 sidebar selector
+    actually change which fitted-model artifact gets loaded here, replacing
+    the previous behavior of silently always loading Model 1 regardless of
+    the sidebar selection (06-PATTERNS.md). It stays a plain ``str``, which
+    is hashable and therefore safe for ``st.cache_data``'s cache-key
+    requirement (never the Engine/fitted-model object itself).
 
     ``n_replicas`` defaults to 8 here -- much smaller than ``simulate.py``'s
     own production default of 1000 -- purely as a demo-runtime knob to keep
@@ -137,7 +147,7 @@ def cached_bootstrap(
     """
     engine = get_engine()
     df = load_panel_clean(engine)
-    fitted = load_model(models.ACTIVE_MODELS["Modelo 1 (PIB per cápita)"]["pkl_path"])
+    fitted = load_model(models.ACTIVE_MODELS[active_model_name]["pkl_path"])
     return simulate.bootstrap_counterfactual(
         fitted,
         df,
@@ -153,6 +163,7 @@ def cached_bootstrap(
 def cached_shap(
     dep_var: str,
     feature_vars: tuple[str, ...],
+    active_model_name: str,
     explain_sample_size: int = 20,
 ) -> tuple[Any, Any, pd.DataFrame, Any]:
     """Cached live recompute of the SHAP analysis (D-03).
@@ -162,6 +173,13 @@ def cached_shap(
     rationale as ``cached_bootstrap``). ``feature_vars`` is a ``tuple``
     (hashable), converted to a ``list`` before delegating to
     ``interpret.shap_analysis``.
+
+    ``active_model_name`` (Phase 6, D-07) is the plain ``str`` key of the
+    dashboard sidebar's currently-selected model in
+    ``models.ACTIVE_MODELS`` -- it is what makes the D-07 sidebar selector
+    actually change which RandomForest/SHAP artifact gets loaded here,
+    replacing the previous behavior of silently always loading Model 1's
+    RF regardless of the sidebar selection (06-PATTERNS.md).
 
     Three demo-runtime knobs keep this inside the <5s cold-start budget
     (DASH-02), all live-measured during the 05-05 rehearsal:
@@ -196,7 +214,7 @@ def cached_shap(
     """
     engine = get_engine()
     df = load_panel_clean(engine)
-    rf = load_model(models.ACTIVE_MODELS["Modelo 1 (PIB per cápita)"]["rf_shap_pkl_path"])
+    rf = load_model(models.ACTIVE_MODELS[active_model_name]["rf_shap_pkl_path"])
     return interpret.shap_analysis(
         df,
         dep_var,
