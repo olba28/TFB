@@ -2,17 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Coverage Heatmap
-current_phase: 7
-status: planning
+current_phase: 07
+current_phase_name: mapa-de-calor-de-cobertura
+status: executing
 stopped_at: Phase 7 context gathered
-last_updated: "2026-07-15T14:21:09.461Z"
+last_updated: "2026-07-15T19:23:29.334Z"
 last_activity: 2026-07-15
-last_activity_desc: Roadmap for v1.1 created (Phase 7)
+last_activity_desc: Phase 07 execution started
 progress:
   total_phases: 1
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -23,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-15)
 
 **Core value:** Un pipeline reproducible de extremo a extremo (ingesta API → almacenamiento → modelado → simulación → visualización) que demuestre, con datos abiertos y trazables, la relación cuantitativa entre estrés hídrico y resultados económicos — y que sea defendible ante un tribunal académico.
-**Current focus:** v1.1 Coverage Heatmap — Phase 7 roadmapped, ready to plan
+**Current focus:** Phase 07 — mapa-de-calor-de-cobertura
 
 ## Current Position
 
-Phase: Phase 7 — Mapa de Calor de Cobertura (not started)
-Plan: —
-Status: Roadmap created, ready for /gsd-plan-phase 7
-Last activity: 2026-07-15 — Roadmap for v1.1 created (Phase 7)
+Phase: 07 (mapa-de-calor-de-cobertura) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-07-15 — Phase 07 execution started
 
 ## Performance Metrics
 
@@ -78,6 +79,7 @@ Last activity: 2026-07-15 — Roadmap for v1.1 created (Phase 7)
 | Phase 06 P01 | 6min | 2 tasks | 2 files |
 | Phase 06 P02 | 15min | 3 tasks | 2 files |
 | Phase 06 P03 | 9min | 3 tasks | 5 files |
+| Phase 07 P01 | 15min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -133,6 +135,9 @@ Recent decisions affecting current work:
 - [Phase 06-02]: Live Model 2 Hausman test rejects H0 (p=0.0143), diverging from Model 1's non-rejection -- flagged for the memoria limitations section, not a degenerate/singular-matrix warning
 - [Phase 06-03]: active_model_name placed after dep_var/indep_var (or dep_var/feature_vars) in both cached loaders' signatures, matching the plan's specified parameter order
 - [Phase 06-03]: Updated test_app.py's pre-existing fake cached_bootstrap/cached_shap stand-ins to accept active_model_name -- without this, app.py's new call sites would raise a TypeError silently swallowed by each tab's existing try/except -> st.error, hiding a real signature mismatch behind a passing exception assertion
+- [Phase 07-01]: build_presence_matrix uses pivot()+reindex()+.notna() (no per-cell loop) so absent-row and value-IS-NULL both collapse to the same missing state (D-04) with zero explicit branching
+- [Phase 07-01]: Docstrings in src/coverage.py and tests/test_coverage.py avoid the literal strings panel_clean/panel_exclusions/data/panel.db (paraphrased instead) so the plan's grep-based Pitfall-3 guard acceptance criteria return zero matches
+- [Phase 07-01]: ruff CLI is not installed anywhere in this project (VS Code extension only, never a requirements.txt/requirements-dev.txt dependency in any of 6 prior phases) -- plan's ruff-check acceptance criteria could not run; manually reviewed for PEP 8 compliance instead, logged as an environment gap, not auto-installed (out of scope, Rule 3 package-install exclusion)
 
 ### Pending Todos
 
@@ -159,7 +164,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T14:21:09.447Z
+Last session: 2026-07-15T19:22:40.976Z
 Stopped at: Phase 7 context gathered
 Resume file: .planning/phases/07-mapa-de-calor-de-cobertura/07-CONTEXT.md
 

@@ -9,7 +9,7 @@ Requisitos para el milestone v1.1 (Coverage Heatmap), cierre de EXTRA-01 diferid
 
 ### Visualización de Cobertura
 
-- [ ] **COVER-01**: El sistema genera un mapa de calor país × indicador × año que visualiza la cobertura de datos (presencia/ausencia) para los 5 indicadores ODS ya ingeridos, calculado sobre los datos crudos (antes del filtro de cobertura del 70% de Fase 2)
+- [x] **COVER-01**: El sistema genera un mapa de calor país × indicador × año que visualiza la cobertura de datos (presencia/ausencia) para los 5 indicadores ODS ya ingeridos, calculado sobre los datos crudos (antes del filtro de cobertura del 70% de Fase 2)
 - [ ] **COVER-02**: La figura se exporta en formato estático (PNG) al directorio `figuras/` para su inclusión directa en el anexo de la memoria, sin cambios al dashboard Streamlit
 
 ## v2 Requirements
@@ -28,7 +28,7 @@ Ninguno diferido en este momento.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| COVER-01 | Phase 7 | Pending |
+| COVER-01 | Phase 7 | Complete |
 | COVER-02 | Phase 7 | Pending |
 
 **Coverage:**

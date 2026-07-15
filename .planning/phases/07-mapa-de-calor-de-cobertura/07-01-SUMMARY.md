@@ -147,3 +147,12 @@ None - no external service configuration required.
 ---
 *Phase: 07-mapa-de-calor-de-cobertura*
 *Completed: 2026-07-15*
+
+## Self-Check: PASSED
+
+- FOUND: src/coverage.py
+- FOUND: tests/test_coverage.py
+- FOUND: .planning/phases/07-mapa-de-calor-de-cobertura/07-01-SUMMARY.md
+- FOUND commit: b525880 (Task 1)
+- FOUND commit: 76adf03 (Task 2)
+- FOUND commit: bb9ffb7 (docs: summary)
