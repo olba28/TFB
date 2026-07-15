@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Modelo 1 — Regresión de Panel (PIB per cápita)** - `panel_base.py` compartido, PanelOLS con efectos fijos bidireccionales, comparación pooled/RE + Hausman, SEs robustos, robustez, serialización, sección de limitaciones (completed 2026-07-12)
 - [x] **Phase 4: Interpretabilidad, Simulación y Robustez** - Simulación contrafactual bootstrap multi-escenario, heterogeneidad regional/por ingresos, SHAP + ALE con semillas fijas (completed 2026-07-13)
 - [x] **Phase 5: Dashboard y Preparación de la Defensa** - Dashboard Streamlit/Plotly cacheado, choropleth, comparación de indicadores, animación temporal, ensayo con caché fría y respaldo pre-renderizado (completed 2026-07-14)
-- [ ] **Phase 6: Modelo 2 — Productividad Agrícola (stretch)** - Reutilización de `panel_base.py` para el indicador 2.3.1, documentación de cobertura reducida, extensión de simulación/SHAP/dashboard
+- [x] **Phase 6: Modelo 2 — Productividad Agrícola (stretch)** - Reutilización de `panel_base.py` para el indicador 2.3.1, documentación de cobertura reducida, extensión de simulación/SHAP/dashboard (completed 2026-07-15)
 
 ## Phase Details
 
@@ -155,7 +155,7 @@ Plans:
   2. Si la muestra de países se reduce por la cobertura del indicador 2.3.1, la limitación queda documentada explícitamente con una tabla de cobertura/exclusiones específica del Modelo 2.
   3. El dashboard, la simulación contrafactual y el análisis SHAP incluyen una vista o selector que permite explorar los resultados del Modelo 2 junto a los del Modelo 1.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -168,7 +168,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 06-03-PLAN.md — Dashboard: selector "Modelo activo" (D-07), aviso de cobertura reducida (D-08), parametrización de cached_bootstrap/cached_shap (MODEL2-03)
+- [x] 06-03-PLAN.md — Dashboard: selector "Modelo activo" (D-07), aviso de cobertura reducida (D-08), parametrización de cached_bootstrap/cached_shap (MODEL2-03)
 
 ## Progress
 
@@ -182,4 +182,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Modelo 1 — Regresión de Panel (PIB per cápita) | 2/2 | Complete    | 2026-07-12 |
 | 4. Interpretabilidad, Simulación y Robustez | 3/3 | Complete    | 2026-07-13 |
 | 5. Dashboard y Preparación de la Defensa | 5/5 | Complete    | 2026-07-14 |
-| 6. Modelo 2 — Productividad Agrícola (stretch) | 2/3 | In Progress|  |
+| 6. Modelo 2 — Productividad Agrícola (stretch) | 3/3 | Complete   | 2026-07-15 |

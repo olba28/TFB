@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 06
 current_phase_name: modelo-2-productividad-agr-cola-stretch
-status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-07-15T07:16:23.229Z"
+status: verifying
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-07-15T07:34:22.612Z"
 last_activity: 2026-07-15
 last_activity_desc: Phase 06 execution started
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 21
-  completed_plans: 20
-  percent: 83
+  completed_plans: 21
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 
 Phase: 06 (modelo-2-productividad-agr-cola-stretch) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-15 — Phase 06 execution started
 
 Progress: [██████████] 100%
@@ -79,6 +79,7 @@ Progress: [██████████] 100%
 | Phase 05 P05 | ~2h59min | 3 tasks | 9 files |
 | Phase 06 P01 | 6min | 2 tasks | 2 files |
 | Phase 06 P02 | 15min | 3 tasks | 2 files |
+| Phase 06 P03 | 9min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,8 @@ Recent decisions affecting current work:
 - [Phase 06-02]: Hausman-input FE fit and RandomEffects fit both use cov_type=unadjusted (classical covariances) for a valid Hausman chi2 approximation; the final serialized model uses whatever choose_cov_type selects from the Pesaran CD result
 - [Phase 06-02]: run_shap(panel_clean) is called with the full panel_clean (not the 39-country panel_m2) since shap_analysis performs its own complete-case dropna and the RF predictors have much broader real coverage than 2.3.1 alone
 - [Phase 06-02]: Live Model 2 Hausman test rejects H0 (p=0.0143), diverging from Model 1's non-rejection -- flagged for the memoria limitations section, not a degenerate/singular-matrix warning
+- [Phase 06-03]: active_model_name placed after dep_var/indep_var (or dep_var/feature_vars) in both cached loaders' signatures, matching the plan's specified parameter order
+- [Phase 06-03]: Updated test_app.py's pre-existing fake cached_bootstrap/cached_shap stand-ins to accept active_model_name -- without this, app.py's new call sites would raise a TypeError silently swallowed by each tab's existing try/except -> st.error, hiding a real signature mismatch behind a passing exception assertion
 
 ### Pending Todos
 
@@ -156,6 +159,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-15T07:16:23.216Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-07-15T07:34:22.598Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
