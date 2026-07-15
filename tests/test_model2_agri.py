@@ -69,6 +69,42 @@ def test_build_coverage_table_marks_included_iff_at_or_above_min_years():
     assert int(coverage.loc["B", "years_available"]) == 2
 
 
+def test_build_coverage_table_honors_non_default_min_years():
+    """WR-01 regression test (06-REVIEW.md): build_coverage_table must use
+    the passed min_years, not the hardcoded module-level MIN_YEARS constant
+    -- otherwise the model2_coverage table would disagree with a
+    build_model2_panel call using a non-default min_years."""
+    df = _make_sparse_m2_panel(
+        {
+            "A": [2000, 2001, 2002, 2003],  # 4 joint-non-null years
+            "B": [2000, 2001],  # 2
+        }
+    )
+
+    coverage = model2_agri.build_coverage_table(df, min_years=4).set_index("country_code")
+
+    assert bool(coverage.loc["A", "included"]) is True
+    assert bool(coverage.loc["B", "included"]) is False
+    # With the default min_years=3, A would still be included, but B's
+    # `reason` text must reflect the min_years actually passed (4), not the
+    # module-level default (3).
+    assert "excluido: <4 años observados" in coverage.loc["B", "reason"]
+
+
+def test_build_coverage_table_default_min_years_matches_build_model2_panel():
+    """Same min_years default (MIN_YEARS=3) as build_model2_panel, so calling
+    both with no explicit min_years stays mutually consistent (D-03)."""
+    df = _make_sparse_m2_panel({"A": [2000, 2001, 2002], "B": [2000, 2001]})
+
+    coverage = model2_agri.build_coverage_table(df).set_index("country_code")
+    filtered = model2_agri.build_model2_panel(df)
+
+    assert bool(coverage.loc["A", "included"]) is True
+    assert "A" in set(filtered["country_code"].unique())
+    assert bool(coverage.loc["B", "included"]) is False
+    assert "B" not in set(filtered["country_code"].unique())
+
+
 def test_build_coverage_table_excludes_countries_with_zero_dep_var_observations():
     """A country with NO 2.3.1 data at all must not appear in the coverage
     table -- it documents every country with ANY 2.3.1 data, not every

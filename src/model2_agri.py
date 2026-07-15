@@ -77,14 +77,23 @@ def build_model2_panel(panel_clean: pd.DataFrame, min_years: int = MIN_YEARS) ->
     return panel_base.filter_by_min_years(panel_clean, DEP_VAR, [INDEP_VAR], min_years)
 
 
-def build_coverage_table(panel_clean: pd.DataFrame) -> pd.DataFrame:
+def build_coverage_table(panel_clean: pd.DataFrame, min_years: int = MIN_YEARS) -> pd.DataFrame:
     """Model 2's dedicated coverage/exclusions table (D-03), same style as
     ``panel_exclusions``: one row for EVERY country with at least one
     non-null ``2.3.1`` observation (not every country in ``panel_clean``),
     with columns ``country_code``, ``years_available`` (count of years where
     BOTH ``2.3.1`` and ``6.4.2`` are simultaneously non-null),
-    ``included`` (bool, ``years_available >= MIN_YEARS``), and a
+    ``included`` (bool, ``years_available >= min_years``), and a
     human-readable ``reason``.
+
+    Accepts the SAME ``min_years`` parameter as ``build_model2_panel`` (fixed
+    06-REVIEW.md WR-01: previously this hardcoded the module-level
+    ``MIN_YEARS`` constant regardless of what ``build_model2_panel`` was
+    actually called with, so the ``model2_coverage`` table written by
+    ``write_coverage_table`` could silently disagree with which countries
+    appear in the fitted panel -- undermining the traceability the table
+    exists to provide, D-03). ``_main()`` threads the same ``min_years``
+    value through both calls.
 
     Indicator columns are coerced via ``pd.to_numeric(errors="coerce")``
     before the non-null test (matches ``filter_by_min_years``'s and
@@ -100,11 +109,11 @@ def build_coverage_table(panel_clean: pd.DataFrame) -> pd.DataFrame:
     years_available = all_nonnull.groupby(subset["country_code"]).sum()
     years_available = years_available.reindex(countries_with_dep, fill_value=0)
 
-    included = years_available >= MIN_YEARS
+    included = years_available >= min_years
     reason = included.map(
         {
-            True: f"incluido: >={MIN_YEARS} años observados",
-            False: f"excluido: <{MIN_YEARS} años observados con {INDEP_VAR} y {DEP_VAR}",
+            True: f"incluido: >={min_years} años observados",
+            False: f"excluido: <{min_years} años observados con {INDEP_VAR} y {DEP_VAR}",
         }
     )
 
@@ -296,8 +305,10 @@ def _main() -> None:
     engine = db.get_engine("data/panel.db")
     panel_clean = pd.read_sql("SELECT * FROM panel_clean", engine)
 
-    coverage_table = build_coverage_table(panel_clean)
-    panel_m2 = build_model2_panel(panel_clean)
+    # Both calls share the SAME min_years value (WR-01) -- keeps
+    # model2_coverage traceable to exactly which countries panel_m2 contains.
+    coverage_table = build_coverage_table(panel_clean, MIN_YEARS)
+    panel_m2 = build_model2_panel(panel_clean, MIN_YEARS)
 
     fitted, diagnostics = fit_model2(panel_m2)
     robustness = run_robustness_no_covid(
