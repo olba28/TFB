@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 6 — Modelo 2 — Productividad Agrícola (stretch)
-Plan: Not started
-Status: All Phase 5 plans (05-01..05-05) complete. Ready for phase-level goal verification.
-Last activity: 2026-07-14 — Completed quick task 260714-s4r: Generar docs/capitulos_3_4.md (capítulos 3 y 4 de la memoria)
+Plan: 3 plans ready (06-01, 06-02, 06-03), 3 waves
+Status: Planned and verified (plan-checker passed, requirements + decision coverage gates passed). Ready to execute.
+Last activity: 2026-07-15 — Planned Phase 6 (research skipped): filter_by_min_years helper, model2_agri.py pipeline, dashboard model selector.
 
 Progress: [██████████] 100%
 
