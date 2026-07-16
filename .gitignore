@@ -41,3 +41,8 @@ data/panel.db
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Herramientas internas de planificación/IA (no forman parte del entregable académico)
+.planning/
+.claude/
+.vs/
