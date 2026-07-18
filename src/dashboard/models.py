@@ -1,47 +1,9 @@
-"""Active-model registry for the Phase 5 dashboard (DASH-01, D-07).
-
-Every dashboard tab that needs to know which fitted model / predictor set to
-load does so by looking up :data:`ACTIVE_MODELS`, never by hardcoding a
-``dep_var``/``pkl_path`` literal inline. This mirrors the parametric-reuse
-philosophy already established by ``src/panel_base.py`` (D-05, Phase 3) and
-``src/simulate.py``/``src/interpret.py`` (D-12, Phase 4): those modules make
-every *function* dependent-variable-agnostic via explicit parameters; this
-registry makes every dashboard *component* model-agnostic via a single
-dict lookup instead.
-
-Why this exists (D-07): Phase 6 adds Model 2 (productividad agrícola,
-``dep_var="2.3.1"``) by appending one more entry to ``ACTIVE_MODELS`` -- it
-never needs to restructure ``src/dashboard/app.py`` or any tab-rendering
-code, because every tab already reads its ``dep_var``/``indep_var``/
-``feature_vars``/``pkl_path`` from this registry rather than from literals
-scattered through the app.
-
-Every ``pkl_path`` value here MUST point only to a local, project-produced
-artifact under ``data/modelos/`` (DASH-01) -- these are files serialized and
-round-trip-verified by earlier phases (Phase 3: ``model1_gdp.pkl``; Phase 4:
-``rf_shap_model.pkl``), never a network source and never a user upload. No
-``st.file_uploader`` for ``.pkl`` is introduced anywhere in this phase (see
-05-PLAN.md threat T-5-02).
-
-This module is pure configuration -- it imports nothing from ``streamlit``
-and must import cleanly under plain ``pytest`` with no Streamlit runtime.
-"""
-
 from __future__ import annotations
 
 from typing import TypedDict
 
 
 class ModelConfig(TypedDict):
-    """One :data:`ACTIVE_MODELS` entry's expected shape (06-REVIEW.md IN-02):
-    a plain ``dict[str, object]`` value type defeats static type checking on
-    the individual fields every call site (``app.py``, ``data.py``) accesses
-    by string key -- a typo in a key name (e.g. ``"indep_vars"`` instead of
-    ``"indep_var"``) would not be caught by Pylance in basic mode, only at
-    runtime via ``KeyError``. Matches the project's "type hints required for
-    all parameters" convention (CLAUDE.md).
-    """
-
     dep_var: str
     indep_var: str
     feature_vars: list[str]
@@ -65,14 +27,8 @@ ACTIVE_MODELS: dict[str, ModelConfig] = {
         ],
         "pkl_path": "data/modelos/model1_gdp.pkl",
         "rf_shap_pkl_path": "data/modelos/rf_shap_model.pkl",
-        # 06-REVIEW.md WR-02: data-driven flag so app.py's reduced-coverage
-        # caption is gated off this registry entry instead of brittle
-        # display-name string matching (ACTIVE_MODEL_NAME.startswith("Modelo 2")).
         "reduced_coverage": False,
     },
-    # Fase 6 (D-07): Modelo 2 (productividad agrícola), producido por
-    # src/model2_agri.py (06-02-SUMMARY.md) -- misma metodología, mismos
-    # feature_vars que Modelo 1, cobertura reducida a 39 países (D-01).
     "Modelo 2 (Productividad agrícola)": {
         "dep_var": "2.3.1",
         "indep_var": "6.4.2",

@@ -1,37 +1,3 @@
-"""Streamlit entry point for the Phase 5 dashboard (D-06, DASH-01, DASH-02,
-DASH-03). This module is the ONLY place in the project that imports
-``streamlit`` for rendering purposes -- it is deliberately kept to
-layout/orchestration only, calling into the cached data layer
-(:mod:`src.dashboard.data`), the pure Plotly figure builders
-(:mod:`src.dashboard.plots`), and the active-model registry
-(:mod:`src.dashboard.models`) rather than doing SQL/pickle I/O or figure
-math itself (05-PATTERNS.md, D-06 controller-separation).
-
-Single-page, four-tab layout (D-06): "Mapa e indicadores" (D-02's
-side-by-side choropleth comparison), "Modelo 1", "Simulación", and
-"Interpretabilidad (SHAP)". ``st.tabs`` is used instead of a multipage app
-so all four sections share Streamlit's cache/session state without
-``st.session_state`` bookkeeping (D-06).
-
-DASH-01: this module reads ONLY local artifacts through
-:mod:`src.dashboard.data` (``data/panel.db``, ``data/modelos/*.pkl``) --
-never the UN SDG API. ``tests/dashboard/test_no_live_api.py`` statically
-enforces the absence of ``requests``/``httpx``/``src.ingesta`` anywhere
-under ``src/dashboard/``.
-
-"Modelo 1" reads the coefficient/diagnostic table straight from the
-deserialized ``PanelEffectsResults`` (``model1_gdp.pkl``, no reajuste).
-"Simulación" and "Interpretabilidad (SHAP)" call D-03's cached live-recompute
-wrappers (``data.cached_bootstrap``/``data.cached_shap``) -- the bootstrap
-counterfactual and SHAP analysis are recomputed inside the dashboard, never
-precomputed to a dedicated artifact, but always through
-:mod:`src.dashboard.data`'s ``st.cache_data``/``st.cache_resource`` split so
-repeat interactions never re-read ``panel.db``/re-run the computation
-(DASH-02). The SHAP tab computes the Phase-2 VIF/correlation caveat via
-``interpret.compute_vif_table`` BEFORE the SHAP summary plot, matching
-INTERP-04's precedence requirement.
-"""
-
 from __future__ import annotations
 
 import time
@@ -47,10 +13,6 @@ from src.dashboard import data, models, plots
 
 st.set_page_config(layout="wide")
 
-# Cold-start timing readout (Claude's Discretion, DASH-02) -- logs elapsed
-# wall-clock time since the FIRST script execution to a sidebar caption, per
-# 05-RESEARCH.md's Code Examples section. ``st.session_state`` survives
-# reruns within the same browser session, so this only logs once.
 if "app_start_time" not in st.session_state:
     st.session_state["app_start_time"] = time.perf_counter()
     st.session_state["cold_start_logged"] = False
@@ -64,9 +26,6 @@ ARTIFACT_ERROR_MSG = (
     "ingesta (Fase 1) y de modelado (Fase 3/4) antes de abrir el dashboard."
 )
 
-# Top-level artifact load (D-06 shared across all 4 tabs): a broken/missing
-# panel.db must show a clear next-step message instead of a raw traceback in
-# front of the tribunal (UI-SPEC Copywriting Contract, Error state).
 try:
     engine = data.get_engine()
     df = data.load_panel_clean(engine)
@@ -83,17 +42,6 @@ ACTIVE_MODEL = models.ACTIVE_MODELS[ACTIVE_MODEL_NAME]
 
 
 def _model2_coverage_caption() -> str:
-    """Build the reduced-coverage caption with country counts computed at
-    runtime (06-REVIEW.md WR-03) rather than hardcoded literals that could
-    silently drift out of sync with the actual data (e.g. after a UN SDG API
-    refresh regenerates ``panel_clean``). Model 1's count reuses
-    ``panel_base.filter_by_exclusions`` (the same function Model 1's own
-    exclusion pipeline calls); Model 2's count reuses
-    ``panel_base.filter_by_min_years`` (the same function
-    ``model2_agri.build_model2_panel`` calls) -- both against ``df``/
-    ``panel_exclusions``, already loaded/cached, so no extra DB query is
-    introduced beyond the existing ``st.cache_data`` loaders.
-    """
     model1_cfg = models.ACTIVE_MODELS["Modelo 1 (PIB per cápita)"]
     model2_cfg = models.ACTIVE_MODELS["Modelo 2 (Productividad agrícola)"]
 
@@ -116,21 +64,11 @@ def _model2_coverage_caption() -> str:
     )
 
 
-# Gated off the registry's "reduced_coverage" flag (06-REVIEW.md WR-02), not
-# brittle display-name string matching
-# (ACTIVE_MODEL_NAME.startswith("Modelo 2")) -- computed once here, referenced
-# identically across all 4 tabs below. If the display name in models.py is
-# ever edited/translated, this caption keeps appearing correctly because it
-# no longer depends on the human-readable string at all.
 MODEL2_COVERAGE_CAPTION: str | None = None
 if ACTIVE_MODEL["reduced_coverage"]:
     try:
         MODEL2_COVERAGE_CAPTION = _model2_coverage_caption()
     except Exception:
-        # Fall back to a count-free caption rather than crashing the whole
-        # app if the runtime count computation itself fails for some reason
-        # (e.g. an unexpected panel_exclusions schema) -- still communicates
-        # the reduced-coverage caveat to the tribunal (D-08).
         MODEL2_COVERAGE_CAPTION = (
             "Modelo 2 (productividad agrícola, indicador 2.3.1): muestra reducida "
             "frente al Modelo 1 -- ver tabla de cobertura/exclusiones del Modelo 2, "
@@ -146,17 +84,11 @@ tab_mapa, tab_modelo1, tab_simulacion, tab_shap = st.tabs(
     ["Mapa e indicadores", "Modelo 1", "Simulación", "Interpretabilidad (SHAP)"]
 )
 
-# --- Tab 1: Mapa e indicadores (DASH-03/D-02) -------------------------------
 with tab_mapa:
     if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
     st.subheader("Comparación de indicadores")
 
-    # D-01: the mappable layers are the 5 raw ODS indicators plus the active
-    # model's fitted values (a country-year scalar, joinable onto the panel
-    # like any other indicator column). The simulation/SHAP layers (D-01
-    # layers 3-4) are not a single scalar per country-year and are surfaced
-    # in their own tabs below instead of on this map.
     map_options: dict[str, str] = dict(models.INDICATOR_LABELS)
     map_df = df
     fitted_col = "_modelo_valores_ajustados"
@@ -207,7 +139,6 @@ with tab_mapa:
         )
         st.caption(NO_DATA_CAPTION)
 
-# --- Tab 2: Modelo 1 ---------------------------------------------------------
 with tab_modelo1:
     if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
@@ -232,7 +163,6 @@ with tab_modelo1:
     except Exception:
         st.error(ARTIFACT_ERROR_MSG)
 
-# --- Tab 3: Simulación (D-03) -------------------------------------------------
 with tab_simulacion:
     if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
@@ -272,7 +202,6 @@ with tab_simulacion:
     except Exception:
         st.error(ARTIFACT_ERROR_MSG)
 
-# --- Tab 4: Interpretabilidad (SHAP) (D-03, INTERP-04) ------------------------
 with tab_shap:
     if MODEL2_COVERAGE_CAPTION:
         st.caption(MODEL2_COVERAGE_CAPTION)
@@ -308,7 +237,6 @@ with tab_shap:
     except Exception:
         st.error(ARTIFACT_ERROR_MSG)
 
-# Cold-start timing readout, logged once after the first full render.
 if not st.session_state["cold_start_logged"]:
     elapsed = time.perf_counter() - st.session_state["app_start_time"]
     st.sidebar.caption(f"Carga en frío: {elapsed:.2f}s")

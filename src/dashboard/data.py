@@ -1,34 +1,3 @@
-"""Cached data-access layer for the Phase 5 Streamlit dashboard (DASH-01,
-DASH-02, D-03, D-04).
-
-Streamlit re-executes the WHOLE script top-to-bottom on every widget
-interaction (05-RESEARCH.md architecture diagram) -- without correctly
-wrapping every heavy load/compute in ``st.cache_resource``/``st.cache_data``,
-each click would reopen the SQLite engine, re-deserialize a pickled model, or
-re-run the bootstrap/SHAP computation, freezing the live demo (DASH-02). The
-split follows Streamlit's own distinction: ``st.cache_resource`` for objects
-that are shared/non-copyable (the SQLAlchemy ``Engine``, a fitted
-``PanelEffectsResults``/``RandomForestRegressor``) and ``st.cache_data`` for
-results that can be safely copied (DataFrames, bootstrap effect arrays, SHAP
-values) -- 05-RESEARCH.md Pattern 1, Pitfall 1.
-
-This module also enforces DASH-01: it reads ONLY local artifacts --
-``data/panel.db`` (via ``src.db.get_engine``, reused unmodified) and local
-``.pkl`` files under ``data/modelos/`` -- and imports neither
-``requests``/``httpx`` nor ``src.ingesta``. There is no live call to the UN
-SDG API anywhere in this module.
-
-``cached_bootstrap``/``cached_shap`` implement D-03: the bootstrap
-counterfactual and SHAP analysis are recomputed live inside the dashboard
-(never precomputed to a dedicated artifact) but their heavy inputs (Engine,
-fitted model) are always loaded internally via the ``st.cache_resource``
-loaders above -- never accepted as a hashed function argument
-(05-RESEARCH.md Pattern 5 / Pitfall 2).
-
-No cache here uses a ``ttl`` (D-04) -- caches are permanent for the lifetime
-of the demo session; there is no manual reload button.
-"""
-
 from __future__ import annotations
 
 import pickle
@@ -45,25 +14,11 @@ from src.dashboard import models
 
 @st.cache_resource
 def get_engine() -> Engine:
-    """Return the shared SQLAlchemy Engine bound to ``data/panel.db``.
-
-    Wrapped in ``st.cache_resource`` (not ``st.cache_data``) because an
-    Engine is a shared, non-copyable resource (05-RESEARCH.md Pitfall 1).
-    Calls ``src.db.get_engine`` directly rather than reimplementing the
-    connection (05-PATTERNS.md).
-    """
     return db.get_engine("data/panel.db")
 
 
 @st.cache_data
 def load_panel_clean(_engine: Engine) -> pd.DataFrame:
-    """Load the full ``panel_clean`` table.
-
-    The table name is a fixed string literal -- never built from a widget
-    value (mirrors ``src/db.py``'s parameterized-SQL discipline, T-5-01).
-    ``_engine`` is prefixed with an underscore so Streamlit excludes the
-    non-hashable Engine from the cache key (05-RESEARCH.md Pitfall 2).
-    """
     frame = pd.read_sql("SELECT * FROM panel_clean", _engine)
     if frame.empty:
         warnings.warn(
@@ -76,24 +31,11 @@ def load_panel_clean(_engine: Engine) -> pd.DataFrame:
 
 @st.cache_data
 def load_panel_exclusions(_engine: Engine) -> pd.DataFrame:
-    """Load the full ``panel_exclusions`` table.
-
-    Same fixed-literal-table-name and underscore-prefix rationale as
-    ``load_panel_clean`` (T-5-01, 05-RESEARCH.md Pitfall 2).
-    """
     return pd.read_sql("SELECT * FROM panel_exclusions", _engine)
 
 
 @st.cache_resource
 def load_model(pkl_path: str) -> Any:
-    """Deserialize a project-produced ``.pkl`` model artifact.
-
-    Loads ONLY local, project-produced artifacts under ``data/modelos/``
-    (T-5-02) -- no ``st.file_uploader`` for ``.pkl`` exists anywhere in this
-    phase. MUST be run from the project's ``.venv`` interpreter so
-    ``linearmodels``/``scikit-learn`` classes deserialize correctly
-    (05-RESEARCH.md Pitfall 6).
-    """
     with open(pkl_path, "rb") as f:
         return pickle.load(f)
 
@@ -107,63 +49,10 @@ def cached_bootstrap(
     n_replicas: int = 8,
     seed: int = 42,
 ) -> dict:
-    """Cached live recompute of the bootstrap counterfactual (D-03).
-
-    Loads its heavy inputs (Engine, fitted model results) internally via
-    ``get_engine``/``load_model`` -- both ``st.cache_resource`` -- rather
-    than receiving them as arguments, so no non-hashable object ever enters
-    this function's cache key (05-RESEARCH.md Pattern 5 / Pitfall 2).
-    ``reduction_pcts`` is a ``tuple`` (hashable) and is converted to a
-    ``list`` before delegating to ``simulate.bootstrap_counterfactual``,
-    which is called unmodified (D-03).
-
-    ``active_model_name`` (Phase 6, D-07) is the plain ``str`` key of the
-    dashboard sidebar's currently-selected model in
-    ``models.ACTIVE_MODELS`` -- it is what makes the D-07 sidebar selector
-    actually change which fitted-model artifact gets loaded here, replacing
-    the previous behavior of silently always loading Model 1 regardless of
-    the sidebar selection (06-PATTERNS.md). It stays a plain ``str``, which
-    is hashable and therefore safe for ``st.cache_data``'s cache-key
-    requirement (never the Engine/fitted-model object itself).
-
-    Before resampling, ``df`` is restricted to the exact country set
-    ``fitted`` was actually fit on (derived from
-    ``fitted.fitted_values.index.get_level_values("country_code")``) --
-    mirrors ``model2_agri.run_bootstrap``'s use of the pre-filtered
-    ``panel_m2``, generically for any active model, so Model 2's 39-country
-    coverage-filtered fit (D-01/D-02) is never silently bootstrapped/
-    extrapolated against the full ~171-215-country panel (06-REVIEW.md
-    CR-01).
-
-    ``n_replicas`` defaults to 8 here -- much smaller than ``simulate.py``'s
-    own production default of 1000 -- purely as a demo-runtime knob to keep
-    the first cold compute inside the <5s demo budget (DASH-02); the
-    underlying bootstrap methodology in ``simulate.py`` is unchanged (each
-    replica still independently resamples entities and refits a real
-    ``PanelOLS`` model -- D-01/D-12 -- just fewer of them).
-
-    History (05-05 live rehearsal, three rounds of measurement): 200
-    replicas measured ~15s; the first drop to 50 alone did not move the
-    *total* cold-start figure because Streamlit executes every tab body on
-    every rerun -- the SHAP tab's live RF refit (fixed separately -- see
-    ``cached_shap``) was masking the improvement. With SHAP fixed
-    separately, 50 replicas in isolation measured ~14.4s (~0.29s/replica,
-    each an independent ``fit_panel_model`` call -- there is no pre-fit
-    shortcut for bootstrap the way ``cached_shap`` has one, since refitting
-    per resampled draw IS the methodology). 8 replicas (~2.3s) is the
-    result of that per-replica cost against the remaining <5s budget after
-    ``cached_shap``'s ~2.25s and the rest of the app's ~0.25s.
-    """
     engine = get_engine()
     df = load_panel_clean(engine)
     fitted = load_model(models.ACTIVE_MODELS[active_model_name]["pkl_path"])
 
-    # Restrict resampling to the exact entity set the model was fit on --
-    # mirrors model2_agri.run_bootstrap's use of the pre-filtered panel_m2,
-    # generically for any active model (D-01/D-02 scope-of-validity). Without
-    # this, the live bootstrap would resample from the FULL, unfiltered panel
-    # (~171-215 countries) even for Model 2's 39-country coverage-filtered
-    # fit -- silently out-of-sample-extrapolating (06-REVIEW.md CR-01).
     fitted_entities = fitted.fitted_values.index.get_level_values("country_code").unique()
     df = df[df["country_code"].isin(fitted_entities)]
 
@@ -185,52 +74,6 @@ def cached_shap(
     active_model_name: str,
     explain_sample_size: int = 20,
 ) -> tuple[Any, Any, pd.DataFrame, Any]:
-    """Cached live recompute of the SHAP analysis (D-03).
-
-    Loads the Engine/panel data internally via ``get_engine``/
-    ``load_panel_clean`` rather than receiving them as arguments (same
-    rationale as ``cached_bootstrap``). ``feature_vars`` is a ``tuple``
-    (hashable), converted to a ``list`` before delegating to
-    ``interpret.shap_analysis``.
-
-    ``active_model_name`` (Phase 6, D-07) is the plain ``str`` key of the
-    dashboard sidebar's currently-selected model in
-    ``models.ACTIVE_MODELS`` -- it is what makes the D-07 sidebar selector
-    actually change which RandomForest/SHAP artifact gets loaded here,
-    replacing the previous behavior of silently always loading Model 1's
-    RF regardless of the sidebar selection (06-PATTERNS.md).
-
-    Three demo-runtime knobs keep this inside the <5s cold-start budget
-    (DASH-02), all live-measured during the 05-05 rehearsal:
-
-    1. ``rf=load_model(rf_shap_pkl_path)`` -- loads the archived, already-
-       fitted RandomForest (``data/modelos/rf_shap_model.pkl``, D-08)
-       instead of refitting live. Refitting alone measured ~4.2s by itself
-       -- already most of the budget before any SHAP computation -- whereas
-       ``load_model`` (``st.cache_resource``) deserializes the pickle in
-       ~0.1s. This is the SAME fitted model either way (D-08's own
-       round-trip contract); only *where* it comes from differs, exactly
-       mirroring how ``cached_bootstrap`` loads Model 1 from
-       ``model1_gdp.pkl`` rather than re-fitting it.
-    2. ``check_additivity=False`` -- see ``interpret.shap_analysis``
-       docstring; 04-RESEARCH.md Pitfall #4 measured ~355s for the full
-       check at this project's scale.
-    3. ``explain_sample_size=20`` -- explain a 20-row sample rather than all
-       ~3,500 complete-case rows; live-measured at ~0.1s/row, so the full
-       set would cost ~5-6s by itself even with the pre-fit ``rf`` and
-       ``check_additivity=False``. The fitted RF and the SHAP values
-       themselves are exact either way -- sampling only changes how many
-       rows the live summary plot shows. The Plan-B screenshots
-       (figuras/plan_b/) are the full-fidelity reference.
-
-    ``interpret.shap_analysis``'s own defaults (``rf=None``,
-    ``check_additivity=True``, ``explain_sample_size=None``) are untouched,
-    so the Phase-4 notebook keeps the full fit + full check + full sample.
-
-    ``interpret.shap_analysis`` already fixes its random seed (REPRO-02), so
-    the cached result is deterministic within a session -- no ``ttl`` is
-    needed here (D-04).
-    """
     engine = get_engine()
     df = load_panel_clean(engine)
     rf = load_model(models.ACTIVE_MODELS[active_model_name]["rf_shap_pkl_path"])
