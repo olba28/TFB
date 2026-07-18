@@ -1,5 +1,0 @@
-# === Dependencias de desarrollo (solo tests) — TFB ===
-# No instalar en producción; solo para ejecutar la suite de tests localmente/CI.
-
-pytest>=8
-pytest-cov>=5
