@@ -1,28 +1,3 @@
-"""Standalone reproducibility-proof script for REPRO-02 (04-03-PLAN.md Task 3).
-
-Not a pytest test: executing the full notebook end-to-end costs ~25-30
-minutes per run (04-RESEARCH.md Open Questions Q2, live-measured) -- far too
-slow for the routine `pytest tests/ -q` suite (10s feedback-latency budget,
-04-VALIDATION.md). This script instead runs
-`jupyter nbconvert --to notebook --execute` on the committed notebook TWICE,
-independently, and asserts the resulting reproducibility snapshot (bootstrap
-CIs, excluded-country lists, RF feature importances/oob_score_, SHAP values
-array) is bit-identical (`np.array_equal`, never `pytest.approx`) between the
-two runs.
-
-Each execution writes its snapshot to the SAME fixed path
-(`data/modelos/_repro_snapshot.pkl`, gitignored via `*.pkl`) -- this script
-reads that file immediately after each run, before the next run overwrites
-it.
-
-Neither throwaway notebook copy executed by this script is committed to git;
-only the already-executed `notebook/4_1_interpretabilidad_simulacion.ipynb`
-(Task 1/2 output) and this script are checked in.
-
-Usage:
-    .venv/Scripts/python.exe scripts/verify_repro02.py
-"""
-
 from __future__ import annotations
 
 import pickle
@@ -41,19 +16,6 @@ PYTHON = sys.executable
 
 
 def run_notebook_and_capture_snapshot(run_label: str) -> dict:
-    """Copy the committed notebook to a throwaway temp path INSIDE
-    ``notebook/`` and execute it there.
-
-    ``nbconvert``'s ``ExecutePreprocessor`` derives the kernel's working
-    directory from the INPUT notebook's own directory (live-verified against
-    this project's nbconvert install; NOT from ``--output-dir`` or the
-    shell's cwd when invoking the command). Keeping the throwaway copy
-    inside ``notebook/`` preserves the committed notebook's own
-    ``PROJECT_ROOT = Path.cwd().parent if Path.cwd().name == "notebook"
-    else Path.cwd()`` bootstrap cell unmodified -- executing the same copy
-    from a directory named anything other than ``notebook`` would silently
-    break that bootstrap logic.
-    """
     temp_notebook = NOTEBOOK_DIR / f"_verify_repro02_{run_label}.ipynb"
     shutil.copy(COMMITTED_NOTEBOOK, temp_notebook)
     print(f"[{run_label}] executing throwaway copy: {temp_notebook.name} ...")
@@ -90,10 +52,6 @@ def run_notebook_and_capture_snapshot(run_label: str) -> dict:
 
 
 def compare_snapshots(run_a: dict, run_b: dict) -> list[str]:
-    """Return a list of human-readable mismatch descriptions (empty list if
-    bit-identical). Uses ``np.array_equal`` (exact), never
-    ``pytest.approx``/``np.allclose`` -- REPRO-02 requires bit-identical
-    results, not merely "close"."""
     mismatches: list[str] = []
 
     scenarios_a, scenarios_b = run_a["scenarios"], run_b["scenarios"]

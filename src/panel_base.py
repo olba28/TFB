@@ -1,22 +1,3 @@
-"""Parametric panel-regression module shared, unmodified, by Model 1
-(Phase 3, dep_var="8.1.1") and Model 2 (Phase 6, dep_var="2.3.1") -- D-05
-(03-CONTEXT.md). Every function is dependent-variable-agnostic.
-
-Country-level exclusion semantics (D-01/D-02): a country is either fully
-included or fully excluded from a given (dep_var, indep_vars) specification
--- never row-filtered per year ("panel balanceado respecto a las variables
-del modelo, no fila a fila"). ``fit_panel_model`` does NOT apply this filter
-itself -- callers pass an already-filtered DataFrame via
-``filter_by_exclusions``, keeping the fit function a thin, single-
-responsibility wrapper reusable across specifications.
-
-Hausman and Pesaran cross-sectional-dependence tests are implemented
-manually here -- neither ``linearmodels`` nor ``statsmodels`` provides them
-(03-RESEARCH.md Finding 2, verified by searching both packages' installed
-source for "hausman"/"pesaran": the only hits are an unrelated IV-context
-Hausman test and an unrelated Pesaran-Shin-Smith cointegration test).
-"""
-
 from __future__ import annotations
 
 import warnings
@@ -39,15 +20,6 @@ def filter_by_exclusions(
     dep_var: str,
     indep_vars: list[str],
 ) -> pd.DataFrame:
-    """Drop a country's ENTIRE row set if it fails the 70%-coverage
-    threshold on ``dep_var`` OR any of ``indep_vars`` (D-01/D-02) -- a
-    country either fully survives (all its rows kept) or is fully dropped
-    (zero rows), never partially filtered row-by-row.
-
-    ``df`` must still contain a plain ``country_code`` column (not yet
-    indexed) -- indexing into the ``(entity, time)`` MultiIndex happens
-    inside ``fit_panel_model``/``compare_specifications``, not here.
-    """
     variables = [dep_var, *indep_vars]
     excluded_countries = set(
         exclusions.loc[exclusions["indicator_code"].isin(variables), "country_code"]
@@ -61,30 +33,6 @@ def filter_by_min_years(
     indep_vars: list[str],
     min_years: int = 3,
 ) -> pd.DataFrame:
-    """Model 2's own coverage criterion (D-01/D-02, 06-CONTEXT.md): keep a
-    country only if it has at least ``min_years`` years with ALL of
-    ``[dep_var, *indep_vars]`` simultaneously non-null. ``min_years=3`` is
-    deliberately NOT the 70%-of-years rule of ``filter_by_exclusions`` --
-    indicator ``2.3.1`` is reported in ~3-year waves, so its max real
-    coverage (26%) never clears a 70% threshold and would leave the Model 2
-    panel at zero countries.
-
-    Computed directly on the passed ``panel_clean``-shaped ``df`` via
-    ``country_code`` grouping -- it never reads or wraps the
-    ``panel_exclusions`` table (fixed to the 70% criterion) nor
-    ``filter_by_exclusions``. The two coverage criteria coexist as separate,
-    explicit functions in this module (D-02): Model 1 keeps using
-    ``filter_by_exclusions``, Model 2 uses this function, and neither calls
-    the other.
-
-    Same country-level exclusion semantics as ``filter_by_exclusions``: a
-    country either fully survives (all its rows kept) or is fully dropped
-    (zero rows) -- never partially filtered row-by-row.
-
-    Pure function: no file/DB I/O, no ``warnings.warn`` -- unlike Hausman/
-    Pesaran, this is deterministic bookkeeping, not a numerically-degenerate
-    statistic.
-    """
     variables = [dep_var, *indep_vars]
     numeric = df[variables].apply(pd.to_numeric, errors="coerce")
     all_nonnull = numeric.notna().all(axis=1)
@@ -94,12 +42,6 @@ def filter_by_min_years(
 
 
 def _build_panel_index(df: pd.DataFrame, dep_var: str, indep_vars: list[str]) -> pd.DataFrame:
-    """Build the ``(country_code, year)`` MultiIndex and defensively coerce
-    the model's dependent/independent columns to numeric (03-RESEARCH.md
-    Finding 3 -- a ``LIMIT``-sampled dtype check can mislead; always coerce
-    the columns actually used by the model regardless of the DataFrame's
-    reported dtype).
-    """
     indexed = df.set_index(["country_code", "year"]).copy()
     for column in [dep_var, *indep_vars]:
         indexed[column] = pd.to_numeric(indexed[column], errors="coerce")
@@ -115,19 +57,8 @@ def fit_panel_model(
     cov_type: str = "clustered",
     **cov_config: Any,
 ) -> PanelEffectsResults:
-    """The D-05-mandated public entry point: a thin wrapper around
-    ``PanelOLS(...).fit(...)``. Does NOT call ``filter_by_exclusions``
-    internally -- the caller is responsible for passing an already-filtered
-    ``df`` (keeps this function testable independently of the exclusion
-    logic, and reusable by Model 2 with a completely different exclusion
-    set if ever needed).
-    """
     indexed = _build_panel_index(df, dep_var, indep_vars)
     if cov_type == "clustered" and not cov_config:
-        # linearmodels silently degrades an unconfigured "clustered" covariance
-        # to a per-observation (i.e. plain "robust"/White) covariance -- make
-        # the entity-clustering intent implied by the parameter name explicit
-        # rather than relying on that fallback (see 03-REVIEW.md CR-01).
         cov_config = {"cluster_entity": True}
     model = PanelOLS(
         indexed[dep_var],
@@ -143,22 +74,9 @@ def compare_specifications(
     dep_var: str,
     indep_vars: list[str],
 ) -> PanelModelComparison:
-    """Fit ``PooledOLS``, ``RandomEffects``, and two-way-effects ``PanelOLS``
-    on the same ``(dep_var, indep_vars)`` (all with ``cov_type="unadjusted"``
-    -- comparison is about coefficient/R-squared differences across
-    estimators, not SE methodology, which is ``fit_panel_model``'s own
-    concern) and return ``linearmodels.panel.compare(...)``'s side-by-side
-    comparison table (03-RESEARCH.md Finding 1 -- verified live, directly
-    embeddable).
-    """
     indexed = _build_panel_index(df, dep_var, indep_vars)
     dependent = indexed[dep_var]
     exog = indexed[indep_vars]
-    # PooledOLS performs no demeaning at all (unlike RandomEffects's
-    # quasi-demeaning or PanelOLS's exact two-way demeaning), so without an
-    # explicit constant the pooled regression is forced through the origin --
-    # add one for both Pooled and RE, for symmetry, leaving PanelOLS unchanged
-    # (its two-way effects already absorb any level shift).
     exog_with_const = exog.assign(const=1.0)
 
     pooled_res = PooledOLS(dependent, exog_with_const).fit(cov_type="unadjusted")
@@ -174,20 +92,6 @@ def hausman_test(
     fe_results: PanelEffectsResults,
     re_results: RandomEffectsResults,
 ) -> dict[str, float]:
-    """Manual FE-vs-RE Hausman test (03-RESEARCH.md Finding 2 -- neither
-    ``linearmodels`` nor ``statsmodels`` provides this test for panel data).
-
-    Restricted to ``fe_results.params.index`` -- FE has no intercept, so this
-    is exactly the regressor set common to both FE and RE (do NOT use RE's
-    ``params.index``, which would include a ``const`` entry FE lacks whenever
-    RE/Pooled are fit with an explicit constant column).
-
-    ``H = (b_FE - b_RE)' [Var(b_FE) - Var(b_RE)]^-1 (b_FE - b_RE) ~ chi2(k)``
-
-    Falls back to ``numpy.linalg.pinv`` (with an explicit warning) if
-    ``var_diff`` is singular -- a documented, known small-sample pathology of
-    this test, not a bug to hide.
-    """
     common = fe_results.params.index
     diff = fe_results.params[common].values - re_results.params[common].values
     var_diff = (
@@ -222,23 +126,7 @@ def hausman_test(
 
 
 def pesaran_cd_test(residuals: pd.Series) -> dict[str, float]:
-    """Manual Pesaran cross-sectional-dependence test (03-RESEARCH.md
-    Finding 2 -- neither ``linearmodels`` nor ``statsmodels`` provides this).
-
-    ``residuals`` must carry a ``(entity, time)`` MultiIndex (e.g.
-    ``fe_results.resids``, directly usable without transformation).
-    ``unstack(level=0)`` unstacks the OUTER index level (``entity``, given
-    the ``(country_code, year)`` MultiIndex ``fit_panel_model`` builds),
-    producing a (time x entity) wide frame -- verified against a
-    hand-computable 3-entity fixture.
-
-    ``CD = sqrt(2/(N(N-1))) * sum_{i<j} sqrt(T_ij) * rho_hat_ij ~ N(0,1)``
-
-    Handles unbalanced panels natively via per-pair ``.dropna()`` -- included
-    countries can still have individually-missing years within their
-    qualifying span even after D-02's country-level exclusion.
-    """
-    wide = residuals.unstack(level=0)  # index=time, columns=entity
+    wide = residuals.unstack(level=0)
     n_entities = wide.shape[1]
     if n_entities < 2:
         raise ValueError(
@@ -264,14 +152,6 @@ def choose_cov_type(
     pesaran_result: dict[str, float],
     alpha: float = 0.05,
 ) -> tuple[str, dict[str, Any]]:
-    """Pure decision rule (Claude's Discretion, 03-CONTEXT.md): returns
-    ``("kernel", {"kernel": "bartlett"})`` (Driscoll-Kraay) if the Pesaran
-    test rejects H0 of no cross-sectional dependence
-    (``pesaran_result["pvalue"] < alpha``), else
-    ``("clustered", {"cluster_entity": True})``. The returned tuple's second
-    element is the exact ``**cov_config`` to splat into
-    ``fit_panel_model(..., cov_type=result[0], **result[1])``.
-    """
     if pesaran_result["pvalue"] < alpha:
         return "kernel", {"kernel": "bartlett"}
     return "clustered", {"cluster_entity": True}

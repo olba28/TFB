@@ -1,31 +1,12 @@
-"""Coverage filter, exclusion table, and idempotent clean-panel build (PANEL-01, PANEL-02).
-
-``panel_clean`` is a faithful, unmodified pivot of ``raw_observations`` (plus
-``country_reference`` columns joined in) -- it is always fully regenerated
-from source, never hand-edited, mirroring ``db.rebuild_panel``'s established
-convention. Coverage/exclusion status against the 70%-of-years threshold is
-computed and documented ENTIRELY in the separate ``panel_exclusions`` table;
-``panel_clean`` never nulls or otherwise alters a real, already-reported
-value based on that status (see 02-01-PLAN.md's Review Notes, fix #3, for
-the rationale -- destroying real data would make Phase 3's robustness-check
-requirement, MODEL1-05, impossible on the excluded subsample).
-
-All reads/writes use ``pandas.read_sql``/``to_sql`` with fixed table names --
-no table or column name is ever built from external input (Security V5,
-mirrors ``src/db.py``'s existing pattern).
-"""
-
 from __future__ import annotations
 
 import pandas as pd
 from sqlalchemy import Engine
 
-# Same fixed indicator list `fetch_data.py` already establishes -- copied as a
-# literal constant (not imported) to keep this module standalone.
 INDICATOR_CODES: list[str] = ["6.4.2", "6.4.1", "8.1.1", "8.2.1", "2.3.1"]
 
-TOTAL_YEARS = 23  # 2000-2022 inclusive
-YEARS_REQUIRED = 17  # 23 * 0.70 = 16.1 -> 17 (02-RESEARCH.md Finding 4)
+TOTAL_YEARS = 23
+YEARS_REQUIRED = 17
 
 REFERENCE_COLUMNS = ["region", "subregion", "is_ldc", "is_lldc", "is_sids"]
 
@@ -35,10 +16,6 @@ def compute_coverage(
     country_reference: pd.DataFrame,
     indicator_codes: list[str] | None = None,
 ) -> pd.DataFrame:
-    """Return one row for EVERY (country_code, indicator_code) pair in the
-    full cross-product of country_reference's countries x indicator_codes --
-    including pairs with ZERO rows in raw_observations at all (years_available=0).
-    """
     if indicator_codes is None:
         indicator_codes = INDICATOR_CODES
 
@@ -62,10 +39,6 @@ def compute_coverage(
 
 
 def build_exclusion_table(coverage: pd.DataFrame) -> pd.DataFrame:
-    """Filter compute_coverage's output to excluded==True rows, with a
-    `reason` column distinguishing "no data at all" from "some data, still
-    below the 70% threshold" -- both are the same underlying rule, the
-    finer-grained string is purely for documentation clarity (PANEL-02)."""
     excluded = coverage[coverage["excluded"]].copy()
     excluded["reason"] = excluded["years_available"].apply(
         lambda n: "no_data_reported" if n == 0 else "coverage_below_70pct_threshold"
@@ -76,11 +49,6 @@ def build_exclusion_table(coverage: pd.DataFrame) -> pd.DataFrame:
 def build_clean_panel(
     raw_observations: pd.DataFrame, country_reference: pd.DataFrame
 ) -> pd.DataFrame:
-    """Pivot raw_observations exactly as db.rebuild_panel does, join
-    country_reference columns in, and NEVER modify a value based on coverage
-    status. Sorted by (country_code, year) with a fixed column order so
-    rebuild_clean_panel is idempotent regardless of run-to-run row order.
-    """
     wide = raw_observations.pivot(
         index=["country_code", "year"], columns="indicator_code", values="value"
     )
@@ -100,10 +68,6 @@ def build_clean_panel(
 
 
 def rebuild_clean_panel(engine: Engine) -> None:
-    """Read raw_observations + country_reference fresh from `engine`, compute
-    coverage/exclusions/clean-panel, and write panel_clean + panel_exclusions
-    back (`if_exists="replace"` -- always fully regenerated, never appended).
-    """
     raw_observations = pd.read_sql("SELECT * FROM raw_observations", engine)
     country_reference = pd.read_sql("SELECT * FROM country_reference", engine)
 
@@ -116,7 +80,6 @@ def rebuild_clean_panel(engine: Engine) -> None:
 
 
 def _main() -> None:
-    """CLI entry: `python -m src.panel_build`."""
     from src import db
 
     engine = db.get_engine()
